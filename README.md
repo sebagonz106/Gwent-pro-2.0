@@ -1,6 +1,10 @@
 # Cuba at war: 1958 (Gwent-Pro)
 Card game for the first-year Programming project in Computer Science 2024. The project rules and requirements are outlined in the gwent-pro.pdf file. The chosen theme was the Cuban Revolutionary War of 1956-1959, which led to the downfall of the Batista dictatorship. The game’s graphical interface was created in Unity. Upon completion of the deadline, the game will also be uploaded as a .exe and .apk file. I hope you find my work enjoyable!
-First steps: https://github.com/sebagonz106/1958-Gwent-pro-
+
+## First steps: 
+1. https://github.com/sebagonz106/1958-Gwent-pro-
+2. https://github.com/sebagonz106/Gwent-pro
+*I am sorry about the mess, i'm learning in the process :')
 
 ## Overall description of the project:
 1. As soon as the game starts running, you will find yourself in a menu with a picture of Sierra Maestra as background. You can choose to turn down the music volume or lower the quality.
