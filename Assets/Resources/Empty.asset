@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33dcce477c3775d45aaf8dee609d9192, type: 3}
+  m_Name: Empty
+  m_EditorClassIdentifier: 
+  name: Empty
+  faction: 0
+  cardType: 0
+  availableRange: 
+  material: {fileID: 2100000, guid: b3027ad9c4d7d3f4c93d5ea806d0d37d, type: 2}
+  information: {fileID: 0}
+  currentPosition: []

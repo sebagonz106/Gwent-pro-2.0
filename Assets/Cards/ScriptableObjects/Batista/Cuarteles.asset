@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5ac48cb235166f4cb42997a450540b5, type: 3}
+  m_Name: Cuarteles
+  m_EditorClassIdentifier: 
+  name: Cuarteles
+  faction: 1
+  cardType: 0
+  availableRange: 02000000
+  material: {fileID: 2100000, guid: 6e50ffe2ec3b7934a880b007f555b112, type: 2}
+  information: {fileID: 0}
+  currentPosition: []
+  initialDamage: 4
+  level: 0
