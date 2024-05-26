@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     public GameObject WonCoin1;
     public GameObject WonCoin2;
     public Board board;
+    public Context context = new Context(Board.board.Fidel);
 
     public Faction PlayerName { get => playerName; }
     public LeaderCard Leader { get => leader; set => leader = value; }
@@ -92,7 +93,7 @@ public class Player : MonoBehaviour
         return true;
     }
 
-    public bool PlayCard(int originPosition, int targetPosition, RangeType rangeType)
+    public bool PlayCard(int originPosition, int targetPosition, Zone rangeType)
     {
         if(!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard) //in case of unexpected behaviours. bait cards will be played through their effect
         {
@@ -108,7 +109,7 @@ public class Player : MonoBehaviour
         {
             if (card is UnitCard unit) //activating unit cart effect
             {
-                if(!unit.Effect(this.board, this, (this.Equals(this.board.Fidel) ? this.board.Batista : this.board.Fidel), Utils.GetListByRangeType(this, rangeType), unit))
+                if(!unit.Effect(this.context.UpdateInstance(Utils.GetListByRangeType(this, rangeType), unit)))
                 {
                     board.masterController.EffectException();
                 }

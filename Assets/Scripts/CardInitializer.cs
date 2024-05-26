@@ -35,7 +35,7 @@ public class CardInitializer : MonoBehaviour
                         unit.AssignEffect(Effects.PlaceBonusInLineWhereIsPlayed);
                         break;
                     case "Guajiros":
-                        unit.AssignEffect(Effects.MultipliesHisDamageTimesTheAmountOfCardsLikeThisOneInBattlefield);
+                        unit.AssignEffect(Effects.MultipliesHisDamageTimesCardsLikeThis);
                         break;
                     #endregion
 
@@ -53,7 +53,7 @@ public class CardInitializer : MonoBehaviour
                         unit.AssignEffect(Effects.PlaceLightButIrremovableWeatherInEnemysBattlefield);
                         break;
                     case "Cuarteles":
-                        unit.AssignEffect(Effects.MultipliesHisDamageTimesTheAmountOfCardsLikeThisOneInBattlefield);
+                        unit.AssignEffect(Effects.MultipliesHisDamageTimesCardsLikeThis);
                         break;
                     #endregion
 

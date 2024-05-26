@@ -11,7 +11,7 @@ public class BonusCard : Card
     {
     }
 
-    public BonusCard(string name, Faction faction, CardType cardType, List<RangeType> availableRange, Material material, Sprite information, List<Card> currentPosition, double increase) : base(name, faction, cardType, availableRange, material, information, currentPosition)
+    public BonusCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, Material material, Sprite information, List<Card> currentPosition, double increase) : base(name, faction, cardType, availableRange, material, information, currentPosition)
     {
         this.increase = increase;
     }

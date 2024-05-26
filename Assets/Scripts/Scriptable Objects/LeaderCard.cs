@@ -11,7 +11,7 @@ public class LeaderCard : Card
     {
     }
 
-    public LeaderCard(string name, Faction faction, CardType cardType, List<RangeType> availableRange, Material material, Sprite information, List<Card> currentPosition) : base(name, faction, cardType, availableRange, material, information, currentPosition)
+    public LeaderCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, Material material, Sprite information, List<Card> currentPosition) : base(name, faction, cardType, availableRange, material, information, currentPosition)
     {
     }
 

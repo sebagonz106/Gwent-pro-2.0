@@ -8,57 +8,55 @@ public static class Effects
 
     #region Rebel effects
 
-    public static bool StealCard(params object[] parameters) => ((Player)parameters[1]).GetCard(); //for it to work, the card with this effect must not 
+    public static bool StealCard(Context context) => context.CurrentPlayer.GetCard(); //for it to work, the card with this effect must not 
                                                                                                    //be the first card played of a full hand
-    public static bool NoOneSurrendersHereGodDamn(params object[] parameters)
+    public static bool NoOneSurrendersHereGodDamn(Context context)
     {
-        ((Board)parameters[0]).AlmeidaIsPlayed = true;
+        context.Board.AlmeidaIsPlayed = true;
         return true;
     }
 
-    public static bool ClearsLineWithFewerCards(params object[] parameters) // if there are two or more lists with the same amount of cards played 
+    public static bool ClearsLineWithFewerCards(Context context) // if there are two or more lists with the same amount of cards played 
                                                                             // this method will clear the first of the lists checked, altough if an enemy
                                                                             // list has the same amount of cards, it will clear the enemy's list.
                                                                             // In case a card set to stay in battlefield is discarded, it will reappear
                                                                             // next round, as soon as battlefield's clear method is called.
                                                                             // Creator's License here: this effect will be able to affect golden cards.
     {
-        Board board = (Board)parameters[0];
-        Player thisPlayer = (Player)parameters[1];
         int minCount = 6; //Max amount of cards this can count
         List<Card> list = new List<Card>();
         Card bonus = Utils.BaseCard;
-        Player player = (Player)parameters[2];
+        Player player = context.EnemyPlayer;
 
-        if (CountCardsInListAndCompareWithMinCount(board.Fidel.Battlefield.Melee, board.Fidel, ref minCount, ref list, thisPlayer))
+        if (CountCardsInListAndCompareWithMinCount(context.Board.Fidel.Battlefield.Melee, context.Board.Fidel, ref minCount, ref list, context.CurrentPlayer))
         {
-            bonus = board.Fidel.Battlefield.Bonus[0];
-            player = board.Fidel;
+            bonus = context.Board.Fidel.Battlefield.Bonus[0];
+            player = context.Board.Fidel;
         }
-        if (CountCardsInListAndCompareWithMinCount(board.Fidel.Battlefield.Range, board.Fidel, ref minCount, ref list, thisPlayer))
+        if (CountCardsInListAndCompareWithMinCount(context.Board.Fidel.Battlefield.Range, context.Board.Fidel, ref minCount, ref list, context.CurrentPlayer))
         {
-            bonus = board.Fidel.Battlefield.Bonus[1];
-            player = board.Fidel;
+            bonus = context.Board.Fidel.Battlefield.Bonus[1];
+            player = context.Board.Fidel;
         }
-        if (CountCardsInListAndCompareWithMinCount(board.Fidel.Battlefield.Siege, board.Fidel, ref minCount, ref list, thisPlayer))
+        if (CountCardsInListAndCompareWithMinCount(context.Board.Fidel.Battlefield.Siege, context.Board.Fidel, ref minCount, ref list, context.CurrentPlayer))
         {
-            bonus = board.Fidel.Battlefield.Bonus[2];
-            player = board.Fidel;
+            bonus = context.Board.Fidel.Battlefield.Bonus[2];
+            player = context.Board.Fidel;
         }
-        if (CountCardsInListAndCompareWithMinCount(board.Batista.Battlefield.Melee, board.Batista, ref minCount, ref list, thisPlayer))
+        if (CountCardsInListAndCompareWithMinCount(context.Board.Batista.Battlefield.Melee, context.Board.Batista, ref minCount, ref list, context.CurrentPlayer))
         {
-            bonus = board.Batista.Battlefield.Bonus[0];
-            player = board.Batista;
+            bonus = context.Board.Batista.Battlefield.Bonus[0];
+            player = context.Board.Batista;
         }
-        if (CountCardsInListAndCompareWithMinCount(board.Batista.Battlefield.Range, board.Batista, ref minCount, ref list, thisPlayer))
+        if (CountCardsInListAndCompareWithMinCount(context.Board.Batista.Battlefield.Range, context.Board.Batista, ref minCount, ref list, context.CurrentPlayer))
         {
-            bonus = board.Batista.Battlefield.Bonus[1];
-            player = board.Batista;
+            bonus = context.Board.Batista.Battlefield.Bonus[1];
+            player = context.Board.Batista;
         }
-        if (CountCardsInListAndCompareWithMinCount(board.Batista.Battlefield.Siege, board.Batista, ref minCount, ref list, thisPlayer))
+        if (CountCardsInListAndCompareWithMinCount(context.Board.Batista.Battlefield.Siege, context.Board.Batista, ref minCount, ref list, context.CurrentPlayer))
         {
-            bonus = board.Batista.Battlefield.Bonus[2];
-            player = board.Batista;
+            bonus = context.Board.Batista.Battlefield.Bonus[2];
+            player = context.Board.Batista;
         }
 
         player.Battlefield.ToGraveyard(bonus, player.Battlefield.Bonus);
@@ -67,15 +65,15 @@ public static class Effects
         return true;
     }
 
-    public static bool PlaceBonusInLineWhereIsPlayed(params object[] parameters)
+    public static bool PlaceBonusInLineWhereIsPlayed(Context context)
     {
-        List<Card> currentPosition = (List<Card>)parameters[3];
-        Player player = (Player)parameters[1];
+        List<Card> currentPosition = context.CurrentPosition;
+        Player player = context.CurrentPlayer;
         BonusCard riot = Resources.Load<BonusCard>("Huelga Revolucionaria");
 
         if (player.Battlefield.AddCard(riot, Utils.GetRangeTypeByList(player, currentPosition), Utils.GetIntByBattlfieldList(player.Battlefield, currentPosition)))
         {
-            ((Board)parameters[0]).UpdateView(true);
+            context.Board.UpdateView(true);
             return true;
         }
         else return false;
@@ -84,47 +82,48 @@ public static class Effects
 
     #region Batista effects
 
-    public static bool RemovePowerfulCard(params object[] parameters)
+    public static bool RemovePowerfulCard(Context context)
     {
-        List<object> fidelList = ((Board)parameters[0]).Fidel.Battlefield.MostPowerfulSilverCard();
-        List<object> batistaList = ((Board)parameters[0]).Batista.Battlefield.MostPowerfulSilverCard();
+        List<object> fidelList = context.Board.Fidel.Battlefield.MostPowerfulSilverCard();
+        List<object> batistaList = context.Board.Batista.Battlefield.MostPowerfulSilverCard();
 
         if ((UnitCard)fidelList[0] == null && (UnitCard)batistaList[0] == null) return false; //checks if there is no unit silver card played
 
         //checks if Batistas most powerful card outpowers Fidels most powerful card. If so, it sends Batsitas card to graveyard
         if ((UnitCard)fidelList[0] == null || ((UnitCard)fidelList[0]).InitialDamage < ((UnitCard)batistaList[0]).InitialDamage)
         {
-            ((Board)parameters[0]).Batista.Battlefield.ToGraveyard((UnitCard)batistaList[0], (List<Card>)batistaList[1]);
+            context.Board.Batista.Battlefield.ToGraveyard((UnitCard)batistaList[0], (List<Card>)batistaList[1]);
         }
 
         //checks if Fidels most powerful card outpowers Batistas most powerful card. If so, it sends it to graveyard
         else if ((UnitCard)batistaList[0] == null || ((UnitCard)fidelList[0]).InitialDamage > ((UnitCard)batistaList[0]).InitialDamage) 
 {
-            ((Board)parameters[0]).Fidel.Battlefield.ToGraveyard(((UnitCard)fidelList[0]), ((List<Card>)fidelList[1]));
+            context.Board.Fidel.Battlefield.ToGraveyard(((UnitCard)fidelList[0]), ((List<Card>)fidelList[1]));
         }
 
         //checks if Fidels most powerful card has the same damage as Batistas most powerful card. If so, it sends both to graveyard.
         else if (((UnitCard)fidelList[0]).InitialDamage == ((UnitCard)batistaList[0]).InitialDamage)
         {
-            ((Board)parameters[0]).Batista.Battlefield.ToGraveyard(((UnitCard)batistaList[0]), ((List<Card>)batistaList[1]));
-            ((Board)parameters[0]).Fidel.Battlefield.ToGraveyard(((UnitCard)fidelList[0]), ((List<Card>)fidelList[1]));
+            context.Board.Batista.Battlefield.ToGraveyard(((UnitCard)batistaList[0]), ((List<Card>)batistaList[1]));
+            context.Board.Fidel.Battlefield.ToGraveyard(((UnitCard)fidelList[0]), ((List<Card>)fidelList[1]));
         }
 
         else return false; //in case of unexpected behaviour
         return true;
     }
 
-    public static bool RemoveEnemyWorstCard(params object[] parameters)
+    public static bool RemoveEnemyWorstCard(Context context)
     {
-        if (((Player)parameters[2]).Battlefield.LeastPowerfulCard()[0] == null) return false;
+        (Card, List<Card>) leastPower = context.EnemyPlayer.Battlefield.LeastPowerfulCard();
+        if (leastPower.Item1 == null) return false;
 
-        ((Player)parameters[2]).Battlefield.ToGraveyard(((UnitCard)((Player)parameters[2]).Battlefield.LeastPowerfulCard()[0]), ((List<Card>)((Player)parameters[2]).Battlefield.LeastPowerfulCard()[1])); //sends to graveyard the least powerful card of the given player
+        context.EnemyPlayer.Battlefield.ToGraveyard(leastPower.Item1, leastPower.Item2); //sends to graveyard the least powerful card of the given player
         return true;
     }
 
-    public static bool PlaceLightButIrremovableWeatherInEnemysBattlefield(params object[] parameters)
+    public static bool PlaceLightButIrremovableWeatherInEnemysBattlefield(Context context)
     {
-        Battlefield enemy = ((Player)parameters[2]).Battlefield;
+        Battlefield enemy = context.EnemyPlayer.Battlefield;
 
         ReduceDamagePermanently(enemy.Melee);
         ReduceDamagePermanently(enemy.Range);
@@ -133,19 +132,18 @@ public static class Effects
         return true;
     }
 
-    public static bool EqualsSilverUnitsDamageToBattlefieldsAverage(params object[] parameters)
+    public static bool EqualsSilverUnitsDamageToBattlefieldsAverage(Context context)
     {
-        Board board = (Board)parameters[0];
         List<UnitCard> list = new List<UnitCard>();
         double pureTotalDamage = 0;
         double average = 0;
 
-        StoreUnitsInListAndModifyTotalDamageOfTheCardsInTheList(board.Fidel.Battlefield.Melee, list, ref pureTotalDamage);
-        StoreUnitsInListAndModifyTotalDamageOfTheCardsInTheList(board.Fidel.Battlefield.Range, list, ref pureTotalDamage);
-        StoreUnitsInListAndModifyTotalDamageOfTheCardsInTheList(board.Fidel.Battlefield.Siege, list, ref pureTotalDamage);
-        StoreUnitsInListAndModifyTotalDamageOfTheCardsInTheList(board.Batista.Battlefield.Melee, list, ref pureTotalDamage);
-        StoreUnitsInListAndModifyTotalDamageOfTheCardsInTheList(board.Batista.Battlefield.Range, list, ref pureTotalDamage);
-        StoreUnitsInListAndModifyTotalDamageOfTheCardsInTheList(board.Batista.Battlefield.Siege, list, ref pureTotalDamage);
+        StoreUnitsInListAndCountDamage(context.Board.Fidel.Battlefield.Melee, list, ref pureTotalDamage);
+        StoreUnitsInListAndCountDamage(context.Board.Fidel.Battlefield.Range, list, ref pureTotalDamage);
+        StoreUnitsInListAndCountDamage(context.Board.Fidel.Battlefield.Siege, list, ref pureTotalDamage);
+        StoreUnitsInListAndCountDamage(context.Board.Batista.Battlefield.Melee, list, ref pureTotalDamage);
+        StoreUnitsInListAndCountDamage(context.Board.Batista.Battlefield.Range, list, ref pureTotalDamage);
+        StoreUnitsInListAndCountDamage(context.Board.Batista.Battlefield.Siege, list, ref pureTotalDamage);
 
         average = pureTotalDamage / list.Count;
 
@@ -159,10 +157,10 @@ public static class Effects
     #endregion
 
     #region Common effects
-    public static bool MultipliesHisDamageTimesTheAmountOfCardsLikeThisOneInBattlefield(params object[] parameters)
+    public static bool MultipliesHisDamageTimesCardsLikeThis(Context context)
     {
-        Player player = (Player)parameters[1];
-        UnitCard card = (UnitCard)parameters[4];
+        Player player = context.CurrentPlayer;
+        UnitCard card = (UnitCard)context.CurrentCard;
         int count; 
         List<UnitCard> list = new List<UnitCard>();
 
@@ -179,7 +177,7 @@ public static class Effects
         return true;
     }
 
-    public static bool VoidEffect(params object[] parameters) => true;
+    public static bool VoidEffect(Context context) => true;
     #endregion
 
     #region Utils
@@ -219,7 +217,7 @@ public static class Effects
             if (item is UnitCard unit && unit.level == Level.Silver) unit.ModifyOnFieldDamage(unit.DamageOnField - toTake, true);
         }
     }
-    static void StoreUnitsInListAndModifyTotalDamageOfTheCardsInTheList(List<Card> listToCheck, List<UnitCard> listToStore, ref double damage)
+    static void StoreUnitsInListAndCountDamage(List<Card> listToCheck, List<UnitCard> listToStore, ref double damage)
     {
         foreach (Card item in listToCheck)
         {

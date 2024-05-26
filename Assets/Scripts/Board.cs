@@ -5,23 +5,21 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
+    public static Board board;
     public Player Fidel;
     public Player Batista;
-    public Canvas gameController;
-    public MasterController masterController => (MasterController)gameController.GetComponent("MasterController");
+    public Canvas gameController; //
+    public MasterController masterController => (MasterController)gameController.GetComponent("MasterController"); //
     int roundCount = 0;
     bool newRound = true;
     public List<Card> Weather = new List<Card>(3);
     public bool AlmeidaIsPlayed = false;
-    Material emptySlot;
 
     public int RoundCount { get => roundCount; private set => roundCount = value; }
-    public Material EmptySlot { get => emptySlot; set => emptySlot = value; }
 
     private void Awake()
     {
         this.Weather.AddRange(Enumerable.Repeat<Card>(Utils.BaseCard, 3));
-        this.emptySlot = Resources.Load<Material>("DiselectedBattlefieldCard");
     }
     public void UpdateView( bool alsoUpdateTexts = false)
     {
@@ -181,7 +179,7 @@ public class Board : MonoBehaviour
 
             if (list[i].name == Utils.BaseCard.name)
             {
-                child.GetComponent<Renderer>().material = emptySlot;
+                child.GetComponent<Renderer>().material = Utils.BaseCard.material;
                 child.GetComponent<CardController>().IsOccupied = false;
                 child.SetActive(setActiveOutOfCount);
             }

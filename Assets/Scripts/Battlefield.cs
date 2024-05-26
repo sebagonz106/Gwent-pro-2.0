@@ -72,9 +72,9 @@ public class Battlefield : MonoBehaviour
                   playerThatOwnsThisBattlefield.board.masterController.EffectException();
         }
     }
-    public bool AddCard(Card card, RangeType rangeType, int position) => TryAdd(rangeType is RangeType.Melee, card, this.Melee, position) ||
-                                                                         TryAdd(rangeType is RangeType.Range, card, this.Range, position) ||
-                                                                         TryAdd(rangeType is RangeType.Siege, card, this.Siege, position);
+    public bool AddCard(Card card, Zone rangeType, int position) => TryAdd(rangeType is Zone.Melee, card, this.Melee, position) ||
+                                                                         TryAdd(rangeType is Zone.Range, card, this.Range, position) ||
+                                                                         TryAdd(rangeType is Zone.Siege, card, this.Siege, position);
     
     public List<object> MostPowerfulSilverCard() //analiza cual es la carta mas poderosa del campo y la devuelve en una lista junto con la fila en la que se encuentra
     {
@@ -88,7 +88,7 @@ public class Battlefield : MonoBehaviour
         return new List<object> { unit, list };
     }
 
-    public List<object> LeastPowerfulCard() //analiza cual es la carta mmenos poderosa del campo y la devuelve en una lista junto con la fila en la que se encuentra
+    public (Card, List<Card>) LeastPowerfulCard() //analiza cual es la carta mmenos poderosa del campo y la devuelve en una lista junto con la fila en la que se encuentra
     {
         UnitCard unit = null;
         List<Card> list = null;
@@ -97,7 +97,7 @@ public class Battlefield : MonoBehaviour
         CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Range, false);
         CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Siege, false);
 
-        return new List<object> { unit, list };
+        return (unit, list);
     }
     private void CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref UnitCard unit, ref List<Card> listToSave, List<Card> listToCheck, bool HighestOrLowestDamage)
     {

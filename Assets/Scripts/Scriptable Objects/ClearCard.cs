@@ -9,7 +9,7 @@ public class ClearCard : Card
     {
     }
 
-    public ClearCard(string name, Faction faction, CardType cardType, List<RangeType> availableRange, Material material, Sprite information, List<Card> currentPosition) : base(name, faction, cardType, availableRange, material, information, currentPosition)
+    public ClearCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, Material material, Sprite information, List<Card> currentPosition) : base(name, faction, cardType, availableRange, material, information, currentPosition)
     {
     }
 }

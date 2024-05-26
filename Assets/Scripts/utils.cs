@@ -18,7 +18,8 @@ public enum CardType
     Bait,
 }
 
-public enum RangeType
+//[Flags]
+public enum Zone
 {
     Melee,
     Range,
@@ -31,7 +32,7 @@ public enum Level
     Golden,
 }
 
-public delegate bool Effect(params object[] parameters);
+public delegate bool Effect(Context context);
 
 public static class Utils 
 {
@@ -39,11 +40,11 @@ public static class Utils
 
     public static Card BaseCard { get => baseCard; }
 
-    public static List<Card> GetListByRangeType(Player player, RangeType rangeType) => rangeType == RangeType.Melee? player.Battlefield.Melee :
-                                                                                       rangeType == RangeType.Range? player.Battlefield.Range : 
+    public static List<Card> GetListByRangeType(Player player, Zone rangeType) => rangeType == Zone.Melee? player.Battlefield.Melee :
+                                                                                       rangeType == Zone.Range? player.Battlefield.Range : 
                                                                                                                      player.Battlefield.Siege;
-    public static int GetIntByRangeType(RangeType rangeType) => rangeType == RangeType.Melee ? 0 :
-                                                                rangeType == RangeType.Range ? 1 : 2;
+    public static int GetIntByRangeType(Zone rangeType) => rangeType == Zone.Melee ? 0 :
+                                                                rangeType == Zone.Range ? 1 : 2;
     public static int GetIntByBattlfieldList(Battlefield field, List<Card> list) => list.Equals(field.Melee) ? 0 :
                                                                                     list.Equals(field.Range) ? 1 : 2;
     public static List<Card> GetListByName(Player player, string name) => name.Contains("Melee") ? player.Battlefield.Melee :
@@ -51,6 +52,6 @@ public static class Utils
                                                                           name.Contains("Siege") ? player.Battlefield.Siege :
                                                                           name.Contains("Bonus") ? player.Battlefield.Bonus :
                                                                                                    player.Hand;
-    public static RangeType GetRangeTypeByList(Player player, List<Card> list) => list.Equals(player.Battlefield.Melee) ? RangeType.Melee :
-                                                                                  list.Equals(player.Battlefield.Range) ? RangeType.Range : RangeType.Siege;
+    public static Zone GetRangeTypeByList(Player player, List<Card> list) => list.Equals(player.Battlefield.Melee) ? Zone.Melee :
+                                                                                  list.Equals(player.Battlefield.Range) ? Zone.Range : Zone.Siege;
 }

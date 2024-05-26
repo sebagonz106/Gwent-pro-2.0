@@ -14,12 +14,12 @@ public class WeatherCard : Card
 
     public void Effect(Board board) //reduces the damage of every silver unit card played:
     {
-        ReduceSilverUnitCardPowerInLineIfPossible(board, RangeType.Melee); //if affects melee
-        ReduceSilverUnitCardPowerInLineIfPossible(board, RangeType.Range); //if affects range
-        ReduceSilverUnitCardPowerInLineIfPossible(board, RangeType.Siege); //if affects siege
+        ReduceSilverUnitCardPowerInLineIfPossible(board, Zone.Melee); //if affects melee
+        ReduceSilverUnitCardPowerInLineIfPossible(board, Zone.Range); //if affects range
+        ReduceSilverUnitCardPowerInLineIfPossible(board, Zone.Siege); //if affects siege
     }
 
-    private void ReduceSilverUnitCardPowerInLineIfPossible(Board board, RangeType rangeType)
+    private void ReduceSilverUnitCardPowerInLineIfPossible(Board board, Zone rangeType)
     {
         if (this.availableRange.Contains(rangeType))
         {

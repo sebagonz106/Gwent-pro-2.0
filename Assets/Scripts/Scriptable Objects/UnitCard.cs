@@ -15,7 +15,7 @@ public class UnitCard : Card
     public double DamageOnField { get => damageOnField; }
     public double Damage { get => damage; set => damage = value; }
 
-    public UnitCard(string name, Faction faction, CardType cardType, List<RangeType> availableRange, Material material, Sprite information, List<Card> currentPosition) : base(name, faction, cardType, availableRange, material, information, currentPosition)
+    public UnitCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, Material material, Sprite information, List<Card> currentPosition) : base(name, faction, cardType, availableRange, material, information, currentPosition)
     {
     }
 
@@ -28,15 +28,15 @@ public class UnitCard : Card
         this.effect = effect;
     }
 
-    public bool Effect(params object[] parameters)
+    public bool Effect(Context context)
     {
         try
         {
-            return effect.Invoke(parameters);
+            return effect.Invoke(context);
         }
         catch (System.NullReferenceException)
         {
-            return Effects.VoidEffect(parameters);
+            return Effects.VoidEffect(context);
         }
     }
 

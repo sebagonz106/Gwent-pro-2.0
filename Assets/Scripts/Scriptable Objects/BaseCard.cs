@@ -8,12 +8,12 @@ public class Card : ScriptableObject
     public new string name;
     public Faction faction;
     public CardType cardType;
-    public List<RangeType> availableRange;
+    public List<Zone> availableRange;
     public Material material;
     public Sprite information;
     public List<Card> currentPosition;
     
-    public Card(string name, Faction faction, CardType cardType, List<RangeType> availableRange, Material material, Sprite information, List<Card> currentPosition)
+    public Card(string name, Faction faction, CardType cardType, List<Zone> availableRange, Material material, Sprite information, List<Card> currentPosition)
     {
         this.name = name;
         this.faction = faction;

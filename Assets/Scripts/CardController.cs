@@ -11,7 +11,7 @@ public class CardController : MonoBehaviour
     Player player;
     GameObject GameManager;
     public int indexOfThisInParent;
-    public List<RangeType> rangeTypes;
+    public List<Zone> rangeTypes;
     public Sprite Info;
     public bool isSelected;
     Vector3 upPosition = new Vector3();
@@ -33,9 +33,9 @@ public class CardController : MonoBehaviour
 
         if (this.gameObject.tag == "BattlefieldCard" || this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")
         {
-            if (this.gameObject.name.Contains("Melee"))      this.rangeTypes = new List<RangeType> { RangeType.Melee } ;
-            else if (this.gameObject.name.Contains("Range")) this.rangeTypes = new List<RangeType> { RangeType.Range } ;
-            else                                             this.rangeTypes = new List<RangeType> { RangeType.Siege } ;
+            if (this.gameObject.name.Contains("Melee"))      this.rangeTypes = new List<Zone> { Zone.Melee } ;
+            else if (this.gameObject.name.Contains("Range")) this.rangeTypes = new List<Zone> { Zone.Range } ;
+            else                                             this.rangeTypes = new List<Zone> { Zone.Siege } ;
         }
 
         else if (this.gameObject.tag == "LeaderCard")
@@ -195,7 +195,7 @@ public class CardController : MonoBehaviour
         else GameManager.GetComponent<MasterController>().GeneralException();
     }
 
-    public void AssignRangeForHandCard (List<RangeType> list) { this.rangeTypes = list; }
+    public void AssignRangeForHandCard (List<Zone> list) { this.rangeTypes = list; }
 
     private void Disable(CardController cardController)
     {
