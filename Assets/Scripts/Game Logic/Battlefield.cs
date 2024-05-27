@@ -3,25 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Battlefield : MonoBehaviour
+public class Battlefield 
 {
     public Player playerThatOwnsThisBattlefield;
     public List<Card> Graveyard = new List<Card>();
-    public List<Card> Melee;
-    public List<Card> Range;
-    public List<Card> Siege;
-    public List<Card> Bonus; //[0] MeleeBonus, [1] RangeBonus, [2] SiegeBonus
+    public List<Card> Melee = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
+    public List<Card> Range = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
+    public List<Card> Siege = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
+    public List<Card> Bonus = Enumerable.Repeat<Card>(Utils.BaseCard, 3).ToList<Card>(); //[0] MeleeBonus, [1] RangeBonus, [2] SiegeBonus
     List<bool> clearsPlayed = Enumerable.Repeat<bool>(false, 3).ToList<bool>(); //[0] Melee, [1] Range, [2] Siege 
-    List<object> staysInBattlefieldController = Enumerable.Repeat<object>(false, 3).ToList<object>(); //[0] Card, [1] List of cards where its played, [2] index
-
-    private void Awake()
-    {
-        Melee = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
-        Range = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
-        Siege = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
-        Bonus = Enumerable.Repeat<Card>(Utils.BaseCard, 3).ToList<Card>();
-    }
-
+    (Card, List<Card>, int) staysInBattlefieldController; //[0] Card, [1] List of cards where its played, [2] index
     public List<bool> ClearsPlayed { get => clearsPlayed; private set => clearsPlayed = value; }
 
     public void ToGraveyard(Card card, List<Card> list)
@@ -29,31 +20,31 @@ public class Battlefield : MonoBehaviour
         if (card.Equals(Utils.BaseCard)) return;
 
         Graveyard.Add(card);
-        if (list.Equals(this.playerThatOwnsThisBattlefield.Hand)) this.playerThatOwnsThisBattlefield.EmptyAt(list.IndexOf(card));
+        if (list.Equals(this.playerThatOwnsThisBattlefield.Hand)) this.playerThatOwnsThisBattlefield.EmptyHandAt(list.IndexOf(card));
         else
         {
             if (card is ClearCard) RemoveClearEffect(Utils.GetIntByBattlfieldList(this, list));
             list[list.IndexOf(card)] = Utils.BaseCard;
         }
     }
+
     public void ToGraveyard(List<Card> list)
     {
         for (int i = 0; i < list.Count; i++)
         {
-            Graveyard.Add(list[i]);
-            list[i] = Utils.BaseCard;
+            ToGraveyard(list[i], list);
         }
     }
-    public void Clear()
+    public bool Clear()
     {
-        for (int i = 0; i < playerThatOwnsThisBattlefield.board.Weather.Count; i++)
+        for (int i = 0; i < Board.Instance.Weather.Count; i++)
         {
-            Card card = playerThatOwnsThisBattlefield.board.Weather[i];
+            Card card = Board.Instance.Weather[i];
 
             //sending to graveyard only the cards on this list played by this player
             if ((card is BaitCard bait && bait.PlayerThatPlayedThisCard.Equals(playerThatOwnsThisBattlefield)) || (card is WeatherCard weather && weather.PlayerThatPlayedThisCard.Equals(playerThatOwnsThisBattlefield)))
             {
-                this.ToGraveyard(card, playerThatOwnsThisBattlefield.board.Weather);
+                this.ToGraveyard(card, Board.Instance.Weather);
             }
         }
 
@@ -63,20 +54,21 @@ public class Battlefield : MonoBehaviour
         this.ToGraveyard(this.Bonus);
         List<bool> clearsPlayed = Enumerable.Repeat<bool>(false, 3).ToList<bool>();
 
-        if (staysInBattlefieldController[0] is Card stayingCard)
+        if (staysInBattlefieldController.Item1 is Card stayingCard)
         {
             if (stayingCard is WeatherCard || stayingCard is BaitCard || stayingCard is BonusCard)
-                 ((List<Card>)staysInBattlefieldController[1])[(int)staysInBattlefieldController[2]] = stayingCard;
+                staysInBattlefieldController.Item2[staysInBattlefieldController.Item3] = stayingCard;
 
-            else if (!TryAdd(true, stayingCard, (List<Card>)staysInBattlefieldController[1], (int)staysInBattlefieldController[2]))
-                  playerThatOwnsThisBattlefield.board.masterController.EffectException();
+            else if (!TryAdd(stayingCard, staysInBattlefieldController.Item2, staysInBattlefieldController.Item3))
+                return false;
         }
+
+        return true;
     }
-    public bool AddCard(Card card, Zone rangeType, int position) => TryAdd(rangeType is Zone.Melee, card, this.Melee, position) ||
-                                                                         TryAdd(rangeType is Zone.Range, card, this.Range, position) ||
-                                                                         TryAdd(rangeType is Zone.Siege, card, this.Siege, position);
-    
-    public List<object> MostPowerfulSilverCard() //analiza cual es la carta mas poderosa del campo y la devuelve en una lista junto con la fila en la que se encuentra
+
+    public bool AddCard(Card card, Zone rangeType, int position) => TryAdd(card, Utils.GetListByRangeType(playerThatOwnsThisBattlefield, rangeType), position);
+
+    public (Card, List<Card>) MostPowerfulSilverCard() //analizes which is the most powerful unit card in the field and returns it alongside the list where it is played
     {
         UnitCard unit = null;
         List<Card> list = null;
@@ -85,10 +77,10 @@ public class Battlefield : MonoBehaviour
         CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Range, true);
         CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Siege, true);
 
-        return new List<object> { unit, list };
+        return (unit, list);
     }
 
-    public (Card, List<Card>) LeastPowerfulCard() //analiza cual es la carta mmenos poderosa del campo y la devuelve en una lista junto con la fila en la que se encuentra
+    public (Card, List<Card>) LeastPowerfulCard() //analizes which is the least powerful unit card in the field and returns it alongside the list where it is played
     {
         UnitCard unit = null;
         List<Card> list = null;
@@ -126,44 +118,41 @@ public class Battlefield : MonoBehaviour
     }
     public bool StaysInBattlefieldIs(string name)
     {
-        if(!(staysInBattlefieldController[0] is Card)) return false;
-        if (name == ((Card)staysInBattlefieldController[0]).name) return true;
+        if (!(staysInBattlefieldController.Item1 is Card)) return false;
+        if (name == staysInBattlefieldController.Item1.name) return true;
         return false;
     }
     public bool StaysInBattlefieldModifier(Card card, List<Card> list)
     {
         if (card is LeaderCard) return false;
-        
-        staysInBattlefieldController = new List<object> { card, list, list.IndexOf(card) };
+
+        staysInBattlefieldController = (card, list, list.IndexOf(card));
         return true;
     }
 
-    bool TryAdd(bool greenLight, Card card, List<Card> list, int index)
+    bool TryAdd(Card card, List<Card> list, int index)
     {
-        if (greenLight)
-        {
-            int bonusAndClearIndex = Utils.GetIntByBattlfieldList(this, list);
+        int bonusAndClearIndex = Utils.GetIntByBattlfieldList(this, list);
 
-            if (list[index].Equals(Utils.BaseCard))
+        if (list[index].Equals(Utils.BaseCard))
+        {
+            if (card.cardType == CardType.Unit)
             {
-                if (card.cardType == CardType.Unit)
-                {
-                    list[index] = card;
-                    return true;
-                }
-                if (card.cardType == CardType.Clear) //Creator's license here: Clear will only protect from 
-                                                     //weather effects the battlrfield line where it is played
-                {
-                    list[index] = card;
-                    ClearsPlayed[bonusAndClearIndex] = true;
-                    return true;
-                }
-            }
-            if (card.cardType == CardType.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
-            {
-                Bonus[bonusAndClearIndex] = card;
+                list[index] = card;
                 return true;
             }
+            if (card.cardType == CardType.Clear) //Creator's license here: Clear will only protect from 
+                                                 //weather effects the battlefield line where it is played
+            {
+                list[index] = card;
+                ClearsPlayed[bonusAndClearIndex] = true;
+                return true;
+            }
+        }
+        if (card.cardType == CardType.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
+        {
+            Bonus[bonusAndClearIndex] = card;
+            return true;
         }
 
         return false;

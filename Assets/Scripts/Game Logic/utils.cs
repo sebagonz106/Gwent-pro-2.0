@@ -53,5 +53,8 @@ public static class Utils
                                                                           name.Contains("Bonus") ? player.Battlefield.Bonus :
                                                                                                    player.Hand;
     public static Zone GetRangeTypeByList(Player player, List<Card> list) => list.Equals(player.Battlefield.Melee) ? Zone.Melee :
-                                                                                  list.Equals(player.Battlefield.Range) ? Zone.Range : Zone.Siege;
+                                                                             list.Equals(player.Battlefield.Range) ? Zone.Range : Zone.Siege;
+
+    public static Player GetPlayerByName(string name) => name == "Fidel" ? Player.Fidel : Player.Batista;
+    public static Player GetEnemyByName(string name) => name == "Batista" ? Player.Fidel : Player.Batista;
 }

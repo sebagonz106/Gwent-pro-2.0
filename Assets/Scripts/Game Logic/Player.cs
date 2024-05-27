@@ -3,31 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player
 {
-    [SerializeField] Faction playerName;
+    #region Fields, properties and builder
+    Faction playerName;
     public List<Card> Hand = new List<Card>(10);
     private List<int> emptySlotsInHand = new List<int>(10);
     public List<Card> Deck = new List<Card>(25);
-    [SerializeField] LeaderCard stealCardLeader;
-    [SerializeField] LeaderCard cardStaysLeader;
-    LeaderCard leader;
-    private bool leaderCardSelected = false;
+    public LeaderCard Leader;
+    public bool leaderCardSelected = false;
     public bool leaderEffectUsedThisRound = false;
-    public Battlefield Battlefield;
     public bool EndRound = false;
     public bool StartedPlaying = false;
+    public double TotalDamage = 0;
     public int Score = 0;
-    public GameObject WonCoin1;
-    public GameObject WonCoin2;
-    public Board board;
-    public Context context = new Context(Board.board.Fidel);
+    public Battlefield Battlefield;
+    public Context context;
+    private static Player fidel;
+    private static Player batista;
 
-    public Faction PlayerName { get => playerName; }
-    public LeaderCard Leader { get => leader; set => leader = value; }
-    public bool LeaderCardSelected { get => leaderCardSelected; set => leaderCardSelected = value; }
+    public static Player Fidel => fidel.Equals(null) ? SetPlayer(fidel, Batista, Faction.Fidel) : fidel;
+    public static Player Batista => batista.Equals(null) ? SetPlayer(batista, Fidel, Faction.Batista) : batista;
+    public Faction PlayerName => playerName;
 
-    private void Awake()
+    private Player(Faction faction)
     {
         Hand = Enumerable.Repeat<Card>(Utils.BaseCard, 10).ToList<Card>();
         for (int i = 0; i < 10; i++)
@@ -35,26 +34,23 @@ public class Player : MonoBehaviour
             emptySlotsInHand.Add(i);
         }
 
-        if (this.playerName==Faction.Fidel)
-        {
-            if (stealCardLeader.name == PlayerPrefs.GetString("Rebel Leader")) Leader = stealCardLeader;
-            else Leader = cardStaysLeader;
-
-            Leader.information = Resources.Load<Sprite>($"Info/Fidel/{Leader.name}");
-        }
-        else
-        {
-            if (stealCardLeader.name == PlayerPrefs.GetString("Batista Leader")) Leader = stealCardLeader;
-            else Leader = cardStaysLeader;
-
-            Leader.information = Resources.Load<Sprite>($"Info/Batista/{Leader.name}");
-        }
     }
 
+    private static  Player SetPlayer(Player player, Player enemy, Faction faction)
+    {
+        player = new Player(faction);
+        player.context = new Context(enemy);
+        player.Battlefield = new Battlefield();
+        player.Battlefield.playerThatOwnsThisBattlefield = player;
+        return player;
+    }
+    #endregion
+
+    #region Functions
     public bool GetCard(int cardsToSteal = 1)
     {
-        if (Deck.Count<=cardsToSteal) //If there are no longer cards left in deck, this conditional shuffles
-                                     //graveyard cards and add them to the deck so the game goes on
+        if (Deck.Count <= cardsToSteal) //If there are no longer cards left in deck, this conditional shuffles
+                                        //graveyard cards and add them to the deck so the game goes on
         {
             int randomNumber;
             Card swapCard;
@@ -93,25 +89,27 @@ public class Player : MonoBehaviour
         return true;
     }
 
-    public bool PlayCard(int originPosition, int targetPosition, Zone rangeType)
+    public bool PlayCard(int originPosition, int targetPosition, Zone rangeType, out bool effectFailed)
     {
-        if(!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard) //in case of unexpected behaviours. bait cards will be played through their effect
+        effectFailed = false;
+
+        if (!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard) //in case of unexpected behaviours. bait cards will be played through their effect
         {
             return false;
         }
 
-        if (card is WeatherCard weather && this.board.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
+        if (card is WeatherCard weather && Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
         {
-            this.board.Weather[targetPosition] = weather;
+            Board.Instance.Weather[targetPosition] = weather;
             weather.PlayerThatPlayedThisCard = this;
         }
         else if (this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
         {
             if (card is UnitCard unit) //activating unit cart effect
             {
-                if(!unit.Effect(this.context.UpdateInstance(Utils.GetListByRangeType(this, rangeType), unit)))
+                if (!unit.Effect(this.context.UpdateInstance(Utils.GetListByRangeType(this, rangeType), unit)))
                 {
-                    board.masterController.EffectException();
+                    effectFailed = true;
                 }
             }
         }
@@ -120,12 +118,11 @@ public class Player : MonoBehaviour
             return false;
         }
 
-        EmptyAt(originPosition);
-        this.board.UpdateView(true);
+        EmptyHandAt(originPosition);
         return true;
     }
 
-    public void EmptyAt(int index)
+    public void EmptyHandAt(int index)
     {
         this.emptySlotsInHand.Add(index);
         this.Hand[index] = Utils.BaseCard;
@@ -133,10 +130,11 @@ public class Player : MonoBehaviour
 
     public override bool Equals(object other)
     {
-        return other is Player otherPlayer && this.PlayerName==otherPlayer.PlayerName;
+        return other is Player otherPlayer && this.PlayerName == otherPlayer.PlayerName;
     }
     public override int GetHashCode()
     {
         return base.GetHashCode();
     }
+    #endregion
 }
