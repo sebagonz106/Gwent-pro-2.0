@@ -2,48 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class Context
+public class Context
 {
-    public MasterController MasterController { get; private set; }
     public Board Board { get; private set; }
     public Player CurrentPlayer { get; private set; }
     public Player EnemyPlayer { get; private set; }
     public List<Card> CurrentPosition { get; private set; }
     public Card CurrentCard { get; private set; }
 
-    #region Singleton
-    //private Context instance;
-    //public Context Instance => instance.Equals(null) ? SetInstance() : instance;
-    //private Context()
-    //{
-    //    this.Board = Board.board;
-    //    this.CurrentPlayer = this.Board.Batista;
-    //    this.EnemyPlayer = this.Board.Fidel;
-    //    this.MasterController = this.Board.masterController;
-    //    this.CurrentPosition = this.Board.Weather;
-    //    this.CurrentCard = Utils.BaseCard;
-    //}
-    //private Context SetInstance()
-    //{
-    //    instance = new Context();
-    //    return instance;
-    //}
-    #endregion
-
-    public Context(Player enemy)
+    public Context(Player player, Player enemy)
     {
-        this.Board = Board.board;
-        this.CurrentPlayer = this.Board.Batista;
-        this.EnemyPlayer = this.Board.Fidel;
-        this.MasterController = this.Board.masterController;
+        this.Board = Board.Instance;
+        this.CurrentPlayer = player;
+        this.EnemyPlayer = enemy;
         this.CurrentPosition = this.Board.Weather;
         this.CurrentCard = Utils.BaseCard;
     }
 
-    public Context UpdateInstance(List<Card> position, Card target)
+    public Context UpdatePlayerInstance(List<Card> position, Card card)
     {
-        this.CurrentCard = target;
         this.CurrentPosition = position;
+        this.CurrentCard = card;
+
         return this;
     }
 }

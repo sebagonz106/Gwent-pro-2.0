@@ -5,16 +5,24 @@ using UnityEngine;
 
 public class Battlefield 
 {
-    public Player playerThatOwnsThisBattlefield;
+    Player playerThatOwnsThisBattlefield;
     public List<Card> Graveyard = new List<Card>();
     public List<Card> Melee = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
     public List<Card> Range = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
     public List<Card> Siege = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
     public List<Card> Bonus = Enumerable.Repeat<Card>(Utils.BaseCard, 3).ToList<Card>(); //[0] MeleeBonus, [1] RangeBonus, [2] SiegeBonus
+    public List<Card>[] Zones;
     List<bool> clearsPlayed = Enumerable.Repeat<bool>(false, 3).ToList<bool>(); //[0] Melee, [1] Range, [2] Siege 
     (Card, List<Card>, int) staysInBattlefieldController; //[0] Card, [1] List of cards where its played, [2] index
     public List<bool> ClearsPlayed { get => clearsPlayed; private set => clearsPlayed = value; }
 
+    public Battlefield(Player player)
+    {
+        this.playerThatOwnsThisBattlefield = player;
+        this.Zones = new List<Card>[] { Melee, Range, Siege, Bonus };
+    }
+
+    #region Clearing methods
     public void ToGraveyard(Card card, List<Card> list)
     {
         if (card.Equals(Utils.BaseCard)) return;
@@ -48,10 +56,11 @@ public class Battlefield
             }
         }
 
-        this.ToGraveyard(this.Melee);
-        this.ToGraveyard(this.Range);
-        this.ToGraveyard(this.Siege);
-        this.ToGraveyard(this.Bonus);
+        foreach (List<Card> item in Zones)
+        {
+            ToGraveyard(item);
+        }
+
         List<bool> clearsPlayed = Enumerable.Repeat<bool>(false, 3).ToList<bool>();
 
         if (staysInBattlefieldController.Item1 is Card stayingCard)
@@ -65,54 +74,31 @@ public class Battlefield
 
         return true;
     }
+    #endregion
 
     public bool AddCard(Card card, Zone rangeType, int position) => TryAdd(card, Utils.GetListByRangeType(playerThatOwnsThisBattlefield, rangeType), position);
 
-    public (Card, List<Card>) MostPowerfulSilverCard() //analizes which is the most powerful unit card in the field and returns it alongside the list where it is played
+    public (UnitCard, List<Card>) SilverCardWithHighestOrLowestDamage(bool highestOrLowestDamage) //analizes which is the most or least powerful unit card in the field and returns it alongside the list where it is played
     {
         UnitCard unit = null;
         List<Card> list = null;
 
-        CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Melee, true);
-        CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Range, true);
-        CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Siege, true);
+        for (int i = 0; i < Zones.Length-1; i++) //not looking in Bonus
+        {
+            CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, Zones[i], highestOrLowestDamage);
+        }
 
         return (unit, list);
     }
 
-    public (Card, List<Card>) LeastPowerfulCard() //analizes which is the least powerful unit card in the field and returns it alongside the list where it is played
-    {
-        UnitCard unit = null;
-        List<Card> list = null;
-
-        CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Melee, false);
-        CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Range, false);
-        CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, this.Siege, false);
-
-        return (unit, list);
-    }
     private void CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref UnitCard unit, ref List<Card> listToSave, List<Card> listToCheck, bool HighestOrLowestDamage)
     {
-        if (HighestOrLowestDamage) //gets card with higher damage
+        foreach (Card item in listToCheck)
         {
-            foreach (Card item in listToCheck)
+            if (item is UnitCard unitItem && unitItem.level == Level.Silver && (unit == null || Compare(unit.InitialDamage, HighestOrLowestDamage, unitItem.InitialDamage)))
             {
-                if (item is UnitCard unitItem && unitItem.level == Level.Silver && (unit == null || unit.InitialDamage < unitItem.InitialDamage))
-                {
-                    unit = unitItem;
-                    listToSave = listToCheck;
-                }
-            }
-        }
-        else //gets card with lower damage
-        {
-            foreach (Card item in listToCheck)
-            {
-                if (item is UnitCard unitItem && unitItem.level == Level.Silver && (unit == null || unit.InitialDamage > unitItem.InitialDamage))
-                {
-                    unit = unitItem;
-                    listToSave = listToCheck;
-                }
+                unit = unitItem;
+                listToSave = listToCheck;
             }
         }
     }
@@ -157,8 +143,9 @@ public class Battlefield
 
         return false;
     }
-    public void RemoveClearEffect(int position)
+    void RemoveClearEffect(int position)
     {
         clearsPlayed[position] = false;
     }
+    bool Compare(double a, bool biggestOrSmallest, double b) => biggestOrSmallest ? a > b : a < b;
 }

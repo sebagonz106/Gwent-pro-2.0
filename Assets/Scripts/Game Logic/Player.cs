@@ -33,15 +33,13 @@ public class Player
         {
             emptySlotsInHand.Add(i);
         }
-
     }
 
     private static  Player SetPlayer(Player player, Player enemy, Faction faction)
     {
         player = new Player(faction);
-        player.context = new Context(enemy);
-        player.Battlefield = new Battlefield();
-        player.Battlefield.playerThatOwnsThisBattlefield = player;
+        player.context = new Context(player, enemy);
+        player.Battlefield = new Battlefield(player);
         return player;
     }
     #endregion
@@ -107,7 +105,7 @@ public class Player
         {
             if (card is UnitCard unit) //activating unit cart effect
             {
-                if (!unit.Effect(this.context.UpdateInstance(Utils.GetListByRangeType(this, rangeType), unit)))
+                if (!unit.Effect(this.context.UpdatePlayerInstance(Utils.GetListByRangeType(this, rangeType), unit)))
                 {
                     effectFailed = true;
                 }

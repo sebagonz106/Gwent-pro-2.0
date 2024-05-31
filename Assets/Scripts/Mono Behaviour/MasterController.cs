@@ -13,6 +13,7 @@ public class MasterController : MonoBehaviour
     public GameObject betweenRoundsPanel;
     public GameObject InfoPanel;
     public GameObject LeaderInfoPanel;
+    public Dictionary<string, GameObject> ZonesList;
     [SerializeField] GameObject batistaVictory;
     [SerializeField] GameObject fidelVictory;
     [SerializeField] GameObject effectException;
@@ -41,6 +42,19 @@ public class MasterController : MonoBehaviour
         fidelAvailableSlots = GameObject.FindGameObjectsWithTag("Fidel");
         batistaAvailableSlots = GameObject.FindGameObjectsWithTag("Batista");
         weather = GameObject.FindGameObjectWithTag("Weather");
+        ZonesList = new Dictionary<string, GameObject>
+        {
+            {"Weather",  GameObject.Find("Weather")},
+            {"Batista Bonus",  GameObject.Find("Batista Bonus")},
+            {"Batista Melee",  GameObject.Find("Batista Melee")},
+            {"Batista Range",  GameObject.Find("Batista Range")},
+            {"Batista Siege",  GameObject.Find("Batista Siege")},
+            {"Fidel Bonus",  GameObject.Find("Fidel Bonus")},
+            {"Fidel Melee",  GameObject.Find("Fidel Melee")},
+            {"Fidel Range",  GameObject.Find("Fidel Range")},
+            {"Fidel Siege",  GameObject.Find("Fidel Siege")},
+
+        };
     }
 
     public void EndTurn()

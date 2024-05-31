@@ -84,13 +84,13 @@ public static class Effects
 
     public static bool RemovePowerfulCard(Context context)
     {
-        List<object> fidelList = context.Board.Fidel.Battlefield.MostPowerfulSilverCard();
-        List<object> batistaList = context.Board.Batista.Battlefield.MostPowerfulSilverCard();
+        (UnitCard, List<Card>) fidelList = Player.Fidel.Battlefield.SilverCardWithHighestOrLowestDamage();
+        (UnitCard, List<Card>) batistaList = Player.Batista.Battlefield.SilverCardWithHighestOrLowestDamage();
 
-        if ((UnitCard)fidelList[0] == null && (UnitCard)batistaList[0] == null) return false; //checks if there is no unit silver card played
+        if (fidelList.Item1 == null && batistaList.Item1 == null) return false; //checks if there is no unit silver card played
 
         //checks if Batistas most powerful card outpowers Fidels most powerful card. If so, it sends Batsitas card to graveyard
-        if ((UnitCard)fidelList[0] == null || ((UnitCard)fidelList[0]).InitialDamage < ((UnitCard)batistaList[0]).InitialDamage)
+        if (fidelList.Item1 == null || (fidelList.Item1).InitialDamage < (batistaList.Item1).InitialDamage)
         {
             context.Board.Batista.Battlefield.ToGraveyard((UnitCard)batistaList[0], (List<Card>)batistaList[1]);
         }
@@ -114,7 +114,7 @@ public static class Effects
 
     public static bool RemoveEnemyWorstCard(Context context)
     {
-        (Card, List<Card>) leastPower = context.EnemyPlayer.Battlefield.LeastPowerfulCard();
+        (Card, List<Card>) leastPower = context.EnemyPlayer.Battlefield.SilverCardWithHighestOrLowestDamage();
         if (leastPower.Item1 == null) return false;
 
         context.EnemyPlayer.Battlefield.ToGraveyard(leastPower.Item1, leastPower.Item2); //sends to graveyard the least powerful card of the given player

@@ -136,6 +136,7 @@ public class Board
     }
 
     public Player GetCurrentPlayer() => IsBatistaPlayingOrAboutToPlay ? Player.Batista : Player.Fidel;
+    public Player GetCurrentEnemy() => IsBatistaPlayingOrAboutToPlay ? Player.Fidel : Player.Batista;
 
     private void SumScore (Player winner, int scoreWinner, Player looser, int scoreLooser)
     {
