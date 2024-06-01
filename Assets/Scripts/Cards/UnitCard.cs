@@ -2,29 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName ="Unit Card", menuName ="Scriptable Objects/Unit Card")]
-public class UnitCard : Card
+public class UnitCard : Card, IEffect
 {
-    [SerializeField] double initialDamage = 0;
-    double damageOnField;
-    double damage;
-    public Level level;
-    public Effect effect = Effects.VoidEffect;
+    double initialDamage = 0;
+    double damageOnField = 0;
+    double damageOnCount = 0;
+    Effect effect = Effects.VoidEffect;
 
+    public Level Level { get; private set; }
     public double InitialDamage { get => initialDamage; }
     public double DamageOnField { get => damageOnField; }
-    public double Damage { get => damage; set => damage = value; }
+    public double Damage { get => damageOnCount; set => damageOnCount = value; }
 
-    public UnitCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, Material material, Sprite information, List<Card> currentPosition) : base(name, faction, cardType, availableRange, material, information, currentPosition)
+    public UnitCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, VisualInfo info, List<Card> currentPosition, double initialDamage, Effect effect) : base(name, faction, cardType, availableRange, info, currentPosition)
     {
+        this.initialDamage = this.damageOnField = this.damageOnCount = initialDamage;
+        AssignEffect(effect);
     }
 
-    public UnitCard(string name, Material material) : base(name, material)
+    public UnitCard(UnitCardSO unit, Effect effect) : base(unit)
     {
+        this.initialDamage = this.damageOnField = this.damageOnCount = unit.InitialDamage;
+        AssignEffect(effect);
     }
 
     public void AssignEffect(Effect effect)
     {
+        if (effect.Equals(null)) return;
+
         this.effect = effect;
     }
 

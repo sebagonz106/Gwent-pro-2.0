@@ -2,17 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Bait Card", menuName = "Scriptable Objects/Bait Card")]
 public class BaitCard : Card
 {
-    Player playerThatPlayedThisCard;
-    public Player PlayerThatPlayedThisCard { get => playerThatPlayedThisCard; }
+    public Player PlayerThatPlayedThisCard { get; private set; }
 
-    public BaitCard(string name, Material material) : base(name, material)
+    public BaitCard(BaitCardSO bait) : base(bait)
     {
     }
 
-    public BaitCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, Material material, Sprite information, List<Card> currentPosition) : base(name, faction, cardType, availableRange, material, information, currentPosition)
+    public BaitCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, VisualInfo visual, List<Card> currentPosition) : base(name, faction, cardType, availableRange, visual, currentPosition)
     {
     }
 
@@ -24,7 +22,7 @@ public class BaitCard : Card
         player.Hand[player.Hand.IndexOf(this)] = card;
         if (card is UnitCard unit) unit.InitializeDamage(); //in case any permanent effects were applied on this card
         if (card is ClearCard) player.Battlefield.RemoveClearEffect(Utils.GetIntByBattlfieldList(player.Battlefield, list));
-        this.playerThatPlayedThisCard = player;
+        this.PlayerThatPlayedThisCard = player;
         return true;
     }
 }

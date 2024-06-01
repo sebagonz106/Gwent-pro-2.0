@@ -53,7 +53,7 @@ public class CardController : MonoBehaviour
         #region Leaders
         if(this.gameObject.tag == "LeaderCard")
         {
-            if(!GameManager.GetComponent<MasterController>().validTurn && player.Equals(board.GetCurrentPlayer()) && !player.leaderEffectUsedThisRound)
+            if(!GameManager.GetComponent<MasterController>().validTurn && player.Equals(board.GetCurrentPlayer()) && !player.LeaderEffectUsedThisRound)
             {
                     OpenInfoPanel(true);
             }

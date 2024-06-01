@@ -74,10 +74,46 @@ public class Battlefield
 
         return true;
     }
+
+    public void RemoveClearEffect(int position)
+    {
+        clearsPlayed[position] = false;
+    }
     #endregion
 
+    #region Adding methods
     public bool AddCard(Card card, Zone rangeType, int position) => TryAdd(card, Utils.GetListByRangeType(playerThatOwnsThisBattlefield, rangeType), position);
 
+    bool TryAdd(Card card, List<Card> list, int index)
+    {
+        int bonusAndClearIndex = Utils.GetIntByBattlfieldList(this, list);
+
+        if (list[index].Equals(Utils.BaseCard))
+        {
+            if (card.cardType == CardType.Unit)
+            {
+                list[index] = card;
+                return true;
+            }
+            if (card.cardType == CardType.Clear) //Creator's license here: Clear will only protect from 
+                                                 //weather effects the battlefield line where it is played
+            {
+                list[index] = card;
+                ClearsPlayed[bonusAndClearIndex] = true;
+                return true;
+            }
+        }
+        if (card.cardType == CardType.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
+        {
+            Bonus[bonusAndClearIndex] = card;
+            return true;
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region utils
     public (UnitCard, List<Card>) SilverCardWithHighestOrLowestDamage(bool highestOrLowestDamage) //analizes which is the most or least powerful unit card in the field and returns it alongside the list where it is played
     {
         UnitCard unit = null;
@@ -116,36 +152,6 @@ public class Battlefield
         return true;
     }
 
-    bool TryAdd(Card card, List<Card> list, int index)
-    {
-        int bonusAndClearIndex = Utils.GetIntByBattlfieldList(this, list);
-
-        if (list[index].Equals(Utils.BaseCard))
-        {
-            if (card.cardType == CardType.Unit)
-            {
-                list[index] = card;
-                return true;
-            }
-            if (card.cardType == CardType.Clear) //Creator's license here: Clear will only protect from 
-                                                 //weather effects the battlefield line where it is played
-            {
-                list[index] = card;
-                ClearsPlayed[bonusAndClearIndex] = true;
-                return true;
-            }
-        }
-        if (card.cardType == CardType.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
-        {
-            Bonus[bonusAndClearIndex] = card;
-            return true;
-        }
-
-        return false;
-    }
-    void RemoveClearEffect(int position)
-    {
-        clearsPlayed[position] = false;
-    }
     bool Compare(double a, bool biggestOrSmallest, double b) => biggestOrSmallest ? a > b : a < b;
+    #endregion
 }

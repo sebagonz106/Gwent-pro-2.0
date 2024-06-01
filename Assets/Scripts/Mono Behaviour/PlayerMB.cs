@@ -7,6 +7,8 @@ public class PlayerMB : MonoBehaviour
 {
     public Player player;
     public BoardMB board;
+    public BattlefieldMB battlefield;
+    public GameObject Hand;
     [SerializeField] LeaderCard stealCardLeader;
     [SerializeField] LeaderCard cardStaysLeader;
     public GameObject WonCoin1;

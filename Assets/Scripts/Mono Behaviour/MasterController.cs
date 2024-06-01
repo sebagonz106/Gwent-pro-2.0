@@ -8,32 +8,38 @@ using UnityEngine.SceneManagement;
 
 public class MasterController : MonoBehaviour
 {
-    public Camera[] cameras = new Camera[3]; //Camera[0] between rounds, Camera[1] fidel, Camera[2] batista,
-    public GameObject playerPanel;
-    public GameObject betweenRoundsPanel;
-    public GameObject InfoPanel;
-    public GameObject LeaderInfoPanel;
-    public Dictionary<string, GameObject> ZonesList;
+    public Camera[] cameras = new Camera[3]; //Camera[0] between rounds, Camera[1] fidel, Camera[2] batista
+
+    #region Panels
+    [SerializeField] GameObject playerPanel;
+    [SerializeField] GameObject betweenRoundsPanel;
+    [SerializeField] GameObject InfoPanel;
+    [SerializeField] GameObject LeaderInfoPanel;
     [SerializeField] GameObject batistaVictory;
     [SerializeField] GameObject fidelVictory;
     [SerializeField] GameObject effectException;
     [SerializeField] GameObject generalException;
     [SerializeField] TMP_Text roundEndedNotification;
+    [SerializeField] TMP_Text BatistaScoreInPlayersPanel;
+    [SerializeField] TMP_Text FidelScoreInPlayersPanel;
+    [SerializeField] TMP_Text BatistaScoreInBetweenRoundsPanel;
+    [SerializeField] TMP_Text FidelScoreInBetweenRoundsPanel;
+
+    GameObject panelOnWhenInformationDisplayed;
+    #endregion
+
+    #region Scene and card objects
     private GameObject[] fidelBody;
     private GameObject[] batistaBody;
     private GameObject[] fidelAvailableSlots;
     private GameObject[] batistaAvailableSlots;
-    private GameObject weather;
-    public Board board;
-    public bool isBatistaPlayingOrAboutToPlay = true;
+    #endregion
+
+    public BoardMB board;
     public bool validTurn = false;
-    public TMP_Text BatistaScoreInPlayersPanel;
-    public TMP_Text FidelScoreInPlayersPanel;
-    public TMP_Text BatistaScoreInBetweenRoundsPanel;
-    public TMP_Text FidelScoreInBetweenRoundsPanel;
-    GameObject panelOnWhenInformationDisplayed;
 
     public GameObject PanelOnWhenInformationDisplayed { get => panelOnWhenInformationDisplayed; set => panelOnWhenInformationDisplayed = value; }
+    bool isBatistaPlayingOrAboutToPlay => Board.Instance.IsBatistaPlayingOrAboutToPlay;
 
     private void Start()
     {
@@ -41,20 +47,6 @@ public class MasterController : MonoBehaviour
         batistaBody = GameObject.FindGameObjectsWithTag("Batista Body");
         fidelAvailableSlots = GameObject.FindGameObjectsWithTag("Fidel");
         batistaAvailableSlots = GameObject.FindGameObjectsWithTag("Batista");
-        weather = GameObject.FindGameObjectWithTag("Weather");
-        ZonesList = new Dictionary<string, GameObject>
-        {
-            {"Weather",  GameObject.Find("Weather")},
-            {"Batista Bonus",  GameObject.Find("Batista Bonus")},
-            {"Batista Melee",  GameObject.Find("Batista Melee")},
-            {"Batista Range",  GameObject.Find("Batista Range")},
-            {"Batista Siege",  GameObject.Find("Batista Siege")},
-            {"Fidel Bonus",  GameObject.Find("Fidel Bonus")},
-            {"Fidel Melee",  GameObject.Find("Fidel Melee")},
-            {"Fidel Range",  GameObject.Find("Fidel Range")},
-            {"Fidel Siege",  GameObject.Find("Fidel Siege")},
-
-        };
     }
 
     public void EndTurn()
@@ -62,10 +54,10 @@ public class MasterController : MonoBehaviour
         if (!validTurn) return;
         validTurn = false;
 
-        if (isBatistaPlayingOrAboutToPlay)
+        if (Board.Instance.IsBatistaPlayingOrAboutToPlay)
         {
             cameras[2].gameObject.SetActive(false);
-            isBatistaPlayingOrAboutToPlay = board.Fidel.EndRound? true : false;
+            Board.Instance.IsBatistaPlayingOrAboutToPlay = board.Fidel.EndRound? true : false;
             playerPanel.SetActive(false);
             betweenRoundsPanel.SetActive(true);
             UpdateScoreInText("Batista");

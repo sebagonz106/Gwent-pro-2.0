@@ -16,7 +16,7 @@ public class LeaderSkillPanel : MonoBehaviour
     public void LeaderSkill()
     {
         LeaderCard leader = this.GetComponent<MasterController>().board.GetCurrentPlayer().Leader;
-        if (this.board.GetCurrentPlayer().leaderEffectUsedThisRound) return;
+        if (this.board.GetCurrentPlayer().LeaderEffectUsedThisRound) return;
 
         if (leader.stealCardLeader)
         {

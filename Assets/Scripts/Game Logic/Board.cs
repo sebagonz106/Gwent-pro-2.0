@@ -11,6 +11,7 @@ public class Board
     public List<Card> Weather = Enumerable.Repeat<Card>(Utils.BaseCard, 3).ToList<Card>();
     public bool AlmeidaIsPlayed = false;
     private static Board instance;
+    public Dictionary<string, List<Card>> ZonesList;
 
     public bool IsBatistaPlayingOrAboutToPlay { get; private set; }
     public static Board Instance => instance.Equals(null) ? SetBoard() : instance;
@@ -20,6 +21,19 @@ public class Board
     private static Board SetBoard()
     {
         instance = new Board();
+        instance.ZonesList = new Dictionary<string, List<Card>>
+        {
+            {"Weather", instance.Weather },
+            {"Batista Bonus",  Player.Batista.Battlefield.Bonus},
+            {"Batista Melee",  Player.Batista.Battlefield.Melee},
+            {"Batista Range",  Player.Batista.Battlefield.Range},
+            {"Batista Siege",  Player.Batista.Battlefield.Siege},
+            {"Fidel Bonus",  Player.Fidel.Battlefield.Bonus},
+            {"Fidel Melee",  Player.Fidel.Battlefield.Melee},
+            {"Fidel Range",  Player.Fidel.Battlefield.Range},
+            {"Fidel Siege",  Player.Fidel.Battlefield.Siege},
+
+        };
         return instance;
     }
     #endregion
@@ -38,8 +52,8 @@ public class Board
             {
                 Player.Fidel.GetCard(2);
                 Player.Batista.GetCard(2);
-                if (Player.Fidel.Leader.stealCardLeader) Player.Fidel.leaderEffectUsedThisRound = false;
-                if (Player.Batista.Leader.stealCardLeader) Player.Batista.leaderEffectUsedThisRound = false;
+                if (Player.Fidel.Leader.stealCardLeader) Player.Fidel.LeaderEffectUsedThisRound = false;
+                if (Player.Batista.Leader.stealCardLeader) Player.Batista.LeaderEffectUsedThisRound = false;
             }
 
             RoundCount++;
@@ -117,8 +131,6 @@ public class Board
                 winner = "";
             }
 
-            Player.Fidel.Battlefield.Clear();
-            Player.Batista.Battlefield.Clear();
             Player.Fidel.EndRound = false;
             Player.Batista.EndRound = false;
             newRound = true;

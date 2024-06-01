@@ -11,8 +11,8 @@ public class Player
     private List<int> emptySlotsInHand = new List<int>(10);
     public List<Card> Deck = new List<Card>(25);
     public LeaderCard Leader;
-    public bool leaderCardSelected = false;
-    public bool leaderEffectUsedThisRound = false;
+    public bool LeaderCardSelected = false;
+    public bool LeaderEffectUsedThisRound = false;
     public bool EndRound = false;
     public bool StartedPlaying = false;
     public double TotalDamage = 0;
@@ -25,6 +25,10 @@ public class Player
     public static Player Fidel => fidel.Equals(null) ? SetPlayer(fidel, Batista, Faction.Fidel) : fidel;
     public static Player Batista => batista.Equals(null) ? SetPlayer(batista, Fidel, Faction.Batista) : batista;
     public Faction PlayerName => playerName;
+
+    public Dictionary<string, List<Card>> ListByName;
+    public Dictionary<Zone, List<Card>> ListByZone;
+    public Dictionary<List<Card>, Zone> ZoneByList;
 
     private Player(Faction faction)
     {
@@ -40,6 +44,24 @@ public class Player
         player = new Player(faction);
         player.context = new Context(player, enemy);
         player.Battlefield = new Battlefield(player);
+        player.ListByName = new Dictionary<string, List<Card>> {
+                                                                { "Melee", player.Battlefield.Melee },
+                                                                { "Range", player.Battlefield.Range },
+                                                                { "Siege", player.Battlefield.Siege },
+                                                                { "Bonus", player.Battlefield.Bonus },
+                                                                { "Weather", Board.Instance.Weather },
+                                                                { "Hand", player.Hand }
+                                                               };
+        player.ListByZone = new Dictionary<Zone, List<Card>> {
+                                                                { Zone.Melee, player.Battlefield.Melee },
+                                                                { Zone.Range, player.Battlefield.Range },
+                                                                { Zone.Siege, player.Battlefield.Siege }
+                                                             };
+        player.ZoneByList= new Dictionary<List<Card>, Zone> {
+                                                                { player.Battlefield.Melee, Zone.Melee },
+                                                                { player.Battlefield.Range, Zone.Range },
+                                                                { player.Battlefield.Siege, Zone.Siege }
+                                                             };
         return player;
     }
     #endregion
@@ -105,7 +127,7 @@ public class Player
         {
             if (card is UnitCard unit) //activating unit cart effect
             {
-                if (!unit.Effect(this.context.UpdatePlayerInstance(Utils.GetListByRangeType(this, rangeType), unit)))
+                if (!unit.Effect(this.context.UpdatePlayerInstance(this.ListByZone[rangeType], unit)))
                 {
                     effectFailed = true;
                 }

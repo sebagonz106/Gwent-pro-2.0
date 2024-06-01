@@ -5,25 +5,39 @@ using UnityEngine;
 
 public class BoardMB : MonoBehaviour
 {
-    PlayerMB Fidel;
-    PlayerMB Batista;
+    public PlayerMB Fidel;
+    public PlayerMB Batista;
+    public GameObject Weather;
     public Canvas gameController;
     public MasterController masterController => (MasterController)gameController.GetComponent("MasterController");
-    //declarar un arreglo que contenga los nombres de las filas y un diccionario que de la fila en forrma de lista y en forma de game object para el update view
+    public Dictionary<string, GameObject> ZonesList;
 
+    public void Start()
+    {
+        ZonesList = new Dictionary<string, GameObject>();
+        foreach(string item in Utils.ZonesName)
+        {
+            ZonesList.Add(item, GameObject.Find(item));
+        }
+        Weather = ZonesList["Weather"];
+    }
     public void UpdateView( bool alsoUpdateTexts = false)
     {
-        CardsInBoardViewModificator("Weather", this.Weather, 3);
-        CardsInBoardViewModificator("Batista Bonus", this.Batista.Battlefield.Bonus, 3, masterController.isBatistaPlayingOrAboutToPlay);
-        CardsInBoardViewModificator("Fidel Bonus", this.Fidel.Battlefield.Bonus, 3, !masterController.isBatistaPlayingOrAboutToPlay);
-        CardsInBoardViewModificator("Batista Hand", this.Batista.Hand, 10, false);
-        CardsInBoardViewModificator("Fidel Hand", this.Fidel.Hand, 10, false);
-        CardsInBoardViewModificator("Batista Melee", this.Batista.Battlefield.Melee, 5, masterController.isBatistaPlayingOrAboutToPlay); 
-        CardsInBoardViewModificator("Batista Range", this.Batista.Battlefield.Range, 5, masterController.isBatistaPlayingOrAboutToPlay);
-        CardsInBoardViewModificator("Batista Siege", this.Batista.Battlefield.Siege, 5, masterController.isBatistaPlayingOrAboutToPlay); 
-        CardsInBoardViewModificator("Fidel Melee", this.Fidel.Battlefield.Melee, 5, !masterController.isBatistaPlayingOrAboutToPlay);
-        CardsInBoardViewModificator("Fidel Range", this.Fidel.Battlefield.Range, 5, !masterController.isBatistaPlayingOrAboutToPlay); 
-        CardsInBoardViewModificator("Fidel Siege", this.Fidel.Battlefield.Siege, 5, !masterController.isBatistaPlayingOrAboutToPlay);
+        for (int i = 0; i < Utils.ZonesName.Length; i++)
+        {
+            if (Utils.ZonesName[i].Contains("Weather") || Utils.ZonesName[i].Contains("Bonus")) continue;
+
+            CardsInBoardViewModificator(ZonesList[Utils.ZonesName[i]],
+                                        Board.Instance.ZonesList[Utils.ZonesName[i]],
+                                        5, // available slots
+                                        Utils.ZonesName[i].Contains("Batista") ? Board.Instance.IsBatistaPlayingOrAboutToPlay :
+                                                                                !Board.Instance.IsBatistaPlayingOrAboutToPlay);
+        }
+
+        CardsInBoardViewModificator(ZonesList["Weather"], Board.Instance.Weather, 3);
+        CardsInBoardViewModificator(Batista.Hand, Player.Batista.Hand, 10, false);
+        CardsInBoardViewModificator(Fidel.Hand, Player.Fidel.Hand, 10, false);
+
         if(alsoUpdateTexts) this.masterController.UpdateScoreInText();
     }
 
@@ -31,6 +45,8 @@ public class BoardMB : MonoBehaviour
     {
         if (Board.Instance.CheckNextRound(out string winner))
         {
+            Fidel.battlefield.Clear();
+            Batista.battlefield.Clear();
             if (winner.Length == 0) this.masterController.RoundEndedNotification();
             else
             {
@@ -64,9 +80,8 @@ public class BoardMB : MonoBehaviour
         }
     }
 
-    void CardsInBoardViewModificator(string name, List<Card> list, int maxCapacity, bool setActiveOutOfCount = true)
+    void CardsInBoardViewModificator (GameObject gameObjectsList, List<Card> list, int maxCapacity, bool setActiveOutOfCount = true)
     {
-        GameObject gameObjectsList = GameObject.Find(name);
         GameObject child;
 
         for (int i = 0; i < maxCapacity; i++)
