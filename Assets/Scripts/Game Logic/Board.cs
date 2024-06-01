@@ -52,8 +52,8 @@ public class Board
             {
                 Player.Fidel.GetCard(2);
                 Player.Batista.GetCard(2);
-                if (Player.Fidel.Leader.stealCardLeader) Player.Fidel.LeaderEffectUsedThisRound = false;
-                if (Player.Batista.Leader.stealCardLeader) Player.Batista.LeaderEffectUsedThisRound = false;
+                if (Player.Fidel.Leader.StealCardLeader) Player.Fidel.LeaderEffectUsedThisRound = false;
+                if (Player.Batista.Leader.StealCardLeader) Player.Batista.LeaderEffectUsedThisRound = false;
             }
 
             RoundCount++;
@@ -70,20 +70,20 @@ public class Board
         }
 
         player.TotalDamage = 0;
-        double meleeBonus = (player.Battlefield.Bonus[0] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[0]).increase : 1;
-        double rangeBonus = (player.Battlefield.Bonus[1] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[1]).increase : 1;
-        double siegeBonus = (player.Battlefield.Bonus[2] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[2]).increase : 1;
+        double meleeBonus = (player.Battlefield.Bonus[0] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[0]).Increase : 1;
+        double rangeBonus = (player.Battlefield.Bonus[1] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[1]).Increase : 1;
+        double siegeBonus = (player.Battlefield.Bonus[2] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[2]).Increase : 1;
 
         foreach (Card card in this.Weather) //applies weather effects
         {
-            if (card is WeatherCard weather) weather.Effect(this);
+            if (card is WeatherCard weather) weather.Effect(player.context.UpdatePlayerInstance(this.Weather, weather));
         }
 
         foreach (Card item in player.Battlefield.Melee) //sums the damage of the unit melee cards
         {
             if (item is UnitCard unit)
             {
-                player.TotalDamage += unit.level == Level.Golden ? unit.Damage : meleeBonus * unit.Damage;
+                player.TotalDamage += unit.Level == Level.Golden ? unit.Damage : meleeBonus * unit.Damage;
                 unit.ResetDamage();
             }
         }
@@ -92,7 +92,7 @@ public class Board
         {
             if (item is UnitCard unit)
             {
-                player.TotalDamage += unit.level == Level.Golden ? unit.Damage : rangeBonus * unit.Damage;
+                player.TotalDamage += unit.Level == Level.Golden ? unit.Damage : rangeBonus * unit.Damage;
                 unit.ResetDamage();
             }
         }
@@ -101,7 +101,7 @@ public class Board
         {
             if (item is UnitCard unit)
             {
-                player.TotalDamage += unit.level == Level.Golden ? unit.Damage : siegeBonus * unit.Damage;
+                player.TotalDamage += unit.Level == Level.Golden ? unit.Damage : siegeBonus * unit.Damage;
                 unit.ResetDamage();
             }
         }

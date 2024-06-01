@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaitCard : Card
+public class BaitCard : Card, ICardsPlayableInCommonPositions
 {
-    public Player PlayerThatPlayedThisCard { get; private set; }
+    public Player PlayerThatPlayedThisCard { get; set; }
 
     public BaitCard(BaitCardSO bait) : base(bait)
     {
@@ -21,7 +21,7 @@ public class BaitCard : Card
         list[index] = this;
         player.Hand[player.Hand.IndexOf(this)] = card;
         if (card is UnitCard unit) unit.InitializeDamage(); //in case any permanent effects were applied on this card
-        if (card is ClearCard) player.Battlefield.RemoveClearEffect(Utils.GetIntByBattlfieldList(player.Battlefield, list));
+        if (card is ClearCard) player.Battlefield.RemoveClearEffect(Utils.IndexByZone[player.ZoneByList[list]]);
         this.PlayerThatPlayedThisCard = player;
         return true;
     }

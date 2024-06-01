@@ -19,20 +19,16 @@ public class PlayerMB : MonoBehaviour
         if (this.gameObject.name == "Fidel")
         {
             player = Player.Fidel;
-            if (stealCardLeader.name == PlayerPrefs.GetString("Rebel Leader")) player.Leader = stealCardLeader;
+            if (stealCardLeader.Name == PlayerPrefs.GetString("Rebel Leader")) player.Leader = stealCardLeader;
             else player.Leader = cardStaysLeader;
-
-            player.Leader.information = Resources.Load<Sprite>($"Info/Fidel/{player.Leader.name}");
         }
 
         else if (this.gameObject.name == "Batista")
         {
             player = Player.Batista;
 
-            if (stealCardLeader.name == PlayerPrefs.GetString("Batista Leader")) player.Leader = stealCardLeader;
+            if (stealCardLeader.Name == PlayerPrefs.GetString("Batista Leader")) player.Leader = stealCardLeader;
             else player.Leader = cardStaysLeader;
-
-            player.Leader.information = Resources.Load<Sprite>($"Info/Batista/{player.Leader.name}");
         }
     }
 

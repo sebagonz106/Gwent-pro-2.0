@@ -136,7 +136,7 @@ public class CardController : MonoBehaviour
                         if (child.GetComponent<CardController>().isSelected && child.GetComponent<CardController>().rangeTypes.Contains(this.rangeTypes[0]))
                         {
                             if ((this.gameObject.tag == "WeatherCard" && player.Hand[i] is WeatherCard) ||
-                                (this.gameObject.tag == "BattlefieldCard" && !(new List<CardType> { CardType.Bait, CardType.Bonus, CardType.Weather }).Contains(player.Hand[i].cardType)) ||
+                                (this.gameObject.tag == "BattlefieldCard" && !(new List<CardType> { CardType.Bait, CardType.Bonus, CardType.Weather }).Contains(player.Hand[i].CardType)) ||
                                 (this.gameObject.tag == "BonusCard" && player.Hand[i] is BonusCard))
                             {
                                 if (this.player.PlayCard(i, indexOfThisInParent, this.rangeTypes[0]))

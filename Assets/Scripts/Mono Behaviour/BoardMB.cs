@@ -88,7 +88,7 @@ public class BoardMB : MonoBehaviour
         {
             child = gameObjectsList.transform.GetChild(i).gameObject;
 
-            if (list[i].name == Utils.BaseCard.name)
+            if (list[i].Name == Utils.BaseCard.Name)
             {
                 child.GetComponent<Renderer>().material = Utils.BaseCard.material;
                 child.GetComponent<CardController>().IsOccupied = false;
@@ -99,7 +99,7 @@ public class BoardMB : MonoBehaviour
                 child.SetActive(true);
                 child.GetComponent<Renderer>().material = list[i].material;
                 child.GetComponent<CardController>().Info = list[i].information;
-                if (name.Contains("Hand")) child.GetComponent<CardController>().AssignRangeForHandCard(list[i].availableRange);
+                if (name.Contains("Hand")) child.GetComponent<CardController>().AssignRangeForHandCard(list[i].AvailableRange);
             }
         }
     }

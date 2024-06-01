@@ -149,7 +149,7 @@ public static class Effects
 
         foreach (UnitCard item in list)
         {
-            if (item.level == Level.Silver) item.ModifyOnFieldDamage(average, true);
+            if (item.Level == Level.Silver) item.ModifyOnFieldDamage(average, true);
         }
 
         return true;
@@ -214,7 +214,7 @@ public static class Effects
     {
         foreach (Card item in list)
         {
-            if (item is UnitCard unit && unit.level == Level.Silver) unit.ModifyOnFieldDamage(unit.DamageOnField - toTake, true);
+            if (item is UnitCard unit && unit.Level == Level.Silver) unit.ModifyOnFieldDamage(unit.DamageOnField - toTake, true);
         }
     }
     static void StoreUnitsInListAndCountDamage(List<Card> listToCheck, List<UnitCard> listToStore, ref double damage)

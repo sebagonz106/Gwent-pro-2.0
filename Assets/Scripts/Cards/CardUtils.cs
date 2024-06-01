@@ -24,3 +24,7 @@ public interface IEffect
     bool Effect(Context context);
 }
 
+public interface ICardsPlayableInCommonPositions
+{
+    Player PlayerThatPlayedThisCard { get; set; }
+}

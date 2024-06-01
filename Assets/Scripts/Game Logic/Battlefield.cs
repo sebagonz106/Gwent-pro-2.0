@@ -31,7 +31,7 @@ public class Battlefield
         if (list.Equals(this.playerThatOwnsThisBattlefield.Hand)) this.playerThatOwnsThisBattlefield.EmptyHandAt(list.IndexOf(card));
         else
         {
-            if (card is ClearCard) RemoveClearEffect(Utils.GetIntByBattlfieldList(this, list));
+            if (card is ClearCard) RemoveClearEffect(Utils.IndexByZone[this.playerThatOwnsThisBattlefield.ZoneByList[list]]);
             list[list.IndexOf(card)] = Utils.BaseCard;
         }
     }
@@ -82,20 +82,20 @@ public class Battlefield
     #endregion
 
     #region Adding methods
-    public bool AddCard(Card card, Zone rangeType, int position) => TryAdd(card, Utils.GetListByRangeType(playerThatOwnsThisBattlefield, rangeType), position);
+    public bool AddCard(Card card, Zone rangeType, int position) => TryAdd(card, this.playerThatOwnsThisBattlefield.ListByZone[rangeType], position);
 
     bool TryAdd(Card card, List<Card> list, int index)
     {
-        int bonusAndClearIndex = Utils.GetIntByBattlfieldList(this, list);
+        int bonusAndClearIndex = Utils.IndexByZone[this.playerThatOwnsThisBattlefield.ZoneByList[list]];
 
         if (list[index].Equals(Utils.BaseCard))
         {
-            if (card.cardType == CardType.Unit)
+            if (card.CardType == CardType.Unit)
             {
                 list[index] = card;
                 return true;
             }
-            if (card.cardType == CardType.Clear) //Creator's license here: Clear will only protect from 
+            if (card.CardType == CardType.Clear) //Creator's license here: Clear will only protect from 
                                                  //weather effects the battlefield line where it is played
             {
                 list[index] = card;
@@ -103,7 +103,7 @@ public class Battlefield
                 return true;
             }
         }
-        if (card.cardType == CardType.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
+        if (card.CardType == CardType.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
         {
             Bonus[bonusAndClearIndex] = card;
             return true;
@@ -131,7 +131,7 @@ public class Battlefield
     {
         foreach (Card item in listToCheck)
         {
-            if (item is UnitCard unitItem && unitItem.level == Level.Silver && (unit == null || Compare(unit.InitialDamage, HighestOrLowestDamage, unitItem.InitialDamage)))
+            if (item is UnitCard unitItem && unitItem.Level == Level.Silver && (unit == null || Compare(unit.InitialDamage, HighestOrLowestDamage, unitItem.InitialDamage)))
             {
                 unit = unitItem;
                 listToSave = listToCheck;
@@ -141,7 +141,7 @@ public class Battlefield
     public bool StaysInBattlefieldIs(string name)
     {
         if (!(staysInBattlefieldController.Item1 is Card)) return false;
-        if (name == staysInBattlefieldController.Item1.name) return true;
+        if (name == staysInBattlefieldController.Item1.Name) return true;
         return false;
     }
     public bool StaysInBattlefieldModifier(Card card, List<Card> list)

@@ -12,14 +12,14 @@ public class CardInitializer : MonoBehaviour
     {
         foreach (Card item in cards)
         {
-            item.information = Resources.Load<Sprite>($"Info/{(this.player.PlayerName==Faction.Fidel? "Fidel" : "Batista")}/{item.name}");
-            item.material = Resources.Load<Material>($"Materials/{(this.player.PlayerName == Faction.Fidel ? "Fidel" : "Batista")}/{item.name}");
+            item.information = Resources.Load<Sprite>($"Info/{(this.player.PlayerName==Faction.Fidel? "Fidel" : "Batista")}/{item.Name}");
+            item.material = Resources.Load<Material>($"Materials/{(this.player.PlayerName == Faction.Fidel ? "Fidel" : "Batista")}/{item.Name}");
 
             if (item is UnitCard unit)
             {
                 unit.InitializeDamage();
 
-                switch (unit.name) //effect asssignation
+                switch (unit.Name) //effect asssignation
                 {
                     #region Rebel effects
                     case "Juan Almeida":

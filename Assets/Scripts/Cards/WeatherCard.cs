@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeatherCard : Card, IEffect
+public class WeatherCard : Card, IEffect, ICardsPlayableInCommonPositions
 {
     public Player PlayerThatPlayedThisCard { get; set; }
 
@@ -16,26 +16,26 @@ public class WeatherCard : Card, IEffect
 
     public bool Effect(Context context) //reduces the damage of every silver unit card played:
     {
-        ReduceSilverUnitCardPowerInLineIfPossible(context.Board, Zone.Melee); //if affects melee
-        ReduceSilverUnitCardPowerInLineIfPossible(context.Board, Zone.Range); //if affects range
-        ReduceSilverUnitCardPowerInLineIfPossible(context.Board, Zone.Siege); //if affects siege
+        ReduceSilverUnitCardPowerInLineIfPossible(Zone.Melee); //if affects melee
+        ReduceSilverUnitCardPowerInLineIfPossible(Zone.Range); //if affects range
+        ReduceSilverUnitCardPowerInLineIfPossible(Zone.Siege); //if affects siege
         return true;
     }
 
-    private void ReduceSilverUnitCardPowerInLineIfPossible(Board board, Zone rangeType)
+    private void ReduceSilverUnitCardPowerInLineIfPossible(Zone rangeType)
     {
         if (this.AvailableRange.Contains(rangeType))
         {
-            List<Card> fidel = Utils.GetListByRangeType(Player.Fidel, rangeType);
-            List<Card> batista = Utils.GetListByRangeType(Player.Batista, rangeType);
+            List<Card> fidel = Player.Fidel.ListByZone[rangeType];
+            List<Card> batista = Player.Batista.ListByZone[rangeType];
 
             for (int i = 0; i < 5; i++)
             {
-                if (batista[i] is UnitCard batistaUnit && batistaUnit.Level == Level.Silver && !Player.Batista.Battlefield.ClearsPlayed[Utils.GetIntByRangeType(rangeType)])
+                if (batista[i] is UnitCard batistaUnit && batistaUnit.Level == Level.Silver && !Player.Batista.Battlefield.ClearsPlayed[Utils.IndexByZone[rangeType]])
                 {
                     batistaUnit.Damage -= batistaUnit.Damage < 2 ? batistaUnit.Damage : 2;
                 }
-                if (fidel[i] is UnitCard fidelUnit && fidelUnit.Level == Level.Silver && !Player.Fidel.Battlefield.ClearsPlayed[Utils.GetIntByRangeType(rangeType)])
+                if (fidel[i] is UnitCard fidelUnit && fidelUnit.Level == Level.Silver && !Player.Fidel.Battlefield.ClearsPlayed[Utils.IndexByZone[rangeType]])
                 {
                     fidelUnit.Damage -= fidelUnit.Damage < 2 ? fidelUnit.Damage : 2;
                 }
