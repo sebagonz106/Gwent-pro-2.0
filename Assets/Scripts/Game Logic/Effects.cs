@@ -4,7 +4,37 @@ using UnityEngine;
 
 public static class Effects
 { //parameters composition: 0 Board, 1 Player player, 2 Player enemy, 3 List<Card> currentPosition, 4 Card
- //works depending on cards being played before aplying their effects.
+  //works depending on cards being played before aplying their effects.
+
+    #region Effects storage
+    static Dictionary<string, Effect> effects = new Dictionary<string, Effect>
+    {
+        {"Empty", VoidEffect },
+        {"Juan Almeida", NoOneSurrendersHereGodDamn },
+        {"Raul Castro", StealCard },
+        {"Celia Sanchez", ClearsLineWithFewerCards },
+        {"Luchadores clandestinos", PlaceBonusInLineWhereIsPlayed },
+        {"Guajiros" , MultipliesHisDamageTimesCardsLikeThis },
+        {"Cuarteles", MultipliesHisDamageTimesCardsLikeThis },
+        {"Tanque de guerra", PlaceLightButIrremovableWeatherInEnemysBattlefield },
+        {"Chivatos", RemoveEnemyWorstCard },
+        {"Pilar Garcia", RemovePowerfulCard },
+        {"Martin Diaz Tamayo", EqualsSilverUnitsDamageToBattlefieldsAverage }
+    };
+
+    public static void AddEffect(string name, Effect effect) { effects.Add(name, effect); }
+    public static Effect GetEffect(string name)
+    {
+        try
+        {
+            return effects[name];
+        }
+        catch (System.ArgumentOutOfRangeException)
+        {
+            return effects["Empty"];
+        }
+    }
+    #endregion
 
     #region Rebel effects
 

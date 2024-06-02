@@ -5,27 +5,28 @@ using UnityEngine;
 public class LeaderSkillPanel : MonoBehaviour
 {
     [SerializeField] GameObject Info;
-    [SerializeField] Board board;
+    [SerializeField] BoardMB board;
 
-    public void StaysInBattlefieldModifierSkill(Card card, List<Card> list)
+    public void LeaderSkillWhenCardSelected(Player player, Card card, List<Card> list)
     {
-        this.GetComponent<MasterController>().board.GetCurrentPlayer().Leader.KeepInBattlefield(card, list);
+        player.Leader.Effect(player.context.UpdatePlayerInstance(list, card));
         Info.SetActive(true);
     }
 
     public void LeaderSkill()
     {
-        LeaderCard leader = this.GetComponent<MasterController>().board.GetCurrentPlayer().Leader;
-        if (this.board.GetCurrentPlayer().LeaderEffectUsedThisRound) return;
+        Player player = board.board.GetCurrentPlayer();
+        LeaderCard leader = player.Leader;
+        if (player.LeaderEffectUsedThisRound) return;
 
-        if (leader.stealCardLeader)
+        if (!leader.NeedsCardSelection)
         {
-            leader.StealCard();
+            leader.Effect(player.context);
             board.UpdateView();
         }
         else
         {
-            board.GetCurrentPlayer().LeaderCardSelected = true;
+            player.LeaderCardSelected = true;
             Info.SetActive(false);
         }
     }

@@ -113,7 +113,7 @@ public class Player
     {
         effectFailed = false;
 
-        if (!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard) //in case of unexpected behaviours. bait cards will be played through their effect
+        if (!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard || Board.Instance.ValidTurn) //in case of unexpected behaviours. bait cards will be played through their effect
         {
             return false;
         }
@@ -138,6 +138,7 @@ public class Player
             return false;
         }
 
+        Board.Instance.ValidTurn = true;
         EmptyHandAt(originPosition);
         return true;
     }

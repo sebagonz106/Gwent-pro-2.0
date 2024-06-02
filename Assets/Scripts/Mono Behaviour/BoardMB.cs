@@ -5,12 +5,18 @@ using UnityEngine;
 
 public class BoardMB : MonoBehaviour
 {
+    #region Fields and Start
+    public Board board;
     public PlayerMB Fidel;
     public PlayerMB Batista;
     public GameObject Weather;
     public Canvas gameController;
     public MasterController masterController => (MasterController)gameController.GetComponent("MasterController");
-    public Dictionary<string, GameObject> ZonesList;
+    public Dictionary<string, GameObject> ZonesList { get; private set; }
+    public Dictionary<string, PlayerMB> GetMBPlayerByName { get; private set; }
+    public Dictionary<Player, PlayerMB> GetMBPlayer { get; private set; }
+
+    public PlayerMB CurrentPlayer => GetMBPlayer[board.GetCurrentPlayer()];
 
     public void Start()
     {
@@ -20,7 +26,14 @@ public class BoardMB : MonoBehaviour
             ZonesList.Add(item, GameObject.Find(item));
         }
         Weather = ZonesList["Weather"];
+        GetMBPlayerByName = new Dictionary<string, PlayerMB>() { { "Fidel", Fidel }, { "Batista", Batista } };
+        GetMBPlayer = new Dictionary<Player, PlayerMB>() { { Player.Fidel, Fidel }, { Player.Batista, Batista } };
+
+        board = Board.Instance;
     }
+    #endregion
+
+    #region ViewModification
     public void UpdateView( bool alsoUpdateTexts = false)
     {
         for (int i = 0; i < Utils.ZonesName.Length; i++)
@@ -40,6 +53,79 @@ public class BoardMB : MonoBehaviour
 
         if(alsoUpdateTexts) this.masterController.UpdateScoreInText();
     }
+    void CardsInBoardViewModificator(GameObject gameObjectsList, List<Card> list, int maxCapacity, bool setActiveOutOfCount = true)
+    {
+        GameObject child;
+
+        for (int i = 0; i < maxCapacity; i++)
+        {
+            child = gameObjectsList.transform.GetChild(i).gameObject;
+
+            if (list[i].Name == Utils.BaseCard.Name)
+            {
+                child.GetComponent<Renderer>().material = Utils.BaseCard.Info.Material;
+                child.GetComponent<CardController>().IsOccupied = false;
+                child.SetActive(setActiveOutOfCount);
+            }
+            else
+            {
+                child.SetActive(true);
+                child.GetComponent<Renderer>().material = list[i].Info.Material;
+                child.GetComponent<CardController>().Info = list[i].Info.Information;
+                if (name.Contains("Hand")) child.GetComponent<CardController>().AssignRangeForHandCard(list[i].AvailableRange);
+            }
+        }
+    }
+    public void DeactivatePlayableSlots(PlayerMB player)
+    {
+        foreach (GameObject item in player.AvailableSlots)
+        {
+            for (int i = 0; i < item.transform.childCount; i++)
+            {
+                if (item.transform.GetChild(i).gameObject.tag == "LeaderCard") continue;
+
+                if (player.player.ListByName[item.name][i].Equals(Utils.BaseCard))
+                {
+                    item.transform.GetChild(i).gameObject.SetActive(false);
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Turns Control
+    public void RecieveTurn(PlayerMB player)
+    {
+        board.StartRoundIfNecesary();
+        UpdateView();
+        ModifyVisibility(player.Body, false);
+    }
+
+    public bool EndTurn(PlayerMB player)
+    {
+        if(!board.EndTurn(player.player)) return false;
+
+        DeactivatePlayableSlots(player);
+
+        for (int i = 0; i < Weather.transform.childCount; i++)
+        {
+            if (board.Weather[i].Equals(Utils.BaseCard))
+            {
+                Weather.transform.GetChild(i).gameObject.SetActive(false);
+            }
+        }
+
+        ModifyVisibility(player.Body, true);
+
+        return true;
+    }
+
+    public bool EndRound(PlayerMB player)
+    {
+        if (!board.EndRound(player.player)) return false;
+        CheckNextRound();
+        return true;
+    }
 
     public void CheckNextRound()
     {
@@ -51,7 +137,7 @@ public class BoardMB : MonoBehaviour
             else
             {
                 this.masterController.RoundEndedNotification(winner);
-                this.masterController.DeactivatePlayableSlots(Utils.GetEnemyByName(winner));
+                DeactivatePlayableSlots(GetMBPlayerByName[winner]);
             }
 
             #region Activating Coins
@@ -75,32 +161,17 @@ public class BoardMB : MonoBehaviour
             #endregion
 
             Board.Instance.UpdateTotalDamage();
-            this.masterController.UpdateScoreInText();
-            UpdateView();
+            UpdateView(true);
         }
     }
 
-    void CardsInBoardViewModificator (GameObject gameObjectsList, List<Card> list, int maxCapacity, bool setActiveOutOfCount = true)
+    #endregion
+
+    void ModifyVisibility(GameObject[] collection, bool visibility)
     {
-        GameObject child;
-
-        for (int i = 0; i < maxCapacity; i++)
+        foreach (GameObject item in collection)
         {
-            child = gameObjectsList.transform.GetChild(i).gameObject;
-
-            if (list[i].Name == Utils.BaseCard.Name)
-            {
-                child.GetComponent<Renderer>().material = Utils.BaseCard.Info.Material;
-                child.GetComponent<CardController>().IsOccupied = false;
-                child.SetActive(setActiveOutOfCount);
-            }
-            else
-            {
-                child.SetActive(true);
-                child.GetComponent<Renderer>().material = list[i].Info.Material;
-                child.GetComponent<CardController>().Info = list[i].Info.Information;
-                if (name.Contains("Hand")) child.GetComponent<CardController>().AssignRangeForHandCard(list[i].AvailableRange);
-            }
+            item.SetActive(visibility);
         }
     }
 }

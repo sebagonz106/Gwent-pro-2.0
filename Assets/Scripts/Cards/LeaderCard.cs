@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class LeaderCard : Card, IEffect
 {
-    public bool StealCardLeader { get; private set; }
+    public bool NeedsCardSelection { get; private set; }
 
     public LeaderCard(LeaderCardSO leader) : base(leader)
     {
-        StealCardLeader = leader.stealCardLeader;
+        NeedsCardSelection = leader.needsCardSelection;
     }
 
-    public LeaderCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, VisualInfo info, List<Card> currentPosition, bool stealCardLeader) : base(name, faction, cardType, availableRange, info, currentPosition)
+    public LeaderCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, VisualInfo info, List<Card> currentPosition, bool needsCardSelection) : base(name, faction, cardType, availableRange, info, currentPosition)
     {
-        StealCardLeader = stealCardLeader;
+        NeedsCardSelection = needsCardSelection;
     }
 
-    public bool Effect (Context context) => StealCardLeader? StealCard(context.CurrentPlayer) : KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition);
+    public bool Effect (Context context) => NeedsCardSelection? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) : StealCard(context.CurrentPlayer);
 
 
     private bool KeepInBattlefield(Player player, Card card, List<Card> list)
     {
-        if (player.LeaderEffectUsedThisRound || this.StealCardLeader || !player.Battlefield.StaysInBattlefieldModifier(card, list)) return false;
+        if (player.LeaderEffectUsedThisRound || !this.NeedsCardSelection || !player.Battlefield.StaysInBattlefieldModifier(card, list)) return false;
 
         player.LeaderEffectUsedThisRound = true;
         return true;
@@ -29,7 +29,7 @@ public class LeaderCard : Card, IEffect
 
     private bool StealCard(Player player)
     {
-        if (player.LeaderEffectUsedThisRound || !this.StealCardLeader || !player.GetCard()) return false;
+        if (player.LeaderEffectUsedThisRound || this.NeedsCardSelection || !player.GetCard()) return false;
 
         player.LeaderEffectUsedThisRound = true;
         return true;

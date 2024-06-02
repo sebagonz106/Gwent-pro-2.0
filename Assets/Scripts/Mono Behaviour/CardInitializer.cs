@@ -4,63 +4,38 @@ using UnityEngine;
 
 public class CardInitializer : MonoBehaviour
 {
-    public Player player;
-    public List<Card> cards;
+    [SerializeField] Player player;
+    [SerializeField] BoardMB board;
+    [SerializeField] List<CardSO> cardsInfo;
+    [SerializeField] List<Card> cards;
     bool cardsStolen;
 
     void Awake()
     {
-        foreach (Card item in cards)
+        foreach (CardSO item in cardsInfo)
         {
-            item.information = Resources.Load<Sprite>($"Info/{(this.player.PlayerName==Faction.Fidel? "Fidel" : "Batista")}/{item.Name}");
-            item.material = Resources.Load<Material>($"Materials/{(this.player.PlayerName == Faction.Fidel ? "Fidel" : "Batista")}/{item.Name}");
+            item.information = Resources.Load<Sprite>($"Info/{(this.player.PlayerName==Faction.Fidel? "Fidel" : "Batista")}/{item.name}");
+            item.material = Resources.Load<Material>($"Materials/{(this.player.PlayerName == Faction.Fidel ? "Fidel" : "Batista")}/{item.name}");
 
-            if (item is UnitCard unit)
+            switch (item.cardType)
             {
-                unit.InitializeDamage();
-
-                switch (unit.Name) //effect asssignation
-                {
-                    #region Rebel effects
-                    case "Juan Almeida":
-                        unit.AssignEffect(Effects.NoOneSurrendersHereGodDamn);
-                        break;
-                    case "Raul Castro":
-                        unit.AssignEffect(Effects.StealCard);
-                        break;
-                    case "Celia Sanchez":
-                        unit.AssignEffect(Effects.ClearsLineWithFewerCards);
-                        break;
-                    case "Luchadores clandestinos":
-                        unit.AssignEffect(Effects.PlaceBonusInLineWhereIsPlayed);
-                        break;
-                    case "Guajiros":
-                        unit.AssignEffect(Effects.MultipliesHisDamageTimesCardsLikeThis);
-                        break;
-                    #endregion
-
-                    #region Batista effects
-                    case "Martin Diaz Tamayo":
-                        unit.AssignEffect(Effects.EqualsSilverUnitsDamageToBattlefieldsAverage);
-                        break;
-                    case "Pilar Garcia":
-                        unit.AssignEffect(Effects.RemovePowerfulCard);
-                        break;
-                    case "Chivatos":
-                        unit.AssignEffect(Effects.RemoveEnemyWorstCard);
-                        break;
-                    case "Tanque de guerra":
-                        unit.AssignEffect(Effects.PlaceLightButIrremovableWeatherInEnemysBattlefield);
-                        break;
-                    case "Cuarteles":
-                        unit.AssignEffect(Effects.MultipliesHisDamageTimesCardsLikeThis);
-                        break;
-                    #endregion
-
-                    default:
-                        unit.AssignEffect(Effects.VoidEffect);
-                        break;
-                }
+                case CardType.Bait:
+                    cards.Add(new BaitCard(item as BaitCardSO));
+                    break;
+                case CardType.Bonus:
+                    cards.Add(new BonusCard(item as BonusCardSO));
+                    break;
+                case CardType.Weather:
+                    cards.Add(new WeatherCard(item as WeatherCardSO));
+                    break;
+                case CardType.Clear:
+                    cards.Add(new ClearCard(item as ClearCardSO));
+                    break;
+                case CardType.Unit:
+                    cards.Add(new UnitCard(item as UnitCardSO, Effects.GetEffect(item.name)));
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -77,28 +52,29 @@ public class CardInitializer : MonoBehaviour
             }
         #endregion
 
-        cards.RemoveRange(25, cards.Count-25);
+        cards.RemoveRange(25, cardsInfo.Count-25);
         player.Deck.AddRange(this.cards);
     }
 
     private void OnMouseDown()
     {
-        if (!player.board.masterController.IsPlayersPanelActive()) return;
+        if (!board.masterController.IsPlayersPanelActive()) return;
 
-        if (player.board.GetCurrentPlayer().Equals(player) && 
-            !player.board.masterController.validTurn && 
-            player.board.RoundCount == 1 && !cardsStolen)
+        if (board.board.GetCurrentPlayer().Equals(player) && 
+           !board.masterController.validTurn              && 
+            board.board.RoundCount == 1                   && 
+           !cardsStolen                                     )
         {
             int index1 = Random.Range(0, player.Hand.Count - 1);
             int index2 = 0;
             do { index2 = Random.Range(0, player.Hand.Count - 1); } while (index1 == index2); //making sure the method wont take the same card
 
-            this.player.Battlefield.ToGraveyard(player.Hand[index1], player.Hand);
-            this.player.Battlefield.ToGraveyard(player.Hand[index2], player.Hand);
-            this.player.GetCard(2);
-            this.cardsStolen = true;
-            this.player.board.UpdateView();
+            player.Battlefield.ToGraveyard(player.Hand[index1], player.Hand);
+            player.Battlefield.ToGraveyard(player.Hand[index2], player.Hand);
+            player.GetCard(2);
+            cardsStolen = true;
+            board.UpdateView();
         }
-        else player.board.masterController.GeneralException();
+        else board.masterController.GeneralException();
     }
 }

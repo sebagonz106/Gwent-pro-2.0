@@ -22,17 +22,7 @@ public class ShowPlayerInfo : MonoBehaviour
     {
         if (masterController.IsAnyInfoActive()) return;
 
-        for (int i = 0; i < GameManager.transform.childCount; i++)
-        {
-            if (GameManager.transform.GetChild(i).gameObject.activeInHierarchy)
-            {
-                masterController.PanelOnWhenInformationDisplayed = GameManager.transform.GetChild(i).gameObject;
-                GameManager.transform.GetChild(i).gameObject.SetActive(false);
-                break;
-            }
-        }
-
-        masterController.InfoPanel.GetComponent<Image>().sprite = this.Info;
-        masterController.InfoPanel.SetActive(true);
+        masterController.SavePanelOnWhenInformationDisplayed(false);
+        masterController.OpenInfo(this.Info);
     }
 }

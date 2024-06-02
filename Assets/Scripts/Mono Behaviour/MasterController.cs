@@ -24,119 +24,70 @@ public class MasterController : MonoBehaviour
     [SerializeField] TMP_Text FidelScoreInPlayersPanel;
     [SerializeField] TMP_Text BatistaScoreInBetweenRoundsPanel;
     [SerializeField] TMP_Text FidelScoreInBetweenRoundsPanel;
-
+    Dictionary<string, (TMP_Text, TMP_Text)> score;
     GameObject panelOnWhenInformationDisplayed;
     #endregion
 
-    #region Scene and card objects
-    private GameObject[] fidelBody;
-    private GameObject[] batistaBody;
-    private GameObject[] fidelAvailableSlots;
-    private GameObject[] batistaAvailableSlots;
-    #endregion
-
     public BoardMB board;
-    public bool validTurn = false;
 
-    public GameObject PanelOnWhenInformationDisplayed { get => panelOnWhenInformationDisplayed; set => panelOnWhenInformationDisplayed = value; }
+    public GameObject PanelOnWhenInformationDisplayed { get => panelOnWhenInformationDisplayed; private set => panelOnWhenInformationDisplayed = value; }
     bool isBatistaPlayingOrAboutToPlay => Board.Instance.IsBatistaPlayingOrAboutToPlay;
+    bool validTurn => Board.Instance.ValidTurn;
 
     private void Start()
     {
-        fidelBody = GameObject.FindGameObjectsWithTag("Fidel Body");
-        batistaBody = GameObject.FindGameObjectsWithTag("Batista Body");
-        fidelAvailableSlots = GameObject.FindGameObjectsWithTag("Fidel");
-        batistaAvailableSlots = GameObject.FindGameObjectsWithTag("Batista");
+        score = new Dictionary<string, (TMP_Text, TMP_Text)>
+        {
+            {"Fidel", (FidelScoreInBetweenRoundsPanel, FidelScoreInPlayersPanel) },
+            {"Batista", (BatistaScoreInBetweenRoundsPanel, BatistaScoreInPlayersPanel) }
+        };
     }
 
     public void EndTurn()
     {
-        if (!validTurn) return;
-        validTurn = false;
+        if (!board.EndTurn(board.CurrentPlayer)) return;
 
-        if (Board.Instance.IsBatistaPlayingOrAboutToPlay)
-        {
-            cameras[2].gameObject.SetActive(false);
-            Board.Instance.IsBatistaPlayingOrAboutToPlay = board.Fidel.EndRound? true : false;
-            playerPanel.SetActive(false);
-            betweenRoundsPanel.SetActive(true);
-            UpdateScoreInText("Batista");
-            DeactivatePlayableSlots(board.Batista);
-
-            foreach (GameObject item in batistaBody)
-            {
-                item.SetActive(true);
-            }
-        }
-        else
-        {
-            cameras[1].gameObject.SetActive(false);
-            isBatistaPlayingOrAboutToPlay = board.Batista.EndRound? false : true;
-            playerPanel.SetActive(false);
-            betweenRoundsPanel.SetActive(true);
-            UpdateScoreInText("Fidel");
-            DeactivatePlayableSlots(board.Fidel);
-
-            foreach (GameObject item in fidelBody)
-            {
-                item.SetActive(true);
-            }
-        }
-
-        for (int i = 0; i < weather.transform.childCount; i++)
-        {
-            if (board.Weather[i].Equals(Utils.BaseCard))
-            {
-                weather.transform.GetChild(i).gameObject.SetActive(false);
-            }
-        }
-
+        cameras[1].gameObject.SetActive(false);
+        cameras[2].gameObject.SetActive(false);
+        UpdateScoreInText();
+        playerPanel.SetActive(false);
+        betweenRoundsPanel.SetActive(true);
         cameras[0].gameObject.SetActive(true);
     }
 
     public void EndRound()
     {
-        if (validTurn) return;
-        if (isBatistaPlayingOrAboutToPlay) board.Batista.EndRound = true;
-        else board.Fidel.EndRound = true;
-        validTurn = true;
+        if (!board.EndRound(board.CurrentPlayer)) return;
+
         EndTurn();
-        board.CheckNextRound();
     }
 
     public void ReceiveTurn()
     {
-        board.StartRoundIfNecesary();
         cameras[0].gameObject.SetActive(false);
         playerPanel.SetActive(true);
         betweenRoundsPanel.SetActive(false);
-        board.UpdateView();
 
-        if (isBatistaPlayingOrAboutToPlay && !board.Batista.EndRound)
+        if (isBatistaPlayingOrAboutToPlay && !Player.Batista.EndRound)
         {
             cameras[2].gameObject.SetActive(true);
-            foreach (GameObject item in batistaBody)
-            {
-                item.SetActive(false);
-            }
+            board.RecieveTurn(board.Batista);
         }
-        else if (!board.Fidel.EndRound)
+        else if (!Player.Fidel.EndRound)
         {
             cameras[1].gameObject.SetActive(true);
-            foreach (GameObject item in fidelBody)
-            {
-                item.SetActive(false);
-            }
+            board.RecieveTurn(board.Fidel);
         }
     }
 
-    public void SavePanelOnWhenInformationDisplayed()
+    public void SavePanelOnWhenInformationDisplayed(bool leaveActive = true)
     {
         for (int i = 0; i < this.gameObject.transform.childCount; i++)
         {
             if (this.gameObject.transform.GetChild(i).gameObject.activeInHierarchy)
             {
                 this.PanelOnWhenInformationDisplayed = this.gameObject.transform.GetChild(i).gameObject;
+                this.gameObject.transform.GetChild(i).gameObject.SetActive(leaveActive);
                 break;
             }
         }
@@ -152,6 +103,11 @@ public class MasterController : MonoBehaviour
         SavePanelOnWhenInformationDisplayed();
         PanelOnWhenInformationDisplayed.SetActive(false);
         generalException.SetActive(true);
+    }
+    public void OpenInfo(Sprite info)
+    {
+        InfoPanel.GetComponent<Image>().sprite = info;
+        InfoPanel.SetActive(true);
     }
     public void CloseInfo()
     {
@@ -181,26 +137,14 @@ public class MasterController : MonoBehaviour
     public void UpdateScoreInText(string playerName = "")
     {
         int damage = 0;
-
-        switch (playerName)
+        if (playerName == "")
         {
-            case "Fidel":
-                damage = Convert.ToInt32(board.TotalDamage(board.Fidel));
-                FidelScoreInBetweenRoundsPanel.text = "Fidel: " + ((damage < 10) ? "0" + damage.ToString() : damage.ToString());
-                FidelScoreInPlayersPanel.text = FidelScoreInBetweenRoundsPanel.text;
-                break;
-
-            case "Batista":
-                damage = Convert.ToInt32(board.TotalDamage(board.Batista));
-                BatistaScoreInBetweenRoundsPanel.text = "Batista: " + ((damage < 10) ? "0" + damage.ToString() : damage.ToString());
-                BatistaScoreInPlayersPanel.text = BatistaScoreInBetweenRoundsPanel.text;
-                break;
-
-            default:
-                UpdateScoreInText("Fidel");
-                UpdateScoreInText("Batista");
-                break;
+            UpdateScoreInText("Fidel");
+            playerName = "Batista";
         }
+
+        damage = Convert.ToInt32(board.GetMBPlayerByName[playerName].player.TotalDamage);
+        score[playerName].Item1.text = score[playerName].Item2.text = $"{playerName}: " + ((damage < 10) ? "0" + damage.ToString() : damage.ToString());
     }
     public bool IsAnyInfoActive()
     {
@@ -212,23 +156,7 @@ public class MasterController : MonoBehaviour
 
         return false;
     }
-    public void DeactivatePlayableSlots(Player player)
-    {
-        GameObject[] collection = player.Equals(board.Batista) ? batistaAvailableSlots : fidelAvailableSlots;
-
-        foreach (GameObject item in collection)
-        {
-            for (int i = 0; i < item.transform.childCount; i++)
-            {
-                if (item.transform.GetChild(i).gameObject.tag == "LeaderCard") continue;
-
-                if (Utils.GetListByName(player, item.transform.GetChild(i).gameObject.name)[i].Equals(Utils.BaseCard))
-                {
-                    item.transform.GetChild(i).gameObject.SetActive(false);
-                }
-            }
-        }
-    }
+    
     public void EndGame(string winnerName)
     {
         this.betweenRoundsPanel.SetActive(false);
@@ -257,19 +185,10 @@ public class MasterController : MonoBehaviour
 
     private bool CheckIfEnded()
     {
-        if (board.RoundCount >= 2)
+        if (board.board.CheckIfEnded(out string winner))
         {
-            if (board.Fidel.Score>=4 && board.Fidel.Score > board.Batista.Score)
-            {
-                EndGame("Fidel");
-                return true;
-            }
-            else if (board.Batista.Score >= 4 && board.Batista.Score > board.Fidel.Score)
-            {
-                EndGame("Batista");
-                return true;
-            }
-
+            EndGame(winner);
+            return true;
         }
         return false;
     }

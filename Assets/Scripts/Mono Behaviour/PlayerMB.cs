@@ -13,6 +13,8 @@ public class PlayerMB : MonoBehaviour
     [SerializeField] LeaderCard cardStaysLeader;
     public GameObject WonCoin1;
     public GameObject WonCoin2;
+    public GameObject[] Body { get; private set; }
+    public GameObject[] AvailableSlots { get; private set; }
 
     private void Awake()
     {
@@ -30,6 +32,12 @@ public class PlayerMB : MonoBehaviour
             if (stealCardLeader.Name == PlayerPrefs.GetString("Batista Leader")) player.Leader = stealCardLeader;
             else player.Leader = cardStaysLeader;
         }
+    }
+
+    private void Start()
+    {
+        Body = GameObject.FindGameObjectsWithTag($"{this.gameObject.name} Body");
+        AvailableSlots = GameObject.FindGameObjectsWithTag(this.gameObject.name);
     }
 
     public bool PlayCard(int originPosition, int targetPosition, Zone rangeType)

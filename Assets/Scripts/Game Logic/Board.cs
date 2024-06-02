@@ -16,6 +16,8 @@ public class Board
     public bool IsBatistaPlayingOrAboutToPlay { get; private set; }
     public static Board Instance => instance.Equals(null) ? SetBoard() : instance;
     public int RoundCount { get => roundCount; private set => roundCount = value; }
+    public bool ValidTurn { get; set; }
+
     private Board() { }
 
     private static Board SetBoard()
@@ -39,6 +41,7 @@ public class Board
     #endregion
 
     #region Functions
+    #region Rounds Control
     public void StartRoundIfNecesary()
     {
         if (newRound)
@@ -52,8 +55,8 @@ public class Board
             {
                 Player.Fidel.GetCard(2);
                 Player.Batista.GetCard(2);
-                if (Player.Fidel.Leader.StealCardLeader) Player.Fidel.LeaderEffectUsedThisRound = false;
-                if (Player.Batista.Leader.StealCardLeader) Player.Batista.LeaderEffectUsedThisRound = false;
+                if (!Player.Fidel.Leader.NeedsCardSelection) Player.Fidel.LeaderEffectUsedThisRound = false;
+                if (!Player.Batista.Leader.NeedsCardSelection) Player.Batista.LeaderEffectUsedThisRound = false;
             }
 
             RoundCount++;
@@ -61,54 +64,31 @@ public class Board
         }
     }
 
-    public void UpdateTotalDamage(Player player = null)
+    public bool EndTurn(Player player)
     {
-        if(player.Equals(null))
-        {
-            UpdateTotalDamage(Player.Batista);
-            player = Player.Fidel;
-        }
+        if (!ValidTurn) return false;
+        ValidTurn = true;
 
-        player.TotalDamage = 0;
-        double meleeBonus = (player.Battlefield.Bonus[0] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[0]).Increase : 1;
-        double rangeBonus = (player.Battlefield.Bonus[1] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[1]).Increase : 1;
-        double siegeBonus = (player.Battlefield.Bonus[2] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[2]).Increase : 1;
+        if (IsBatistaPlayingOrAboutToPlay) IsBatistaPlayingOrAboutToPlay = Player.Fidel.EndRound;
+        else IsBatistaPlayingOrAboutToPlay = Player.Batista.EndRound;
 
-        foreach (Card card in this.Weather) //applies weather effects
-        {
-            if (card is WeatherCard weather) weather.Effect(player.context.UpdatePlayerInstance(this.Weather, weather));
-        }
-
-        foreach (Card item in player.Battlefield.Melee) //sums the damage of the unit melee cards
-        {
-            if (item is UnitCard unit)
-            {
-                player.TotalDamage += unit.Level == Level.Golden ? unit.Damage : meleeBonus * unit.Damage;
-                unit.ResetDamage();
-            }
-        }
-
-        foreach (Card item in player.Battlefield.Range) //sums the damage of the unit range cards
-        {
-            if (item is UnitCard unit)
-            {
-                player.TotalDamage += unit.Level == Level.Golden ? unit.Damage : rangeBonus * unit.Damage;
-                unit.ResetDamage();
-            }
-        }
-
-        foreach (Card item in player.Battlefield.Siege) //sums the damage of the unit siege cards
-        {
-            if (item is UnitCard unit)
-            {
-                player.TotalDamage += unit.Level == Level.Golden ? unit.Damage : siegeBonus * unit.Damage;
-                unit.ResetDamage();
-            }
-        }
+        return true;
     }
 
+    public bool EndRound(Player player)
+    {
+        if (ValidTurn) return false;
+        ValidTurn = true;
+
+        if (IsBatistaPlayingOrAboutToPlay) Player.Batista.EndRound = true;
+        else Player.Fidel.EndRound = true;
+
+        return true;
+    }
     public bool CheckNextRound(out string winner)
     {
+        winner = "";
+
         if (Player.Fidel.EndRound && Player.Batista.EndRound)
         {
 
@@ -128,23 +108,73 @@ public class Board
             {
                 SumScore(Player.Fidel.StartedPlaying ? Player.Batista : Player.Fidel, 1, Player.Batista.StartedPlaying ? Player.Fidel : Player.Batista, 1);
                 IsBatistaPlayingOrAboutToPlay = Player.Batista.StartedPlaying;
-                winner = "";
             }
 
             Player.Fidel.EndRound = false;
             Player.Batista.EndRound = false;
             newRound = true;
 
-            if (!Player.Fidel.Battlefield.StaysInBattlefieldIs("Almeida")) //checks if almeida will stay in battlefield to modify its boolean
-            {
-                this.AlmeidaIsPlayed = false;
-            }
+            this.AlmeidaIsPlayed = Player.Fidel.Battlefield.StaysInBattlefieldIs("Almeida"); //checks if almeida will stay in battlefield to modify its boolean
 
             return true;
         }
 
-        winner = "";
         return false;
+    }
+
+    public bool CheckIfEnded(out string winner)
+    {
+        winner = "";
+
+        if (RoundCount >= 2)
+        {
+            if (Player.Fidel.Score >= 4 && Player.Fidel.Score > Player.Batista.Score)
+            {
+                winner = "Fidel";
+                return true;
+            }
+            else if (Player.Batista.Score >= 4 && Player.Batista.Score > Player.Fidel.Score)
+            {
+                winner = "Batista";
+                return true;
+            }
+
+        }
+        return false;
+    }
+    #endregion
+    public void UpdateTotalDamage(Player player = null)
+    {
+        if(player.Equals(null))
+        {
+            UpdateTotalDamage(Player.Batista);
+            player = Player.Fidel;
+        }
+
+        player.TotalDamage = 0;
+
+        double[] bonus = new double[3];
+        for (int i = 0; i < bonus.Length; i++)
+        {
+            bonus[i] = (player.Battlefield.Bonus[i] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[i]).Increase : 1;
+        }
+
+        foreach (Card card in this.Weather) //applies weather effects
+        {
+            if (card is WeatherCard weather) weather.Effect(player.context.UpdatePlayerInstance(this.Weather, weather));
+        }
+
+        for  (int i = 0; i < player.Battlefield.Zones.Length; i++)
+        {
+            foreach (Card item in player.Battlefield.Zones[i]) //sums the damage of every unit cards
+            {
+                if (item is UnitCard unit)
+                {
+                    player.TotalDamage += unit.Level == Level.Golden ? unit.Damage : bonus[i] * unit.Damage;
+                    unit.ResetDamage();
+                }
+            }
+        }
     }
 
     public Player GetCurrentPlayer() => IsBatistaPlayingOrAboutToPlay ? Player.Batista : Player.Fidel;
