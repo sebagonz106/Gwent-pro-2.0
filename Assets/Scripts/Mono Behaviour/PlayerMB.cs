@@ -37,7 +37,7 @@ public class PlayerMB : MonoBehaviour
         if(player.PlayCard(originPosition, targetPosition, rangeType, out bool effectFailed))
         {
             if(effectFailed) board.masterController.EffectException();
-
+            board.UpdateView(true);
             return true;
         }
         return false;

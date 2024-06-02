@@ -9,55 +9,41 @@ public static class Effects
     #region Rebel effects
 
     public static bool StealCard(Context context) => context.CurrentPlayer.GetCard(); //for it to work, the card with this effect must not 
-                                                                                                   //be the first card played of a full hand
+                                                                                     //be the first card played of a full hand
     public static bool NoOneSurrendersHereGodDamn(Context context)
     {
         context.Board.AlmeidaIsPlayed = true;
         return true;
     }
 
-    public static bool ClearsLineWithFewerCards(Context context) // if there are two or more lists with the same amount of cards played 
-                                                                            // this method will clear the first of the lists checked, altough if an enemy
-                                                                            // list has the same amount of cards, it will clear the enemy's list.
-                                                                            // In case a card set to stay in battlefield is discarded, it will reappear
-                                                                            // next round, as soon as battlefield's clear method is called.
-                                                                            // Creator's License here: this effect will be able to affect golden cards.
+    public static bool ClearsLineWithFewerCards(Context context) // if there are two or more lists with the same amount of cards played
+                                                                 // this method will clear the first of the lists checked, altough if an enemy 
+                                                                 // list has the same amount of cards, it will clear the enemy's list.
+                                                                 // In case a card set to stay in battlefield is discarded, it will reappear
+                                                                 // next round, as soon as battlefield's clear method is called.
+                                                                 // Creator's License here: this effect will be able to affect golden cards.
     {
         int minCount = 6; //Max amount of cards this can count
-        List<Card> list = new List<Card>();
+        List<Card> list = null;
         Card bonus = Utils.BaseCard;
         Player player = context.EnemyPlayer;
 
-        if (CountCardsInListAndCompareWithMinCount(context.Board.Fidel.Battlefield.Melee, context.Board.Fidel, ref minCount, ref list, context.CurrentPlayer))
+        for (int i = 0; i < context.CurrentPlayer.Battlefield.Zones.Length; i++)
         {
-            bonus = context.Board.Fidel.Battlefield.Bonus[0];
-            player = context.Board.Fidel;
+
+            if (CountCardsInListAndCompareWithMinCount(context.CurrentPlayer.Battlefield.Zones[i], context.CurrentPlayer, ref minCount, ref list, context.CurrentPlayer))
+            {
+                bonus = context.CurrentPlayer.Battlefield.Bonus[i];
+                player = context.CurrentPlayer;
+            }
+            if (CountCardsInListAndCompareWithMinCount(context.EnemyPlayer.Battlefield.Zones[i], context.EnemyPlayer, ref minCount, ref list, context.CurrentPlayer))
+            {
+                bonus = context.EnemyPlayer.Battlefield.Bonus[i];
+                player = context.EnemyPlayer;
+            }
         }
-        if (CountCardsInListAndCompareWithMinCount(context.Board.Fidel.Battlefield.Range, context.Board.Fidel, ref minCount, ref list, context.CurrentPlayer))
-        {
-            bonus = context.Board.Fidel.Battlefield.Bonus[1];
-            player = context.Board.Fidel;
-        }
-        if (CountCardsInListAndCompareWithMinCount(context.Board.Fidel.Battlefield.Siege, context.Board.Fidel, ref minCount, ref list, context.CurrentPlayer))
-        {
-            bonus = context.Board.Fidel.Battlefield.Bonus[2];
-            player = context.Board.Fidel;
-        }
-        if (CountCardsInListAndCompareWithMinCount(context.Board.Batista.Battlefield.Melee, context.Board.Batista, ref minCount, ref list, context.CurrentPlayer))
-        {
-            bonus = context.Board.Batista.Battlefield.Bonus[0];
-            player = context.Board.Batista;
-        }
-        if (CountCardsInListAndCompareWithMinCount(context.Board.Batista.Battlefield.Range, context.Board.Batista, ref minCount, ref list, context.CurrentPlayer))
-        {
-            bonus = context.Board.Batista.Battlefield.Bonus[1];
-            player = context.Board.Batista;
-        }
-        if (CountCardsInListAndCompareWithMinCount(context.Board.Batista.Battlefield.Siege, context.Board.Batista, ref minCount, ref list, context.CurrentPlayer))
-        {
-            bonus = context.Board.Batista.Battlefield.Bonus[2];
-            player = context.Board.Batista;
-        }
+
+        if (list.Equals(null)) return false;
 
         player.Battlefield.ToGraveyard(bonus, player.Battlefield.Bonus);
         player.Battlefield.ToGraveyard(list);
@@ -69,14 +55,9 @@ public static class Effects
     {
         List<Card> currentPosition = context.CurrentPosition;
         Player player = context.CurrentPlayer;
-        BonusCard riot = Resources.Load<BonusCard>("Huelga Revolucionaria");
+        BonusCard riot = new BonusCard(Resources.Load<BonusCardSO>("Huelga Revolucionaria"));
 
-        if (player.Battlefield.AddCard(riot, Utils.GetRangeTypeByList(player, currentPosition), Utils.GetIntByBattlfieldList(player.Battlefield, currentPosition)))
-        {
-            context.Board.UpdateView(true);
-            return true;
-        }
-        else return false;
+        return player.Battlefield.AddCard(riot, player.ZoneByList[currentPosition]);
     }
     #endregion
 
@@ -84,37 +65,38 @@ public static class Effects
 
     public static bool RemovePowerfulCard(Context context)
     {
-        (UnitCard, List<Card>) fidelList = Player.Fidel.Battlefield.SilverCardWithHighestOrLowestDamage();
-        (UnitCard, List<Card>) batistaList = Player.Batista.Battlefield.SilverCardWithHighestOrLowestDamage();
+        (UnitCard, List<Card>) currentPlayerList = context.CurrentPlayer.Battlefield.SilverCardWithHighestOrLowestDamage(true);
+        (UnitCard, List<Card>) enemyPlayerList = context.EnemyPlayer.Battlefield.SilverCardWithHighestOrLowestDamage(true);
 
-        if (fidelList.Item1 == null && batistaList.Item1 == null) return false; //checks if there is no unit silver card played
+        if (currentPlayerList.Item1 == null && enemyPlayerList.Item1 == null) return false; //checks if there is no unit silver card played
 
-        //checks if Batistas most powerful card outpowers Fidels most powerful card. If so, it sends Batsitas card to graveyard
-        if (fidelList.Item1 == null || (fidelList.Item1).InitialDamage < (batistaList.Item1).InitialDamage)
+        //checks if enemy's most powerful card outpowers current player's most powerful card. If so, it sends enemy's card to graveyard
+        if (currentPlayerList.Item1 == null || currentPlayerList.Item1.InitialDamage < enemyPlayerList.Item1.InitialDamage)
         {
-            context.Board.Batista.Battlefield.ToGraveyard((UnitCard)batistaList[0], (List<Card>)batistaList[1]);
+            context.EnemyPlayer.Battlefield.ToGraveyard(enemyPlayerList.Item1, enemyPlayerList.Item2);
         }
 
-        //checks if Fidels most powerful card outpowers Batistas most powerful card. If so, it sends it to graveyard
-        else if ((UnitCard)batistaList[0] == null || ((UnitCard)fidelList[0]).InitialDamage > ((UnitCard)batistaList[0]).InitialDamage) 
-{
-            context.Board.Fidel.Battlefield.ToGraveyard(((UnitCard)fidelList[0]), ((List<Card>)fidelList[1]));
+        //checks if current player's most powerful card outpowers enemy's most powerful card. If so, it sends it to graveyard
+        else if (enemyPlayerList.Item1 == null || currentPlayerList.Item1.InitialDamage > enemyPlayerList.Item1.InitialDamage) 
+        {
+            context.CurrentPlayer.Battlefield.ToGraveyard(currentPlayerList.Item1, currentPlayerList.Item2);
         }
 
-        //checks if Fidels most powerful card has the same damage as Batistas most powerful card. If so, it sends both to graveyard.
-        else if (((UnitCard)fidelList[0]).InitialDamage == ((UnitCard)batistaList[0]).InitialDamage)
+        //If both cards inflict the same damage, it sends them to graveyard.
+        else if (currentPlayerList.Item1.InitialDamage == enemyPlayerList.Item1.InitialDamage)
         {
-            context.Board.Batista.Battlefield.ToGraveyard(((UnitCard)batistaList[0]), ((List<Card>)batistaList[1]));
-            context.Board.Fidel.Battlefield.ToGraveyard(((UnitCard)fidelList[0]), ((List<Card>)fidelList[1]));
+            context.EnemyPlayer.Battlefield.ToGraveyard(enemyPlayerList.Item1, enemyPlayerList.Item2);
+            context.CurrentPlayer.Battlefield.ToGraveyard(currentPlayerList.Item1, currentPlayerList.Item2);
         }
 
         else return false; //in case of unexpected behaviour
+
         return true;
     }
 
     public static bool RemoveEnemyWorstCard(Context context)
     {
-        (Card, List<Card>) leastPower = context.EnemyPlayer.Battlefield.SilverCardWithHighestOrLowestDamage();
+        (Card, List<Card>) leastPower = context.EnemyPlayer.Battlefield.SilverCardWithHighestOrLowestDamage(false);
         if (leastPower.Item1 == null) return false;
 
         context.EnemyPlayer.Battlefield.ToGraveyard(leastPower.Item1, leastPower.Item2); //sends to graveyard the least powerful card of the given player
@@ -125,9 +107,8 @@ public static class Effects
     {
         Battlefield enemy = context.EnemyPlayer.Battlefield;
 
-        ReduceDamagePermanently(enemy.Melee);
-        ReduceDamagePermanently(enemy.Range);
-        ReduceDamagePermanently(enemy.Siege);
+        for (int i = 0; i < enemy.Zones.Length; i++)
+            ReduceDamagePermanently(enemy.Zones[i]);
 
         return true;
     }
@@ -138,12 +119,11 @@ public static class Effects
         double pureTotalDamage = 0;
         double average = 0;
 
-        StoreUnitsInListAndCountDamage(context.Board.Fidel.Battlefield.Melee, list, ref pureTotalDamage);
-        StoreUnitsInListAndCountDamage(context.Board.Fidel.Battlefield.Range, list, ref pureTotalDamage);
-        StoreUnitsInListAndCountDamage(context.Board.Fidel.Battlefield.Siege, list, ref pureTotalDamage);
-        StoreUnitsInListAndCountDamage(context.Board.Batista.Battlefield.Melee, list, ref pureTotalDamage);
-        StoreUnitsInListAndCountDamage(context.Board.Batista.Battlefield.Range, list, ref pureTotalDamage);
-        StoreUnitsInListAndCountDamage(context.Board.Batista.Battlefield.Siege, list, ref pureTotalDamage);
+        for (int i = 0; i < context.CurrentPlayer.Battlefield.Zones.Length; i++)
+        {
+            StoreUnitsInListAndCountDamage(context.CurrentPlayer.Battlefield.Zones[i], list, ref pureTotalDamage);
+            StoreUnitsInListAndCountDamage(context.EnemyPlayer.Battlefield.Zones[i], list, ref pureTotalDamage);
+        }
 
         average = pureTotalDamage / list.Count;
 
@@ -161,14 +141,11 @@ public static class Effects
     {
         Player player = context.CurrentPlayer;
         UnitCard card = (UnitCard)context.CurrentCard;
-        int count; 
+        int count = 0; 
         List<UnitCard> list = new List<UnitCard>();
 
-        //FindEveryCardInList(player.Battlefield.Melee, card, list, ref count); 
-        //FindEveryCardInList(player.Battlefield.Range, card, list, ref count);
-        //*unnecesary because cards with this effect can only be played in Siege
-
-        FindEveryCardInListAndCountThem(player.Battlefield.Siege, card, list, out count);
+        for (int i = 0; i < player.Battlefield.Zones.Length; i++)
+            FindEveryCardInListAndCountThem(player.Battlefield.Zones[i], card, list, ref count);
 
         foreach (UnitCard item in list)
         {
@@ -188,7 +165,7 @@ public static class Effects
         {
             if (!item.Equals(Utils.BaseCard)) tempCount++;
         }
-        if (!thisPlayer.Battlefield.Bonus[Utils.GetIntByBattlfieldList(thisPlayer.Battlefield, toCount)].Equals(Utils.BaseCard)) tempCount++;
+        if (!thisPlayer.Battlefield.Bonus[Utils.IndexByZone[checkingPlayer.ZoneByList[toCount]]].Equals(Utils.BaseCard)) tempCount++;
 
         if (tempCount>0 && (tempCount<minCount||(tempCount==minCount && !checkingPlayer.Equals(thisPlayer))))
         {
@@ -198,9 +175,8 @@ public static class Effects
         }
         return false;
     }
-    static void FindEveryCardInListAndCountThem(List<Card> listToSearch, UnitCard card, List<UnitCard> listToSave, out int count)
+    static void FindEveryCardInListAndCountThem(List<Card> listToSearch, UnitCard card, List<UnitCard> listToSave, ref int count)
     {
-        count = 0;
         foreach (Card item in listToSearch)
         {
             if (card.Equals(item))

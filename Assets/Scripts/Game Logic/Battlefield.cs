@@ -11,7 +11,7 @@ public class Battlefield
     public List<Card> Range = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
     public List<Card> Siege = Enumerable.Repeat<Card>(Utils.BaseCard, 5).ToList<Card>();
     public List<Card> Bonus = Enumerable.Repeat<Card>(Utils.BaseCard, 3).ToList<Card>(); //[0] MeleeBonus, [1] RangeBonus, [2] SiegeBonus
-    public List<Card>[] Zones;
+    public List<Card>[] Zones { get; private set; }
     List<bool> clearsPlayed = Enumerable.Repeat<bool>(false, 3).ToList<bool>(); //[0] Melee, [1] Range, [2] Siege 
     (Card, List<Card>, int) staysInBattlefieldController; //[0] Card, [1] List of cards where its played, [2] index
     public List<bool> ClearsPlayed { get => clearsPlayed; private set => clearsPlayed = value; }
@@ -19,7 +19,7 @@ public class Battlefield
     public Battlefield(Player player)
     {
         this.playerThatOwnsThisBattlefield = player;
-        this.Zones = new List<Card>[] { Melee, Range, Siege, Bonus };
+        this.Zones = new List<Card>[] { Melee, Range, Siege };
     }
 
     #region Clearing methods
@@ -60,6 +60,7 @@ public class Battlefield
         {
             ToGraveyard(item);
         }
+        ToGraveyard(this.Bonus);
 
         List<bool> clearsPlayed = Enumerable.Repeat<bool>(false, 3).ToList<bool>();
 
@@ -82,9 +83,9 @@ public class Battlefield
     #endregion
 
     #region Adding methods
-    public bool AddCard(Card card, Zone rangeType, int position) => TryAdd(card, this.playerThatOwnsThisBattlefield.ListByZone[rangeType], position);
+    public bool AddCard(Card card, Zone rangeType, int position = 0) => TryAdd(card, this.playerThatOwnsThisBattlefield.ListByZone[rangeType], position);
 
-    bool TryAdd(Card card, List<Card> list, int index)
+    bool TryAdd(Card card, List<Card> list, int index = 0)
     {
         int bonusAndClearIndex = Utils.IndexByZone[this.playerThatOwnsThisBattlefield.ZoneByList[list]];
 
@@ -119,7 +120,7 @@ public class Battlefield
         UnitCard unit = null;
         List<Card> list = null;
 
-        for (int i = 0; i < Zones.Length-1; i++) //not looking in Bonus
+        for (int i = 0; i < Zones.Length; i++) //not looking in Bonus
         {
             CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, Zones[i], highestOrLowestDamage);
         }

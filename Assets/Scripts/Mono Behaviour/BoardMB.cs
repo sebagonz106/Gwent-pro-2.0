@@ -90,15 +90,15 @@ public class BoardMB : MonoBehaviour
 
             if (list[i].Name == Utils.BaseCard.Name)
             {
-                child.GetComponent<Renderer>().material = Utils.BaseCard.material;
+                child.GetComponent<Renderer>().material = Utils.BaseCard.Info.Material;
                 child.GetComponent<CardController>().IsOccupied = false;
                 child.SetActive(setActiveOutOfCount);
             }
             else
             {
                 child.SetActive(true);
-                child.GetComponent<Renderer>().material = list[i].material;
-                child.GetComponent<CardController>().Info = list[i].information;
+                child.GetComponent<Renderer>().material = list[i].Info.Material;
+                child.GetComponent<CardController>().Info = list[i].Info.Information;
                 if (name.Contains("Hand")) child.GetComponent<CardController>().AssignRangeForHandCard(list[i].AvailableRange);
             }
         }
