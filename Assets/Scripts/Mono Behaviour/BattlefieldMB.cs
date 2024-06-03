@@ -8,7 +8,7 @@ public class BattlefieldMB : MonoBehaviour
     public PlayerMB playerThatOwnsThisBattlefield;
     public Battlefield battlefield;
 
-    private void Awake()
+    private void Start()
     {
         this.battlefield = playerThatOwnsThisBattlefield.player.Battlefield;
     }

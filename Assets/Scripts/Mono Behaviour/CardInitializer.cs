@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class CardInitializer : MonoBehaviour
 {
-    [SerializeField] Player player;
+    [SerializeField] PlayerMB playerMB;
     [SerializeField] BoardMB board;
     [SerializeField] List<CardSO> cardsInfo;
     [SerializeField] List<Card> cards;
     bool cardsStolen;
+    Player player => playerMB.player;
 
-    void Awake()
+    void Start()
     {
         foreach (CardSO item in cardsInfo)
         {
@@ -61,7 +62,7 @@ public class CardInitializer : MonoBehaviour
         if (!board.masterController.IsPlayersPanelActive()) return;
 
         if (board.board.GetCurrentPlayer().Equals(player) && 
-           !board.masterController.validTurn              && 
+           !board.board.ValidTurn                         && 
             board.board.RoundCount == 1                   && 
            !cardsStolen                                     )
         {

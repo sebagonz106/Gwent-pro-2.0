@@ -9,7 +9,9 @@ public class CardController : MonoBehaviour
     CardsPositionWarehouse parent;
     Board board;
     Player player;
+    PlayerMB playerMB;
     GameObject GameManager;
+    MasterController masterController;
     public int indexOfThisInParent;
     public List<Zone> rangeTypes;
     public Sprite Info;
@@ -27,8 +29,10 @@ public class CardController : MonoBehaviour
         upPosition.z = this.transform.position.z;
         parent = this.gameObject.transform.parent.gameObject.GetComponent<CardsPositionWarehouse>();
         GameManager = GameObject.Find("Game Manager");
-        board = GameManager.GetComponent<MasterController>().board;
-        player = parent.tag.Contains("Batista") ? board.Batista : board.Fidel;
+        masterController = GameManager.GetComponent<MasterController>();
+        board = Board.Instance;
+        playerMB = parent.tag.Contains("Batista") ? masterController.board.Batista : masterController.board.Fidel;
+        player = playerMB.player;
         indexOfThisInParent = (this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")? 2 - Array.IndexOf(parent.positions, this.gameObject) : Array.IndexOf(parent.positions, this.gameObject);
 
         if (this.gameObject.tag == "BattlefieldCard" || this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")
@@ -40,20 +44,27 @@ public class CardController : MonoBehaviour
 
         else if (this.gameObject.tag == "LeaderCard")
         {
-            this.GetComponent<Renderer>().material = this.player.Leader.material;
-            this.Info = this.player.Leader.information;
+            this.GetComponent<Renderer>().material = this.player.Leader.Info.Material;
+            this.Info = this.player.Leader.Info.Information;
             this.IsOccupied = true;
         }
     }
 
     private void OnMouseDown()
     {
-        if (this.board.masterController.IsAnyInfoActive() || !(this.board.masterController.IsPlayersPanelActive()||this.player.LeaderCardSelected)) return;
+        if (this.masterController.IsAnyInfoActive() || !(this.masterController.IsPlayersPanelActive()||this.player.LeaderCardSelected)) return;
 
         #region Leaders
         if(this.gameObject.tag == "LeaderCard")
         {
-            if(!GameManager.GetComponent<MasterController>().validTurn && player.Equals(board.GetCurrentPlayer()) && !player.LeaderEffectUsedThisRound)
+            if (player.LeaderCardSelected)
+            {
+                player.LeaderCardSelected = false;
+                masterController.EffectException();
+                return;
+            }
+
+            if (!board.ValidTurn && player.Equals(board.GetCurrentPlayer()) && !player.LeaderEffectUsedThisRound)
             {
                     OpenInfoPanel(true);
             }
@@ -67,7 +78,7 @@ public class CardController : MonoBehaviour
             if (player.LeaderCardSelected)
             {
                 player.LeaderCardSelected = false;
-                GameManager.GetComponent<MasterController>().EffectException();
+                masterController.EffectException();
                 return;
             }
             if (!isSelected)
@@ -102,24 +113,19 @@ public class CardController : MonoBehaviour
 
             if (player.LeaderCardSelected)
             {
-                if (!isOccupied)
-                {
-                    player.LeaderCardSelected = false;
-                    GameManager.GetComponent<MasterController>().EffectException();
-                    return;
-                }
+                if (!isOccupied) GameManager.GetComponent<MasterController>().EffectException();
                 else
                 {
-                    List<Card> list = this.gameObject.tag == "WeatherCard" ? board.Weather : 
-                                      this.gameObject.tag == "BonusCard" ? this.player.Battlefield.Bonus : Utils.GetListByRangeType(this.player, this.rangeTypes[0]);
+                    List<Card> list = GetList(this);
 
-                    GameManager.GetComponent<LeaderSkillPanel>().StaysInBattlefieldModifierSkill(list[indexOfThisInParent], list);
-                    player.LeaderCardSelected = false;
-                    return;
+                    GameManager.GetComponent<LeaderSkillPanel>().LeaderSkillWhenCardSelected(player, list[indexOfThisInParent], list);
                 }
+
+                player.LeaderCardSelected = false;
+                return;
             }
 
-            if (!GameManager.GetComponent<MasterController>().validTurn)
+            if (!board.ValidTurn)
             {
                 #region Play normal card
                 if (!isOccupied)
@@ -139,15 +145,14 @@ public class CardController : MonoBehaviour
                                 (this.gameObject.tag == "BattlefieldCard" && !(new List<CardType> { CardType.Bait, CardType.Bonus, CardType.Weather }).Contains(player.Hand[i].CardType)) ||
                                 (this.gameObject.tag == "BonusCard" && player.Hand[i] is BonusCard))
                             {
-                                if (this.player.PlayCard(i, indexOfThisInParent, this.rangeTypes[0]))
+                                if (playerMB.PlayCard(i, indexOfThisInParent, this.rangeTypes[0]))
                                 {
                                     child.SetActive(false); //just in case jeje
                                     this.IsOccupied = true;
-                                    GameManager.GetComponent<MasterController>().validTurn = true;
                                 }
-                                else GameManager.GetComponent<MasterController>().GeneralException();
+                                else masterController.GeneralException();
                             }
-                            else GameManager.GetComponent<MasterController>().GeneralException();
+                            else masterController.GeneralException();
                             break;
                         }
                     }
@@ -170,13 +175,11 @@ public class CardController : MonoBehaviour
                         {
                             if (this.gameObject.tag == "WeatherCard" && (!(board.Weather[indexOfThisInParent] is WeatherCard weather) || !weather.PlayerThatPlayedThisCard.Equals(this.player))) break;
 
-                            if (bait.Effect(this.player,
-                                            this.gameObject.tag == "WeatherCard" ? board.Weather : this.gameObject.tag == "BonusCard" ? this.player.Battlefield.Bonus : Utils.GetListByRangeType(this.player, this.rangeTypes[0]),
-                                            indexOfThisInParent))
+                            if (bait.Effect(this.player, GetList(this), indexOfThisInParent))
                             {
                                 BaitFound = true;
-                                board.UpdateView(true);
-                                GameManager.GetComponent<MasterController>().validTurn = true;
+                                masterController.board.UpdateView(true);
+                                board.ValidTurn = true;
                             }
 
                             break;
@@ -211,15 +214,15 @@ public class CardController : MonoBehaviour
     {
         if (!isOccupied)
         {
-            GameManager.GetComponent<MasterController>().GeneralException();
+            masterController.GeneralException();
             return;
         }
 
-        GameManager.GetComponent<MasterController>().SavePanelOnWhenInformationDisplayed();
-        GameManager.GetComponent<MasterController>().PanelOnWhenInformationDisplayed.SetActive(false);
-
-        GameObject infoPanel = leader ? GameManager.GetComponent<MasterController>().LeaderInfoPanel : GameManager.GetComponent<MasterController>().InfoPanel;
-        infoPanel.GetComponent<Image>().sprite = this.Info;
-        infoPanel.SetActive(true);
+        masterController.SavePanelOnWhenInformationDisplayed(false);
+        masterController.OpenInfo(this.Info, leader);
     }
+
+    List<Card> GetList (CardController cardController) => cardController.gameObject.tag == "WeatherCard" ? board.Weather :
+                                                          cardController.gameObject.tag == "BonusCard" ? cardController.player.Battlefield.Bonus : 
+                                                          cardController.player.ListByZone[rangeTypes[0]];
 }

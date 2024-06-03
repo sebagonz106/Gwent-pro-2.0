@@ -1849,7 +1849,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
+  m_fontSize: 39.4
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2019,11 +2019,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerThatOwnsThisBattlefield: {fileID: 2015054635}
-  Graveyard: []
-  Melee: []
-  Range: []
-  Siege: []
-  Bonus: []
 --- !u!1 &171810673
 GameObject:
   m_ObjectHideFlags: 0
@@ -2635,13 +2630,11 @@ MonoBehaviour:
   effectException: {fileID: 1437676315}
   generalException: {fileID: 1975582063}
   roundEndedNotification: {fileID: 1939879473}
-  board: {fileID: 1748365316}
-  isBatistaPlayingOrAboutToPlay: 1
-  validTurn: 0
   BatistaScoreInPlayersPanel: {fileID: 1191953806}
   FidelScoreInPlayersPanel: {fileID: 794695498}
   BatistaScoreInBetweenRoundsPanel: {fileID: 1479368257}
   FidelScoreInBetweenRoundsPanel: {fileID: 116481095}
+  board: {fileID: 1748365316}
 --- !u!114 &251077639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5930,40 +5923,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47d8edf14b944224289a0a297c6b989e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1600062079}
-  cards:
-  - {fileID: 11400000, guid: 3a921040caaaf3540910952f4f4e3449, type: 2}
-  - {fileID: 11400000, guid: 8d317270b3a835341a4f8d48498d1c63, type: 2}
-  - {fileID: 11400000, guid: a7b2d5c6293ecfb4f8a78cb80b3daaed, type: 2}
-  - {fileID: 11400000, guid: 9fe33d28b7f09034cb6507f0c4b5aa81, type: 2}
-  - {fileID: 11400000, guid: 85279df2b26edac4fa423c4ef953aa8c, type: 2}
-  - {fileID: 11400000, guid: 2a364b198ee23104d97c054959d939f7, type: 2}
-  - {fileID: 11400000, guid: 6da152d106adbfa458a9efd778e03c94, type: 2}
-  - {fileID: 11400000, guid: 07c2b6d7d00e9794db9af50bb1cd9924, type: 2}
-  - {fileID: 11400000, guid: ea89149a19e249045a01abec78424388, type: 2}
-  - {fileID: 11400000, guid: d8b8b1afa8f136542bcf93db6fe8a314, type: 2}
-  - {fileID: 11400000, guid: d2ecbf5645e72314684ca7446f2e1548, type: 2}
-  - {fileID: 11400000, guid: ce9a554d35df1074abcd7ac5d7de97a2, type: 2}
-  - {fileID: 11400000, guid: d89810061ae16514a9fcd6e6167805a9, type: 2}
-  - {fileID: 11400000, guid: e249c87223591604093943170afd4304, type: 2}
-  - {fileID: 11400000, guid: e249c87223591604093943170afd4304, type: 2}
-  - {fileID: 11400000, guid: e249c87223591604093943170afd4304, type: 2}
-  - {fileID: 11400000, guid: fb0bc1679b94b4344badb854a4250daf, type: 2}
-  - {fileID: 11400000, guid: d9e58a30e2abbdb438be33e672a859d9, type: 2}
-  - {fileID: 11400000, guid: d9e58a30e2abbdb438be33e672a859d9, type: 2}
-  - {fileID: 11400000, guid: d9e58a30e2abbdb438be33e672a859d9, type: 2}
-  - {fileID: 11400000, guid: da7db088706baeb44baa6d8857d19d9d, type: 2}
-  - {fileID: 11400000, guid: da7db088706baeb44baa6d8857d19d9d, type: 2}
-  - {fileID: 11400000, guid: da7db088706baeb44baa6d8857d19d9d, type: 2}
-  - {fileID: 11400000, guid: e15c9f4cfc600974d84e27b0ab8e8818, type: 2}
-  - {fileID: 11400000, guid: e15c9f4cfc600974d84e27b0ab8e8818, type: 2}
-  - {fileID: 11400000, guid: e15c9f4cfc600974d84e27b0ab8e8818, type: 2}
-  - {fileID: 11400000, guid: 0485249e0b3ab4a45a6682052ca67d34, type: 2}
-  - {fileID: 11400000, guid: 0485249e0b3ab4a45a6682052ca67d34, type: 2}
-  - {fileID: 11400000, guid: 0485249e0b3ab4a45a6682052ca67d34, type: 2}
-  - {fileID: 11400000, guid: fe02271b965f360458ab06b4fa910ae2, type: 2}
-  - {fileID: 11400000, guid: fe02271b965f360458ab06b4fa910ae2, type: 2}
-  - {fileID: 11400000, guid: fe02271b965f360458ab06b4fa910ae2, type: 2}
+  board: {fileID: 1748365316}
+  cardsInfo: []
 --- !u!1 &577266958
 GameObject:
   m_ObjectHideFlags: 0
@@ -12517,11 +12478,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerThatOwnsThisBattlefield: {fileID: 1600062079}
-  Graveyard: []
-  Melee: []
-  Range: []
-  Siege: []
-  Bonus: []
 --- !u!1 &1189336908
 GameObject:
   m_ObjectHideFlags: 0
@@ -15568,7 +15524,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32.55
+  m_fontSize: 32.05
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -17064,19 +17020,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4330a9c6d4bafa941a0bb13db153a422, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerName: 0
-  Hand: []
-  Deck: []
-  stealCardLeader: {fileID: 11400000, guid: 2da2eab5dea640748aef42f2516e9711, type: 2}
-  cardStaysLeader: {fileID: 11400000, guid: 6df7303f687b836468b50484328a18fb, type: 2}
-  leaderEffectUsedThisRound: 0
-  Battlefield: {fileID: 1188513063}
-  EndRound: 0
-  StartedPlaying: 0
-  Score: 0
+  board: {fileID: 1748365316}
+  battlefield: {fileID: 1188513063}
+  Hand: {fileID: 1513112936}
   WonCoin1: {fileID: 1464133100}
   WonCoin2: {fileID: 1366303772}
-  board: {fileID: 1748365316}
 --- !u!1 &1603574129
 GameObject:
   m_ObjectHideFlags: 0
@@ -18071,9 +18019,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Fidel: {fileID: 1600062079}
   Batista: {fileID: 2015054635}
+  Weather: {fileID: 268362466}
   gameController: {fileID: 251077634}
-  Weather: []
-  AlmeidaIsPlayed: 0
 --- !u!1 &1748723397
 GameObject:
   m_ObjectHideFlags: 0
@@ -19662,40 +19609,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47d8edf14b944224289a0a297c6b989e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 2015054635}
-  cards:
-  - {fileID: 11400000, guid: 689b67cfcc7c9fa489e25892a592eaa6, type: 2}
-  - {fileID: 11400000, guid: 5b45c40afb25ae440b019213292acfa7, type: 2}
-  - {fileID: 11400000, guid: 3a7153680dd8f09498c81d621f37d2be, type: 2}
-  - {fileID: 11400000, guid: 5d917e441661a5147bc60a7bc34e2661, type: 2}
-  - {fileID: 11400000, guid: b8e3aa15b25774c4faf906c2ead8e341, type: 2}
-  - {fileID: 11400000, guid: 42cb5e116af3d7c45b9c43e6e5e544eb, type: 2}
-  - {fileID: 11400000, guid: 2babce1b23e10834caa500233f89df3b, type: 2}
-  - {fileID: 11400000, guid: c376cc15f131a0342b19c0c284e3e717, type: 2}
-  - {fileID: 11400000, guid: 44a872c7aec89c541a915c1c604b665d, type: 2}
-  - {fileID: 11400000, guid: 12cd46c2252cf154cb7e3bf650408cb5, type: 2}
-  - {fileID: 11400000, guid: 5ccb3e3543a08024ba61364347930bd9, type: 2}
-  - {fileID: 11400000, guid: 76553476534b2594f89569ba94065039, type: 2}
-  - {fileID: 11400000, guid: ff8a4003cf052614fa6c84f5e27e8aab, type: 2}
-  - {fileID: 11400000, guid: 3a8d298dea059114f8dee6f62d3d9047, type: 2}
-  - {fileID: 11400000, guid: b2062d1b41358d641a4f4606f55c6d88, type: 2}
-  - {fileID: 11400000, guid: b2062d1b41358d641a4f4606f55c6d88, type: 2}
-  - {fileID: 11400000, guid: b2062d1b41358d641a4f4606f55c6d88, type: 2}
-  - {fileID: 11400000, guid: 139b26740c0795d42947382fd850f18f, type: 2}
-  - {fileID: 11400000, guid: 139b26740c0795d42947382fd850f18f, type: 2}
-  - {fileID: 11400000, guid: 139b26740c0795d42947382fd850f18f, type: 2}
-  - {fileID: 11400000, guid: 19ac3fbbc634bfb48a2c759ee84b2d3a, type: 2}
-  - {fileID: 11400000, guid: 19ac3fbbc634bfb48a2c759ee84b2d3a, type: 2}
-  - {fileID: 11400000, guid: 19ac3fbbc634bfb48a2c759ee84b2d3a, type: 2}
-  - {fileID: 11400000, guid: e31c8087b9c15d04ab0b4a76dea89455, type: 2}
-  - {fileID: 11400000, guid: e31c8087b9c15d04ab0b4a76dea89455, type: 2}
-  - {fileID: 11400000, guid: e31c8087b9c15d04ab0b4a76dea89455, type: 2}
-  - {fileID: 11400000, guid: bfaebe739b228804e85843eac912edf8, type: 2}
-  - {fileID: 11400000, guid: bfaebe739b228804e85843eac912edf8, type: 2}
-  - {fileID: 11400000, guid: bfaebe739b228804e85843eac912edf8, type: 2}
-  - {fileID: 11400000, guid: 9f31c3472e264e341a2853ee0b3f21e1, type: 2}
-  - {fileID: 11400000, guid: 9f31c3472e264e341a2853ee0b3f21e1, type: 2}
-  - {fileID: 11400000, guid: 9f31c3472e264e341a2853ee0b3f21e1, type: 2}
+  board: {fileID: 1748365316}
+  cardsInfo: []
 --- !u!1 &1975582063
 GameObject:
   m_ObjectHideFlags: 0
@@ -20148,19 +20063,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4330a9c6d4bafa941a0bb13db153a422, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerName: 1
-  Hand: []
-  Deck: []
-  stealCardLeader: {fileID: 11400000, guid: ab2fa5e098c0b6c4186799fe7d413ebc, type: 2}
-  cardStaysLeader: {fileID: 11400000, guid: d1148969b48c84a48ae0de226fc86c92, type: 2}
-  leaderEffectUsedThisRound: 0
-  Battlefield: {fileID: 168874699}
-  EndRound: 0
-  StartedPlaying: 1
-  Score: 0
+  board: {fileID: 1748365316}
+  battlefield: {fileID: 168874699}
+  Hand: {fileID: 161318323}
   WonCoin1: {fileID: 1603574129}
   WonCoin2: {fileID: 1905158876}
-  board: {fileID: 1748365316}
 --- !u!4 &2026064322 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6fdf4142d45a253409611ae4b2cde99c, type: 3}

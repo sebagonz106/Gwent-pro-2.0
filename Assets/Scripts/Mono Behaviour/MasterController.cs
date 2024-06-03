@@ -104,10 +104,11 @@ public class MasterController : MonoBehaviour
         PanelOnWhenInformationDisplayed.SetActive(false);
         generalException.SetActive(true);
     }
-    public void OpenInfo(Sprite info)
+    public void OpenInfo(Sprite info, bool leader = false)
     {
-        InfoPanel.GetComponent<Image>().sprite = info;
-        InfoPanel.SetActive(true);
+        GameObject infoPanel = leader ? LeaderInfoPanel : InfoPanel;
+        infoPanel.GetComponent<Image>().sprite = info;
+        infoPanel.SetActive(true);
     }
     public void CloseInfo()
     {
@@ -156,7 +157,7 @@ public class MasterController : MonoBehaviour
 
         return false;
     }
-    
+
     public void EndGame(string winnerName)
     {
         this.betweenRoundsPanel.SetActive(false);
