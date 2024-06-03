@@ -15,8 +15,8 @@ public class CardInitializer : MonoBehaviour
     {
         foreach (CardSO item in cardsInfo)
         {
-            item.information = Resources.Load<Sprite>($"Info/{(this.player.PlayerName==Faction.Fidel? "Fidel" : "Batista")}/{item.name}");
-            item.material = Resources.Load<Material>($"Materials/{(this.player.PlayerName == Faction.Fidel ? "Fidel" : "Batista")}/{item.name}");
+            item.information = Resources.Load<Sprite>($"Info/{playerMB.Name}/{item.name}");
+            item.material = Resources.Load<Material>($"Materials/{playerMB.Name}/{item.name}");
 
             switch (item.cardType)
             {

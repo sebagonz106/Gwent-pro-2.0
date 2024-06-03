@@ -17,6 +17,7 @@ public class VisualInfo
         this.Material = card.material;
         this.Information = card.information;
     }
+    public VisualInfo() { }
 }
 
 public interface IEffect

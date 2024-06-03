@@ -15,17 +15,19 @@ public class PlayerMB : MonoBehaviour
     public GameObject WonCoin2;
     public GameObject[] Body { get; private set; }
     public GameObject[] AvailableSlots { get; private set; }
+    public string Name { get; private set; }
 
     private void Awake()
     {
-        if (this.gameObject.name == "Fidel")
+        Name = this.gameObject.name;
+        if (Name == "Fidel")
         {
             player = Player.Fidel;
             if (stealCardLeader.Name == PlayerPrefs.GetString("Rebel Leader")) player.Leader = stealCardLeader;
             else player.Leader = cardStaysLeader;
         }
 
-        else if (this.gameObject.name == "Batista")
+        else if (Name == "Batista")
         {
             player = Player.Batista;
 
