@@ -10,11 +10,11 @@ public class Board
     bool newRound = true;
     public List<Card> Weather = Enumerable.Repeat<Card>(Utils.BaseCard, 3).ToList<Card>();
     public bool AlmeidaIsPlayed = false;
-    private static Board instance;
+    private static Board instance = new Board();
     public Dictionary<string, List<Card>> ZonesList;
 
     public bool IsBatistaPlayingOrAboutToPlay { get; private set; }
-    public static Board Instance => instance.Equals(null) ? SetBoard() : instance;
+    public static Board Instance => instance == null ? SetBoard() : instance;
     public int RoundCount { get => roundCount; private set => roundCount = value; }
     public bool ValidTurn { get; set; }
 

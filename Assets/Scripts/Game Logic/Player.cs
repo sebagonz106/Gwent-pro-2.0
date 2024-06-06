@@ -22,8 +22,8 @@ public class Player
     private static Player fidel;
     private static Player batista;
 
-    public static Player Fidel => fidel.Equals(null) ? SetPlayer(fidel, Batista, Faction.Fidel) : fidel;
-    public static Player Batista => batista.Equals(null) ? SetPlayer(batista, Fidel, Faction.Batista) : batista;
+    public static Player Fidel => fidel == null ? SetPlayer(ref fidel, batista, Faction.Fidel) : fidel;
+    public static Player Batista => batista == null ? SetPlayer(ref batista, fidel, Faction.Batista) : batista;
     public Faction PlayerName => playerName;
 
     public Dictionary<string, List<Card>> ListByName;
@@ -39,7 +39,7 @@ public class Player
         }
     }
 
-    private static  Player SetPlayer(Player player, Player enemy, Faction faction)
+    private static  Player SetPlayer(ref Player player, Player enemy, Faction faction)
     {
         player = new Player(faction);
         player.context = new Context(player, enemy);

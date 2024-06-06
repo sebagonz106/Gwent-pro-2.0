@@ -7,12 +7,13 @@ public class CardInitializer : MonoBehaviour
     [SerializeField] PlayerMB playerMB;
     [SerializeField] BoardMB board;
     [SerializeField] List<CardSO> cardsInfo;
-    [SerializeField] List<Card> cards;
+    List<Card> cards;
     bool cardsStolen;
     Player player => playerMB.player;
 
     void Start()
     {
+        cards = new List<Card>();
         foreach (CardSO item in cardsInfo)
         {
             item.information = Resources.Load<Sprite>($"Info/{playerMB.Name}/{item.name}");
