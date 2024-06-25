@@ -31,3 +31,6 @@ Card game for the first-year Programming project in Computer Science 2024. The p
 4. **Battlefield:** Class where the basic process of the game is ran. It stores the lists of cards displayed in the board and the graveyard.
 5. **Card:** little to say about this, you can check the definition to see more (There are plenty of classes wich inheritate from this class, and i would say are the base cells of the game).
 6. **Utils:** Commonly used methods and declarations. In this .cs document I declared the delegate Effects and all the Enums used throughout the coding.
+
+##Interpreter
+https://github.com/sebagonz106/Gwent-Interpreter
