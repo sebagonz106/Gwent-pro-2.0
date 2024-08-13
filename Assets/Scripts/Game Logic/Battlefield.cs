@@ -50,7 +50,7 @@ public class Battlefield
             Card card = Board.Instance.Weather[i];
 
             //sending to graveyard only the cards on this list played by this player
-            if ((card is BaitCard bait && bait.PlayerThatPlayedThisCard.Equals(playerThatOwnsThisBattlefield)) || (card is WeatherCard weather && weather.PlayerThatPlayedThisCard.Equals(playerThatOwnsThisBattlefield)))
+            if ((card is BaitCard bait && bait.Owner.Equals(playerThatOwnsThisBattlefield)) || (card is WeatherCard weather && weather.Owner.Equals(playerThatOwnsThisBattlefield)))
             {
                 this.ToGraveyard(card, Board.Instance.Weather);
             }
@@ -151,6 +151,30 @@ public class Battlefield
 
         staysInBattlefieldController = (card, list, list.IndexOf(card));
         return true;
+    }
+    
+    public List<Card> CardsInBattlefield
+    {
+        get
+        {
+            List<Card> list = new List<Card>();
+            foreach (var zone in Zones)
+            {
+                list.AddRange(zone);
+            }
+            list.AddRange(Bonus);
+            foreach (var card in Board.Instance.Weather)
+            {
+                if (card is ICardsWithOwner common && common.Owner == playerThatOwnsThisBattlefield) list.Add(card);
+            }
+            return list;
+        }
+    }
+    public void ToGraveyard(Card card)
+    {
+        if (Bonus.Contains(card)) this.ToGraveyard(card, Bonus);
+        else if (Board.Instance.Weather.Contains(card)) this.ToGraveyard(card, Board.Instance.Weather);
+        else foreach (var zone in Zones) if (zone.Contains(card)) this.ToGraveyard(card, zone);
     }
 
     bool Compare(double a, bool biggestOrSmallest, double b) => biggestOrSmallest ? a > b : a < b;

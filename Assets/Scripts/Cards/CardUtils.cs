@@ -12,11 +12,7 @@ public class VisualInfo
         this.Material = material;
         this.Information = information;
     }
-    public VisualInfo(CardSO card)
-    {
-        this.Material = card.material;
-        this.Information = card.information;
-    }
+
     public VisualInfo() { }
 }
 
@@ -25,7 +21,7 @@ public interface IEffect
     bool Effect(Context context);
 }
 
-public interface ICardsPlayableInCommonPositions
+public interface ICardsWithOwner
 {
-    Player PlayerThatPlayedThisCard { get; set; }
+    Player Owner { get; set; }
 }

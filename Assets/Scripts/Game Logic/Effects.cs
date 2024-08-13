@@ -39,7 +39,7 @@ public static class Effects
     #region Rebel effects
 
     public static bool StealCard(Context context) => context.CurrentPlayer.GetCard(); //for it to work, the card with this effect must not 
-                                                                                     //be the first card played of a full hand
+                                                                                      //be the first card played of a full hand
     public static bool NoOneSurrendersHereGodDamn(Context context)
     {
         context.Board.AlmeidaIsPlayed = true;
@@ -85,9 +85,9 @@ public static class Effects
     {
         List<Card> currentPosition = context.CurrentPosition;
         Player player = context.CurrentPlayer;
-        BonusCard riot = new BonusCard(Resources.Load<BonusCardSO>("Huelga Revolucionaria"));
+        //BonusCard riot = new BonusCard(Resources.Load<BonusCardSO>("Huelga Revolucionaria"));
 
-        return player.Battlefield.AddCard(riot, player.ZoneByList[currentPosition]);
+        return player.Battlefield.AddCard(Utils.BaseCard, player.ZoneByList[currentPosition]); //TODO: crear carta huelga y pasarla en vez de basecard
     }
     #endregion
 
@@ -107,7 +107,7 @@ public static class Effects
         }
 
         //checks if current player's most powerful card outpowers enemy's most powerful card. If so, it sends it to graveyard
-        else if (enemyPlayerList.Item1 == null || currentPlayerList.Item1.InitialDamage > enemyPlayerList.Item1.InitialDamage) 
+        else if (enemyPlayerList.Item1 == null || currentPlayerList.Item1.InitialDamage > enemyPlayerList.Item1.InitialDamage)
         {
             context.CurrentPlayer.Battlefield.ToGraveyard(currentPlayerList.Item1, currentPlayerList.Item2);
         }
@@ -171,7 +171,7 @@ public static class Effects
     {
         Player player = context.CurrentPlayer;
         UnitCard card = (UnitCard)context.CurrentCard;
-        int count = 0; 
+        int count = 0;
         List<UnitCard> list = new List<UnitCard>();
 
         for (int i = 0; i < player.Battlefield.Zones.Length; i++)
@@ -197,7 +197,7 @@ public static class Effects
         }
         if (!thisPlayer.Battlefield.Bonus[Utils.IndexByZone[checkingPlayer.ZoneByList[toCount]]].Equals(Utils.BaseCard)) tempCount++;
 
-        if (tempCount>0 && (tempCount<minCount||(tempCount==minCount && !checkingPlayer.Equals(thisPlayer))))
+        if (tempCount > 0 && (tempCount < minCount || (tempCount == minCount && !checkingPlayer.Equals(thisPlayer))))
         {
             minCountList = toCount;
             minCount = tempCount;

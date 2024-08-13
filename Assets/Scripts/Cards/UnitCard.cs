@@ -2,47 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitCard : Card, IEffect
+public class UnitCard : Card
 {
-    double initialDamage = 0;
     double damageOnField = 0;
     double damageOnCount = 0;
-    Effect effect = Effects.VoidEffect;
 
     public Level Level { get; private set; }
     public double InitialDamage { get => initialDamage; }
     public double DamageOnField { get => damageOnField; }
     public double Damage { get => damageOnCount; set => damageOnCount = value; }
 
-    public UnitCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, VisualInfo info, List<Card> currentPosition, double initialDamage, Effect effect) : base(name, faction, cardType, availableRange, info, currentPosition)
+    public UnitCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, Level level, double initialDamage = 0, Effect effect = null) :
+               base(name, faction, cardType, availableRange, initialDamage, effect)
     {
-        this.initialDamage = this.damageOnField = this.damageOnCount = initialDamage;
-        AssignEffect(effect);
-    }
-
-    public UnitCard(UnitCardSO unit, Effect effect) : base(unit)
-    {
-        this.initialDamage = this.damageOnField = this.damageOnCount = unit.InitialDamage;
-        AssignEffect(effect);
-    }
-
-    public void AssignEffect(Effect effect)
-    {
-        if (effect.Equals(null)) return;
-
-        this.effect = effect;
-    }
-
-    public bool Effect(Context context)
-    {
-        try
-        {
-            return effect.Invoke(context);
-        }
-        catch (System.NullReferenceException)
-        {
-            return Effects.VoidEffect(context);
-        }
+        this.damageOnField = this.damageOnCount = initialDamage;
+        this.Level = level;
     }
 
     public void ResetDamage() //when a weathercard affects the damage of this card, the value will only be changed until it

@@ -33,13 +33,14 @@ public class Player
     private Player(Faction faction)
     {
         Hand = Enumerable.Repeat<Card>(Utils.BaseCard, 10).ToList<Card>();
+        playerName = faction;
         for (int i = 0; i < 10; i++)
         {
             emptySlotsInHand.Add(i);
         }
     }
 
-    private static  Player SetPlayer(ref Player player, Player enemy, Faction faction)
+    private static Player SetPlayer(ref Player player, Player enemy, Faction faction)
     {
         player = new Player(faction);
         player.context = new Context(player, enemy);
@@ -57,7 +58,7 @@ public class Player
                                                                 { Zone.Range, player.Battlefield.Range },
                                                                 { Zone.Siege, player.Battlefield.Siege }
                                                              };
-        player.ZoneByList= new Dictionary<List<Card>, Zone> {
+        player.ZoneByList = new Dictionary<List<Card>, Zone> {
                                                                 { player.Battlefield.Melee, Zone.Melee },
                                                                 { player.Battlefield.Range, Zone.Range },
                                                                 { player.Battlefield.Siege, Zone.Siege }
@@ -77,7 +78,7 @@ public class Player
 
             for (int k = Battlefield.Graveyard.Count - 1; k >= 0; k--)
             {
-                randomNumber = Random.Range(0, Battlefield.Graveyard.Count - 1);
+                randomNumber = new System.Random().Next(Battlefield.Graveyard.Count - 1);
                 swapCard = Battlefield.Graveyard[randomNumber];
                 Battlefield.Graveyard[randomNumber] = Battlefield.Graveyard[k];
                 Battlefield.Graveyard[k] = swapCard;
@@ -90,7 +91,7 @@ public class Player
         while (emptySlotsInHand.Count < cardsToSteal) //if cardsToSteal is bigger than the amount of empty slots in players hand, this sends 
                                                       //a random card in deck to graveyard until a proper value for cardsToSteal is achieved
         {
-            int index = Random.Range(0, Deck.Count - 1);
+            int index = new System.Random().Next(Deck.Count - 1);
             Battlefield.Graveyard.Add(Deck[index]);
             Deck.RemoveAt(index);
             cardsToSteal--;
@@ -100,7 +101,7 @@ public class Player
 
         for (int count = cardsToSteal; count > 0; count--)
         {
-            int index = Random.Range(0, Deck.Count - 1);
+            int index = new System.Random().Next(Deck.Count - 1);
             Hand[emptySlotsInHand[0]] = Deck[index];
             Deck.RemoveAt(index);
             emptySlotsInHand.RemoveAt(0);
@@ -121,21 +122,16 @@ public class Player
         if (card is WeatherCard weather && Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
         {
             Board.Instance.Weather[targetPosition] = weather;
-            weather.PlayerThatPlayedThisCard = this;
+            weather.Owner = this;
         }
-        else if (this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
-        {
-            if (card is UnitCard unit) //activating unit cart effect
-            {
-                if (!unit.Effect(this.context.UpdatePlayerInstance(this.ListByZone[rangeType], unit)))
-                {
-                    effectFailed = true;
-                }
-            }
-        }
-        else
+        else if (!this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
         {
             return false;
+        }
+
+        if (!card.Effect(this.context.UpdatePlayerInstance(this.ListByZone[rangeType], card)))
+        {
+            effectFailed = true;
         }
 
         Board.Instance.ValidTurn = true;

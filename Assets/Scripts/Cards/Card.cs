@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Card
+public class Card : IEffect, ICardsWithOwner
 {
     public string Name { get; }
     public Faction Faction { get; }
@@ -10,25 +10,28 @@ public class Card
     public List<Zone> AvailableRange { get; }
     public List<Card> CurrentPosition { get; }
     public VisualInfo Info { get; }
+    protected Effect effect;
+    protected double initialDamage;
 
-    public Card(string name, Faction faction, CardType cardType, List<Zone> availableRange, VisualInfo info, List<Card> currentPosition)
+    public int Power
+    {
+        get => this is UnitCard unit ? Convert.ToInt32(unit.DamageOnField) : Convert.ToInt32(initialDamage);
+        set
+        {
+            if (this is UnitCard unit) unit.ModifyOnFieldDamage(value);
+        }
+    }
+
+    public Player Owner { get => GwentInterpreterContext.Context.Players[Faction]; set => Owner = value; }
+
+    public Card(string name, Faction faction, CardType cardType, List<Zone> availableRange, double damage = 0, Effect effect = null)
     {
         this.Name = name;
         this.Faction = faction;
         this.CardType = cardType;
         this.AvailableRange = availableRange;
-        this.CurrentPosition = currentPosition;
-        this.Info = info;
-    }
-
-    public Card(CardSO cardInfo)
-    {
-        this.Name = cardInfo.name;
-        this.Faction = cardInfo.faction;
-        this.CardType = cardInfo.cardType;
-        this.AvailableRange = cardInfo.availableRange;
-        this.CurrentPosition = cardInfo.currentPosition;
-        this.Info = new VisualInfo(cardInfo);
+        AssignEffect(effect);
+        initialDamage = damage;
     }
 
     public override bool Equals(object other)
@@ -38,6 +41,24 @@ public class Card
 
     public override int GetHashCode()
     {
-        return base.GetHashCode();
+        return base.GetHashCode(); //combinar nombre y faccion
     }
+
+    public virtual bool Effect(Context context)
+    {
+        try
+        {
+            return effect is null ? true : effect.Invoke(context);
+        }
+        catch (System.NullReferenceException)
+        {
+            return false;
+        }
+    }
+
+    public void AssignPosition(List<Card> currentPosition) => this.CurrentPosition = currentPosition is null ? Owner.Hand : currentPosition;
+
+    public void AssignInfo(VisualInfo info) => this.Info = info;
+
+    public void AssignEffect(Effect effect) => this.effect = effect is null ? Effects.VoidEffect : effect;
 }

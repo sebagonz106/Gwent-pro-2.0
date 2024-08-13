@@ -145,7 +145,7 @@ public class Board
     #endregion
     public void UpdateTotalDamage(Player player = null)
     {
-        if(player.Equals(null))
+        if (player.Equals(null))
         {
             UpdateTotalDamage(Player.Batista);
             player = Player.Fidel;
@@ -161,10 +161,10 @@ public class Board
 
         foreach (Card card in this.Weather) //applies weather effects
         {
-            if (card is WeatherCard weather) weather.Effect(player.context.UpdatePlayerInstance(this.Weather, weather));
+            if (card is WeatherCard weather) weather.WeatherEffect(player.context.UpdatePlayerInstance(this.Weather, weather));
         }
 
-        for  (int i = 0; i < player.Battlefield.Zones.Length; i++)
+        for (int i = 0; i < player.Battlefield.Zones.Length; i++)
         {
             foreach (Card item in player.Battlefield.Zones[i]) //sums the damage of every unit cards
             {
@@ -180,7 +180,7 @@ public class Board
     public Player GetCurrentPlayer() => IsBatistaPlayingOrAboutToPlay ? Player.Batista : Player.Fidel;
     public Player GetCurrentEnemy() => IsBatistaPlayingOrAboutToPlay ? Player.Fidel : Player.Batista;
 
-    private void SumScore (Player winner, int scoreWinner, Player looser, int scoreLooser)
+    private void SumScore(Player winner, int scoreWinner, Player looser, int scoreLooser)
     {
         winner.Score += scoreWinner;
         winner.StartedPlaying = true;
