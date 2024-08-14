@@ -2018,7 +2018,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adf99ed02f353864d9ec342ac9a2ffc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerThatOwnsThisBattlefield: {fileID: 2015054635}
+  owner: {fileID: 2015054635}
 --- !u!1 &171810673
 GameObject:
   m_ObjectHideFlags: 0
@@ -5923,8 +5923,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47d8edf14b944224289a0a297c6b989e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerMB: {fileID: 0}
   board: {fileID: 1748365316}
-  cardsInfo: []
 --- !u!1 &577266958
 GameObject:
   m_ObjectHideFlags: 0
@@ -12477,7 +12477,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adf99ed02f353864d9ec342ac9a2ffc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerThatOwnsThisBattlefield: {fileID: 1600062079}
+  owner: {fileID: 1600062079}
 --- !u!1 &1189336908
 GameObject:
   m_ObjectHideFlags: 0
@@ -16823,7 +16823,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 31.05
+  m_fontSize: 29.25
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -19609,8 +19609,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47d8edf14b944224289a0a297c6b989e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerMB: {fileID: 0}
   board: {fileID: 1748365316}
-  cardsInfo: []
 --- !u!1 &1975582063
 GameObject:
   m_ObjectHideFlags: 0

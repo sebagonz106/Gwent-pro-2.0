@@ -9,7 +9,7 @@ public class LeaderCardSelectionMenu : MonoBehaviour
 
     public void SaveInfo()
     {
-        PlayerPrefs.SetString("Rebel Leader", rebelLeader);
+        PlayerPrefs.SetString("Fidel Leader", rebelLeader);
         PlayerPrefs.SetString("Batista Leader", batistaLeader);
     }
 

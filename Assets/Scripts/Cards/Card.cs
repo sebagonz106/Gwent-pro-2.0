@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,8 +9,8 @@ public class Card : IEffect, ICardsWithOwner
     public Faction Faction { get; }
     public CardType CardType { get; }
     public List<Zone> AvailableRange { get; }
-    public List<Card> CurrentPosition { get; }
-    public VisualInfo Info { get; }
+    public List<Card> CurrentPosition { get; private set; }
+    public VisualInfo Info { get; private set; }
     protected Effect effect;
     protected double initialDamage;
 
@@ -22,7 +23,7 @@ public class Card : IEffect, ICardsWithOwner
         }
     }
 
-    public Player Owner { get => GwentInterpreterContext.Context.Players[Faction]; set => Owner = value; }
+    public Player Owner { get => Utils.PlayerByFaction[Faction]; set => Owner = value; }
 
     public Card(string name, Faction faction, CardType cardType, List<Zone> availableRange, double damage = 0, Effect effect = null)
     {

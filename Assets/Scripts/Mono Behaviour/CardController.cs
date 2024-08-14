@@ -116,7 +116,7 @@ public class CardController : MonoBehaviour
                 if (!isOccupied) GameManager.GetComponent<MasterController>().EffectException();
                 else
                 {
-                    List<Card> list = GetList(this);
+                    List<Card> list = GetList();
 
                     GameManager.GetComponent<LeaderSkillPanel>().LeaderSkillWhenCardSelected(player, list[indexOfThisInParent], list);
                 }
@@ -173,9 +173,9 @@ public class CardController : MonoBehaviour
                         GameObject child = collection.transform.GetChild(i).gameObject;
                         if (child.GetComponent<CardController>().isSelected && player.Hand[i] is BaitCard bait)
                         {
-                            if (this.gameObject.tag == "WeatherCard" && (!(board.Weather[indexOfThisInParent] is WeatherCard weather) || !weather.PlayerThatPlayedThisCard.Equals(this.player))) break;
+                            if (this.gameObject.tag == "WeatherCard" && (!(board.Weather[indexOfThisInParent] is WeatherCard weather) || !weather.Owner.Equals(this.player))) break;
 
-                            if (bait.Effect(this.player, GetList(this), indexOfThisInParent))
+                            if (bait.Effect(this.player.context.UpdatePlayerInstance(GetList(), bait)))
                             {
                                 BaitFound = true;
                                 masterController.board.UpdateView(true);
@@ -222,7 +222,7 @@ public class CardController : MonoBehaviour
         masterController.OpenInfo(this.Info, leader);
     }
 
-    List<Card> GetList (CardController cardController) => cardController.gameObject.tag == "WeatherCard" ? board.Weather :
-                                                          cardController.gameObject.tag == "BonusCard" ? cardController.player.Battlefield.Bonus : 
-                                                          cardController.player.ListByZone[rangeTypes[0]];
+    List<Card> GetList () => this.gameObject.tag == "WeatherCard" ? board.Weather :
+                             this.gameObject.tag == "BonusCard" ? this.player.Battlefield.Bonus : 
+                             this.player.ListByZone[rangeTypes[0]];
 }

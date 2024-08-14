@@ -6,7 +6,6 @@ public class CardInitializer : MonoBehaviour
 {
     [SerializeField] PlayerMB playerMB;
     [SerializeField] BoardMB board;
-    [SerializeField] List<CardSO> cardsInfo;
     List<Card> cards;
     bool cardsStolen;
     Player player => playerMB.player;
@@ -14,31 +13,10 @@ public class CardInitializer : MonoBehaviour
     void Start()
     {
         cards = new List<Card>();
-        foreach (CardSO item in cardsInfo)
+        foreach (Card item in cards)
         {
-            item.information = Resources.Load<Sprite>($"Info/{playerMB.Name}/{item.name}");
-            item.material = Resources.Load<Material>($"Materials/{playerMB.Name}/{item.name}");
-
-            switch (item.cardType)
-            {
-                case CardType.Bait:
-                    cards.Add(new BaitCard(item as BaitCardSO));
-                    break;
-                case CardType.Bonus:
-                    cards.Add(new BonusCard(item as BonusCardSO));
-                    break;
-                case CardType.Weather:
-                    cards.Add(new WeatherCard(item as WeatherCardSO));
-                    break;
-                case CardType.Clear:
-                    cards.Add(new ClearCard(item as ClearCardSO));
-                    break;
-                case CardType.Unit:
-                    cards.Add(new UnitCard(item as UnitCardSO, Effects.GetEffect(item.name)));
-                    break;
-                default:
-                    break;
-            }
+            item.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{playerMB.Name}/{item.Name}"), 
+                                           Resources.Load<Sprite>($"Info/{playerMB.Name}/{item.Name}")));
         }
 
         #region Modern Fisher-Yates shuffle algorithm
@@ -54,7 +32,7 @@ public class CardInitializer : MonoBehaviour
             }
         #endregion
 
-        cards.RemoveRange(25, cardsInfo.Count-25);
+        cards.RemoveRange(25, cards.Count-25);
         player.Deck.AddRange(this.cards);
     }
 

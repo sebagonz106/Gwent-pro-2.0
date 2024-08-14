@@ -5,16 +5,16 @@ using UnityEngine;
 
 public class BattlefieldMB : MonoBehaviour
 {
-    public PlayerMB playerThatOwnsThisBattlefield;
+    public PlayerMB owner;
     public Battlefield battlefield;
 
     private void Start()
     {
-        this.battlefield = playerThatOwnsThisBattlefield.player.Battlefield;
+        this.battlefield = owner.player.Battlefield;
     }
 
     public void Clear()
     {
-        if (!battlefield.Clear()) playerThatOwnsThisBattlefield.board.masterController.EffectException();
+        if (!battlefield.Clear()) owner.board.masterController.EffectException();
     }
 }

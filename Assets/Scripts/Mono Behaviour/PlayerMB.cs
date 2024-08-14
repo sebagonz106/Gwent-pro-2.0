@@ -9,8 +9,13 @@ public class PlayerMB : MonoBehaviour
     public BoardMB board;
     public BattlefieldMB battlefield;
     public GameObject Hand;
-    [SerializeField] LeaderCard stealCardLeader;
-    [SerializeField] LeaderCard cardStaysLeader;
+    static Dictionary<string, LeaderCard> leaders = new Dictionary<string, LeaderCard>
+    {
+        {"Camilo Cienfuegos", (LeaderCard)CardsWarehouse.RebelCards[0] },
+        {"Ernesto Che Guevara", (LeaderCard)CardsWarehouse.RebelCards[1] },
+        {"Eulogio Cantillo", (LeaderCard)CardsWarehouse.BatistaCards[0] },
+        {"Francisco Tabernilla", (LeaderCard)CardsWarehouse.BatistaCards[1] }
+    };
     public GameObject WonCoin1;
     public GameObject WonCoin2;
     public GameObject[] Body { get; private set; }
@@ -20,20 +25,9 @@ public class PlayerMB : MonoBehaviour
     private void Awake()
     {
         Name = this.gameObject.name;
-        if (Name == "Fidel")
-        {
-            player = Player.Fidel;
-            if (stealCardLeader.Name == PlayerPrefs.GetString("Rebel Leader")) player.Leader = stealCardLeader;
-            else player.Leader = cardStaysLeader;
-        }
-
-        else if (Name == "Batista")
-        {
-            player = Player.Batista;
-
-            if (stealCardLeader.Name == PlayerPrefs.GetString("Batista Leader")) player.Leader = stealCardLeader;
-            else player.Leader = cardStaysLeader;
-        }
+        player = Utils.GetPlayerByName(Name);
+        if (PlayerPrefs.GetString(Name + " Leader") == "") player.Leader = Name == "Batista" ? leaders["Francisco Tabernilla"] : leaders["Ernesto Che Guevara"];
+        else player.Leader = leaders[PlayerPrefs.GetString(Name + " Leader")];
     }
 
     private void Start()
