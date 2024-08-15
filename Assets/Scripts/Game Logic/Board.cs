@@ -14,18 +14,17 @@ public class Board
     public Dictionary<string, List<Card>> ZonesList;
 
     public bool IsBatistaPlayingOrAboutToPlay { get; private set; }
-    public static Board Instance => instance == null ? SetBoard() : instance;
+    public static Board Instance => instance;
     public int RoundCount { get => roundCount; private set => roundCount = value; }
     public bool ValidTurn { get; set; }
 
-    private Board() { }
+    private Board() { IsBatistaPlayingOrAboutToPlay = true; }
 
-    private static Board SetBoard()
+    public void SetZonesList()
     {
-        instance = new Board();
-        instance.ZonesList = new Dictionary<string, List<Card>>
+        this.ZonesList = new Dictionary<string, List<Card>>
         {
-            {"Weather", instance.Weather },
+            {"Weather", this.Weather },
             {"Batista Bonus",  Player.Batista.Battlefield.Bonus},
             {"Batista Melee",  Player.Batista.Battlefield.Melee},
             {"Batista Range",  Player.Batista.Battlefield.Range},
@@ -36,7 +35,6 @@ public class Board
             {"Fidel Siege",  Player.Fidel.Battlefield.Siege},
 
         };
-        return instance;
     }
     #endregion
 
@@ -48,8 +46,11 @@ public class Board
         {
             if (RoundCount == 0)
             {
+                Player.Fidel.StartedPlaying   = !IsBatistaPlayingOrAboutToPlay;
+                Player.Batista.StartedPlaying =  IsBatistaPlayingOrAboutToPlay;
                 Player.Fidel.GetCard(10);
                 Player.Batista.GetCard(10);
+                SetZonesList();
             }
             else
             {
@@ -67,11 +68,13 @@ public class Board
     public bool EndTurn(Player player)
     {
         if (!ValidTurn) return false;
-        ValidTurn = true;
+        ValidTurn = false;
 
-        if (IsBatistaPlayingOrAboutToPlay) IsBatistaPlayingOrAboutToPlay = Player.Fidel.EndRound;
-        else IsBatistaPlayingOrAboutToPlay = Player.Batista.EndRound;
-
+        if (!newRound)
+        {
+            if (IsBatistaPlayingOrAboutToPlay) IsBatistaPlayingOrAboutToPlay = Player.Fidel.EndRound;
+            else IsBatistaPlayingOrAboutToPlay = !Player.Batista.EndRound;
+        }
         return true;
     }
 
@@ -79,9 +82,7 @@ public class Board
     {
         if (ValidTurn) return false;
         ValidTurn = true;
-
-        if (IsBatistaPlayingOrAboutToPlay) Player.Batista.EndRound = true;
-        else Player.Fidel.EndRound = true;
+        player.EndRound = true;
 
         return true;
     }
@@ -106,7 +107,7 @@ public class Board
             }
             else //draw
             {
-                SumScore(Player.Fidel.StartedPlaying ? Player.Batista : Player.Fidel, 1, Player.Batista.StartedPlaying ? Player.Fidel : Player.Batista, 1);
+                SumScore(Player.Fidel.StartedPlaying ? Player.Batista : Player.Fidel, 1, Player.Fidel.StartedPlaying ? Player.Fidel : Player.Batista, 1);
                 IsBatistaPlayingOrAboutToPlay = Player.Batista.StartedPlaying;
             }
 
@@ -145,7 +146,7 @@ public class Board
     #endregion
     public void UpdateTotalDamage(Player player = null)
     {
-        if (player.Equals(null))
+        if (player is null)
         {
             UpdateTotalDamage(Player.Batista);
             player = Player.Fidel;

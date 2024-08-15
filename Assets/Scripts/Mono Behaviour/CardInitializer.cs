@@ -12,12 +12,9 @@ public class CardInitializer : MonoBehaviour
 
     void Start()
     {
-        cards = new List<Card>();
-        foreach (Card item in cards)
-        {
-            item.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{playerMB.Name}/{item.Name}"), 
-                                           Resources.Load<Sprite>($"Info/{playerMB.Name}/{item.Name}")));
-        }
+        AssignInfo(player.Leader);
+        cards = CardsWarehouse.GetDeck(playerMB.Name);
+        foreach (Card item in cards) AssignInfo(item);
 
         #region Modern Fisher-Yates shuffle algorithm
             int randomNumber;
@@ -57,4 +54,7 @@ public class CardInitializer : MonoBehaviour
         }
         else board.masterController.GeneralException();
     }
+
+    void AssignInfo(Card card) => card.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{playerMB.Name}/{card.Name}"),
+                                                                 Resources.Load<Sprite>($"Info/{playerMB.Name}/{card.Name}")));
 }

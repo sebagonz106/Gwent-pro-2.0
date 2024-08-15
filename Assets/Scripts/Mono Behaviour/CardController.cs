@@ -44,8 +44,8 @@ public class CardController : MonoBehaviour
 
         else if (this.gameObject.tag == "LeaderCard")
         {
-            this.GetComponent<Renderer>().material = this.player.Leader.Info.Material;
-            this.Info = this.player.Leader.Info.Information;
+            this.GetComponent<Renderer>().material = Resources.Load<Material>($"Materials/{playerMB.Name}/{player.Leader.Name}");
+            this.Info = Resources.Load<Sprite>($"Info/{playerMB.Name}/{player.Leader.Name}");
             this.IsOccupied = true;
         }
     }
@@ -132,14 +132,14 @@ public class CardController : MonoBehaviour
                 {
                     GameObject collection;
 
-                    if (this.player.PlayerName == Faction.Batista) collection = GameObject.Find("Batista Hand");
-                    else                                           collection = GameObject.Find("Fidel Hand");
+                    if (this.player.PlayerFaction == Faction.Batista) collection = GameObject.Find("Batista Hand");
+                    else    /*--------------------------------->*/    collection = GameObject.Find("Fidel Hand");
 
                     for (int i = 0; i < collection.transform.childCount; i++)
                     {
                         GameObject child = collection.transform.GetChild(i).gameObject;
 
-                        if (child.GetComponent<CardController>().isSelected && child.GetComponent<CardController>().rangeTypes.Contains(this.rangeTypes[0]))
+                        if (child.GetComponent<CardController>().isSelected && player.Hand[i].AvailableRange.Contains(this.rangeTypes[0]))
                         {
                             if ((this.gameObject.tag == "WeatherCard" && player.Hand[i] is WeatherCard) ||
                                 (this.gameObject.tag == "BattlefieldCard" && !(new List<CardType> { CardType.Bait, CardType.Bonus, CardType.Weather }).Contains(player.Hand[i].CardType)) ||
@@ -165,8 +165,8 @@ public class CardController : MonoBehaviour
                     bool BaitFound = false;
                     GameObject collection;
 
-                    if (this.player.PlayerName == Faction.Batista) collection = GameObject.Find("Batista Hand");
-                    else                                           collection = GameObject.Find("Fidel Hand");
+                    if (this.player.PlayerFaction == Faction.Batista) collection = GameObject.Find("Batista Hand");
+                    else    /*--------------------------------->*/    collection = GameObject.Find("Fidel Hand");
 
                     for (int i = 0; i < collection.transform.childCount; i++)
                     {
@@ -175,7 +175,7 @@ public class CardController : MonoBehaviour
                         {
                             if (this.gameObject.tag == "WeatherCard" && (!(board.Weather[indexOfThisInParent] is WeatherCard weather) || !weather.Owner.Equals(this.player))) break;
 
-                            if (bait.Effect(this.player.context.UpdatePlayerInstance(GetList(), bait)))
+                            if (bait.Effect(this.player.context.UpdatePlayerInstance(GetList(), GetList()[indexOfThisInParent])))
                             {
                                 BaitFound = true;
                                 masterController.board.UpdateView(true);

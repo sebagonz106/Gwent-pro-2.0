@@ -85,9 +85,11 @@ public static class Effects
     {
         List<Card> currentPosition = context.CurrentPosition;
         Player player = context.CurrentPlayer;
-        //BonusCard riot = new BonusCard(Resources.Load<BonusCardSO>("Huelga Revolucionaria"));
 
-        return player.Battlefield.AddCard(Utils.BaseCard, player.ZoneByList[currentPosition]); //TODO: crear carta huelga y pasarla en vez de basecard
+        BonusCard riot = new BonusCard("Huelga revolucionaria", Faction.Fidel, CardType.Bonus, new List<Zone> { Zone.Melee, Zone.Range, Zone.Siege }, 1.8);
+        riot.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{player.Name}/{riot.Name}"),
+                                       Resources.Load<Sprite>($"Info/{player.Name}/{riot.Name}")));
+        return player.Battlefield.AddCard(riot, player.ZoneByList[currentPosition]);
     }
     #endregion
 

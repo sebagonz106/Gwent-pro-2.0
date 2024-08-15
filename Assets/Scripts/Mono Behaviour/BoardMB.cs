@@ -13,6 +13,7 @@ public class BoardMB : MonoBehaviour
     public Canvas gameController;
     public MasterController masterController => (MasterController)gameController.GetComponent("MasterController");
     public Dictionary<string, GameObject> ZonesList { get; private set; }
+    public List<GameObject> list;
     public Dictionary<string, PlayerMB> GetMBPlayerByName { get; private set; }
     public Dictionary<Player, PlayerMB> GetMBPlayer { get; private set; }
 
@@ -21,9 +22,11 @@ public class BoardMB : MonoBehaviour
     public void Start()
     {
         ZonesList = new Dictionary<string, GameObject>();
+        list = new List<GameObject>();
         foreach(string item in Utils.ZonesName)
         {
             ZonesList.Add(item, GameObject.Find(item));
+            list.Add(GameObject.Find(item));
         }
         Weather = ZonesList["Weather"];
         GetMBPlayerByName = new Dictionary<string, PlayerMB>() { { "Fidel", Fidel }, { "Batista", Batista } };
@@ -38,13 +41,17 @@ public class BoardMB : MonoBehaviour
     {
         for (int i = 0; i < Utils.ZonesName.Length; i++)
         {
-            if (Utils.ZonesName[i].Contains("Weather") || Utils.ZonesName[i].Contains("Bonus")) continue;
-
-            CardsInBoardViewModificator(ZonesList[Utils.ZonesName[i]],
-                                        Board.Instance.ZonesList[Utils.ZonesName[i]],
+            if (Utils.ZonesName[i].Contains("Weather")) continue;
+            else if (Utils.ZonesName[i].Contains("Bonus")) CardsInBoardViewModificator(ZonesList[Utils.ZonesName[i]],
+                                                           board.ZonesList[Utils.ZonesName[i]],
+                                                           3, // available slots
+                                                           Utils.ZonesName[i].Contains("Batista") ? board.IsBatistaPlayingOrAboutToPlay :
+                                                                                                   !board.IsBatistaPlayingOrAboutToPlay);
+            else CardsInBoardViewModificator(ZonesList[Utils.ZonesName[i]],
+                                        board.ZonesList[Utils.ZonesName[i]],
                                         5, // available slots
-                                        Utils.ZonesName[i].Contains("Batista") ? Board.Instance.IsBatistaPlayingOrAboutToPlay :
-                                                                                !Board.Instance.IsBatistaPlayingOrAboutToPlay);
+                                        Utils.ZonesName[i].Contains("Batista") ? board.IsBatistaPlayingOrAboutToPlay :
+                                                                                !board.IsBatistaPlayingOrAboutToPlay);
         }
 
         CardsInBoardViewModificator(ZonesList["Weather"], Board.Instance.Weather, 3);
@@ -72,6 +79,7 @@ public class BoardMB : MonoBehaviour
                 child.SetActive(true);
                 child.GetComponent<Renderer>().material = list[i].Info.Material;
                 child.GetComponent<CardController>().Info = list[i].Info.Information;
+                child.GetComponent<CardController>().IsOccupied = true;
                 if (name.Contains("Hand")) child.GetComponent<CardController>().AssignRangeForHandCard(list[i].AvailableRange);
             }
         }
@@ -161,6 +169,8 @@ public class BoardMB : MonoBehaviour
             #endregion
 
             Board.Instance.UpdateTotalDamage();
+            ModifyVisibility(Batista.Body, true);
+            ModifyVisibility(Fidel.Body, true);
             UpdateView(true);
         }
     }

@@ -6,7 +6,7 @@ using UnityEngine;
 public class Player
 {
     #region Fields, properties and builder
-    Faction playerName;
+    Faction playerFaction;
     public List<Card> Hand = new List<Card>(10);
     private List<int> emptySlotsInHand = new List<int>(10);
     public List<Card> Deck = new List<Card>(25);
@@ -24,7 +24,8 @@ public class Player
 
     public static Player Fidel => fidel == null ? SetPlayer(ref fidel, batista, Faction.Fidel) : fidel;
     public static Player Batista => batista == null ? SetPlayer(ref batista, fidel, Faction.Batista) : batista;
-    public Faction PlayerName => playerName;
+    public Faction PlayerFaction => playerFaction;
+    public string Name { get; }
 
     public Dictionary<string, List<Card>> ListByName;
     public Dictionary<Zone, List<Card>> ListByZone;
@@ -33,7 +34,8 @@ public class Player
     private Player(Faction faction)
     {
         Hand = Enumerable.Repeat<Card>(Utils.BaseCard, 10).ToList<Card>();
-        playerName = faction;
+        playerFaction = faction;
+        Name = faction is Faction.Fidel ? "Fidel" : "Batista";
         for (int i = 0; i < 10; i++)
         {
             emptySlotsInHand.Add(i);
@@ -46,12 +48,12 @@ public class Player
         player.context = new Context(player, enemy);
         player.Battlefield = new Battlefield(player);
         player.ListByName = new Dictionary<string, List<Card>> {
-                                                                { "Melee", player.Battlefield.Melee },
-                                                                { "Range", player.Battlefield.Range },
-                                                                { "Siege", player.Battlefield.Siege },
-                                                                { "Bonus", player.Battlefield.Bonus },
-                                                                { "Weather", Board.Instance.Weather },
-                                                                { "Hand", player.Hand }
+                                                                { $"{player.Name} Melee", player.Battlefield.Melee },
+                                                                { $"{player.Name} Range", player.Battlefield.Range },
+                                                                { $"{player.Name} Siege", player.Battlefield.Siege },
+                                                                { $"{player.Name} Bonus", player.Battlefield.Bonus },
+                                                                { $"Weather", Board.Instance.Weather },
+                                                                { $"{player.Name} Hand", player.Hand }
                                                                };
         player.ListByZone = new Dictionary<Zone, List<Card>> {
                                                                 { Zone.Melee, player.Battlefield.Melee },
@@ -129,12 +131,10 @@ public class Player
             return false;
         }
 
-        if (!card.Effect(this.context.UpdatePlayerInstance(this.ListByZone[rangeType], card)))
-        {
-            effectFailed = true;
-        }
+        effectFailed = !card.Effect(this.context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
 
         Board.Instance.ValidTurn = true;
+        Board.Instance.UpdateTotalDamage(this);
         EmptyHandAt(originPosition);
         return true;
     }
@@ -147,7 +147,7 @@ public class Player
 
     public override bool Equals(object other)
     {
-        return other is Player otherPlayer && this.PlayerName == otherPlayer.PlayerName;
+        return other is Player otherPlayer && this.PlayerFaction == otherPlayer.PlayerFaction;
     }
     public override int GetHashCode()
     {

@@ -4896,7 +4896,7 @@ GameObject:
   - component: {fileID: 452511905}
   - component: {fileID: 452511908}
   m_Layer: 0
-  m_Name: Fidel  Siege (3)
+  m_Name: Fidel Siege (3)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5241,7 +5241,7 @@ GameObject:
   - component: {fileID: 484960335}
   - component: {fileID: 484960338}
   m_Layer: 0
-  m_Name: Fidel  Melee (3)
+  m_Name: Fidel Melee (3)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5923,7 +5923,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47d8edf14b944224289a0a297c6b989e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMB: {fileID: 0}
+  playerMB: {fileID: 1600062079}
   board: {fileID: 1748365316}
 --- !u!1 &577266958
 GameObject:
@@ -6247,7 +6247,7 @@ GameObject:
   - component: {fileID: 613853717}
   - component: {fileID: 613853720}
   m_Layer: 0
-  m_Name: Fidel  Melee (1)
+  m_Name: Fidel Melee (1)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9916,7 +9916,7 @@ GameObject:
   - component: {fileID: 912114591}
   - component: {fileID: 912114594}
   m_Layer: 0
-  m_Name: Fidel  Melee (0)
+  m_Name: Fidel Melee (0)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12822,7 +12822,7 @@ GameObject:
   - component: {fileID: 1195061000}
   - component: {fileID: 1195061003}
   m_Layer: 0
-  m_Name: Fidel  Siege (2)
+  m_Name: Fidel Siege (2)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14609,7 +14609,7 @@ GameObject:
   - component: {fileID: 1354935363}
   - component: {fileID: 1354935366}
   m_Layer: 0
-  m_Name: Fidel  Siege (0)
+  m_Name: Fidel Siege (0)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16823,7 +16823,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 29.25
+  m_fontSize: 29.75
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -17659,7 +17659,7 @@ GameObject:
   - component: {fileID: 1740313765}
   - component: {fileID: 1740313768}
   m_Layer: 0
-  m_Name: Fidel  Siege (1)
+  m_Name: Fidel Siege (1)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18021,6 +18021,7 @@ MonoBehaviour:
   Batista: {fileID: 2015054635}
   Weather: {fileID: 268362466}
   gameController: {fileID: 251077634}
+  list: []
 --- !u!1 &1748723397
 GameObject:
   m_ObjectHideFlags: 0
@@ -19007,7 +19008,7 @@ GameObject:
   - component: {fileID: 1912366266}
   - component: {fileID: 1912366269}
   m_Layer: 0
-  m_Name: Fidel  Melee (4)
+  m_Name: Fidel Melee (4)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19609,7 +19610,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47d8edf14b944224289a0a297c6b989e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMB: {fileID: 0}
+  playerMB: {fileID: 2015054635}
   board: {fileID: 1748365316}
 --- !u!1 &1975582063
 GameObject:
@@ -19826,7 +19827,7 @@ GameObject:
   - component: {fileID: 2004679410}
   - component: {fileID: 2004679413}
   m_Layer: 0
-  m_Name: Fidel  Melee (2)
+  m_Name: Fidel Melee (2)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20725,7 +20726,7 @@ GameObject:
   - component: {fileID: 2069463793}
   - component: {fileID: 2069463796}
   m_Layer: 0
-  m_Name: Fidel  Siege (4)
+  m_Name: Fidel Siege (4)
   m_TagString: BattlefieldCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

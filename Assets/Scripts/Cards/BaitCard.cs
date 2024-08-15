@@ -13,7 +13,7 @@ public class BaitCard : Card
     {
         try
         {
-            return effect is null ? Effect(context.CurrentPosition, context.CurrentPosition.IndexOf(context.CurrentCard)) : effect.Invoke(context);
+            return Effect(context.CurrentPosition, context.CurrentPosition.IndexOf(context.CurrentCard)) & effect.Invoke(context);
         }
         catch (System.NullReferenceException)
         {
@@ -28,8 +28,7 @@ public class BaitCard : Card
         list[index] = this;
         Owner.Hand[Owner.Hand.IndexOf(this)] = card;
         if (card is UnitCard unit) unit.InitializeDamage(); //in case any permanent effects were applied on this card
-        if (card is ClearCard) Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[Owner.ZoneByList[list]]);
-        this.Owner = Owner;
+        else if (card is ClearCard) Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[Owner.ZoneByList[list]]);
         return true;
     }
 }

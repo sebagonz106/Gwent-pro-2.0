@@ -6,9 +6,9 @@ public class BonusCard : Card
 {
     public double Increase { get; private set; }
 
-    public BonusCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, double initialDamage = 0, Effect effect = null) : base(name, faction, cardType, availableRange, initialDamage, effect)
+    public BonusCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, double increase = 1, Effect effect = null) : base(name, faction, cardType, availableRange, increase, effect)
     {
-        this.Increase = initialDamage == 0 ? 1 : initialDamage >= 10 ? initialDamage / 10 : initialDamage;
+        Increase = increase == 0 ? 1 : increase >= 10 ? increase / 10 : increase;
     }
 
     /* This card will have two possible non excluyent behaviours:

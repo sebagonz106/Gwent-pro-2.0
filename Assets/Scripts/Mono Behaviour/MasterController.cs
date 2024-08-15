@@ -78,6 +78,11 @@ public class MasterController : MonoBehaviour
             cameras[1].gameObject.SetActive(true);
             board.RecieveTurn(board.Fidel);
         }
+        else //bug
+        {
+            cameras[0].gameObject.SetActive(true);
+            betweenRoundsPanel.SetActive(true); 
+        }
     }
 
     public void SavePanelOnWhenInformationDisplayed(bool leaveActive = true)
