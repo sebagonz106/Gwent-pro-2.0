@@ -107,9 +107,12 @@ public class CardController : MonoBehaviour
         #region Battlfield and weather cards
         else if (this.gameObject.tag == "BattlefieldCard" || this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")
         {
-            if (this.gameObject.tag == "WeatherCard" && !this.isOccupied) player = board.GetCurrentPlayer(); //empty slots of weather cards can be filled
-                                                                                                            //by both players, so empty weather cards player will 
-                                                                                                           //update every time a weather card is clicked
+            if (this.gameObject.tag == "WeatherCard" && !this.isOccupied)      //empty slots of weather cards can be filled
+            {                                                                 //by both players, so empty weather cards player will
+                player = board.GetCurrentPlayer();                           //update every time a weather card is clicked
+                playerMB = masterController.board.GetMBPlayer[player];
+            }                                
+                                                                                
 
             if (player.LeaderCardSelected)
             {

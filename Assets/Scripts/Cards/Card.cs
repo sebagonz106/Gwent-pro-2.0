@@ -23,7 +23,7 @@ public class Card : IEffect, ICardsWithOwner
         }
     }
 
-    public Player Owner { get => Utils.PlayerByFaction[Faction]; set => Owner = value; }
+    public Player Owner => Utils.PlayerByFaction[Faction];
 
     public Card(string name, Faction faction, CardType cardType, List<Zone> availableRange, double damage = 0, Effect effect = null)
     {

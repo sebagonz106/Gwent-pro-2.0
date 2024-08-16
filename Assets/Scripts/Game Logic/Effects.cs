@@ -53,14 +53,16 @@ public static class Effects
                                                                  // next round, as soon as battlefield's clear method is called.
                                                                  // Creator's License here: this effect will be able to affect golden cards.
     {
-        int minCount = 6; //Max amount of cards this can count
-        List<Card> list = null;
-        Card bonus = Utils.BaseCard;
-        Player player = context.EnemyPlayer;
+        try
+        {
+            int minCount = 7; //Max amount of cards this can count
+            List<Card> list = null;
+            Card bonus = Utils.BaseCard;
+            Player player = context.EnemyPlayer;
+        
 
         for (int i = 0; i < context.CurrentPlayer.Battlefield.Zones.Length; i++)
         {
-
             if (CountCardsInListAndCompareWithMinCount(context.CurrentPlayer.Battlefield.Zones[i], context.CurrentPlayer, ref minCount, ref list, context.CurrentPlayer))
             {
                 bonus = context.CurrentPlayer.Battlefield.Bonus[i];
@@ -73,12 +75,18 @@ public static class Effects
             }
         }
 
-        if (list.Equals(null)) return false;
+        if (list is null) return false;
 
         player.Battlefield.ToGraveyard(bonus, player.Battlefield.Bonus);
         player.Battlefield.ToGraveyard(list);
 
         return true;
+        }
+        catch (System.Exception exc)
+        {
+            Debug.Log(exc.Message);
+            return false;
+        }
     }
 
     public static bool PlaceBonusInLineWhereIsPlayed(Context context)

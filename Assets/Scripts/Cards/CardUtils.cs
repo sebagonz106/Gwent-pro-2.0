@@ -23,5 +23,5 @@ public interface IEffect
 
 public interface ICardsWithOwner
 {
-    Player Owner { get; set; }
+    Player Owner { get; }
 }

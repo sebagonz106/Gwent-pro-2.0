@@ -45,7 +45,6 @@ public class Player
     private static Player SetPlayer(ref Player player, Player enemy, Faction faction)
     {
         player = new Player(faction);
-        player.context = new Context(player, enemy);
         player.Battlefield = new Battlefield(player);
         player.ListByName = new Dictionary<string, List<Card>> {
                                                                 { $"{player.Name} Melee", player.Battlefield.Melee },
@@ -65,6 +64,11 @@ public class Player
                                                                 { player.Battlefield.Range, Zone.Range },
                                                                 { player.Battlefield.Siege, Zone.Siege }
                                                              };
+        if(!(enemy is null))
+        {
+            player.context = new Context(player, enemy);
+            enemy.context = new Context(enemy, player);
+        }
         return player;
     }
     #endregion
@@ -124,7 +128,6 @@ public class Player
         if (card is WeatherCard weather && Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
         {
             Board.Instance.Weather[targetPosition] = weather;
-            weather.Owner = this;
         }
         else if (!this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
         {
@@ -134,7 +137,7 @@ public class Player
         effectFailed = !card.Effect(this.context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
 
         Board.Instance.ValidTurn = true;
-        Board.Instance.UpdateTotalDamage(this);
+        Board.Instance.UpdateTotalDamage();
         EmptyHandAt(originPosition);
         return true;
     }
