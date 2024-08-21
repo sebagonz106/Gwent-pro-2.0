@@ -1,0 +1,109 @@
+effect {
+
+Name: "Damage",
+
+Params: {
+
+amount: Number
+
+}
+
+Action: (targets, context) => {
+
+for target in targets {
+
+i = 0;
+
+while (i++ < amount) target.Power -= 1;
+
+};
+
+}
+}
+
+effect {
+
+Name: "Draw",
+
+Action: (targets, context) => { topCard = context.Deck.Pop(); context.Hand.Add(topCard); context.Hand.Shuffle();
+
+}
+
+}
+
+effect {
+
+Name: "Return ToDeck",
+
+Action: (targets, context) => {
+
+for target in targets {
+owner = target.Owner;
+deck = context.DeckOfPlayer (owner);
+deck. Push(target); deck.Shuffle(); context.Board. Remove (target);
+};
+
+}
+
+}
+
+card {
+
+Type: "Oro",
+
+Name: "Beluga",
+
+Faction: "Northern Realms",
+
+Power: 10,
+
+Range: ["Melee", "Ranged"],
+
+OnActivation: [
+
+{
+
+Effect: {
+
+Name: "Damage", // este efecto tiene que estar previamente definido.
+
+Amount: 5, // ... y tener estos parámetros.
+
+}
+
+Selector: {
+
+Source: "board", // o "hand", "otherHand", "deck", "otherDeck", "field", "otherField", "parent".
+
+Single: false, // aunque por defecto es false.
+
+Predicate: (unit) => unit. Faction == "Northern" @@ "Realms"
+
+}
+
+PostAction: {
+
+Type: "Return ToDeck",
+
+Selector: { // opcional dentro de PostAction, en cuyo caso no se vuelve a seleccionar sino que se usa los del padre.
+
+Source: "parent",
+
+Single: false,
+
+Predicate: (unit) => unit.Power < 1
+}
+
+}
+
+},
+
+{
+
+}
+
+Effect: "Draw" // si se pone un string directo es equivalente a { Name: "Draw" }
+
+]
+
+}

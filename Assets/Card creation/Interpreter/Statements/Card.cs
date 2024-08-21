@@ -1,0 +1,133 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Gwent_Interpreter.Utils;
+
+namespace Gwent_Interpreter.Statements
+{
+    class CardStatement : IStatement
+    {
+        (int, int) coordinates;
+        IExpression type;
+        IExpression name;
+        IExpression faction;
+        List<IExpression> range;
+        IExpression damage;
+        OnActivation onActivation;
+        public string Code { get; }
+
+        static List<Card> cards = new List<Card>();
+        static Dictionary<string, string> cardDeclaration = new Dictionary<string, string>();
+
+        public static Dictionary<string, string> CardDeclaration => cardDeclaration; 
+
+        public CardStatement((int, int) coordinates, IExpression type, IExpression name, IExpression faction, List<IExpression> range, IExpression damage, OnActivation onActivation, string code)
+        {
+            this.coordinates = coordinates;
+            this.type = type;
+            this.name = name;
+            this.faction = faction;
+            this.range = range;
+            this.damage = damage;
+            this.onActivation = onActivation;
+            Code = code;
+        }
+
+        public static List<Card> Cards => cards;
+
+        public bool CheckSemantic(out List<string> errors)
+        {
+            if (onActivation is null) errors = new List<string>();
+            else onActivation.CheckSemantic(out errors);
+
+            if (type.Return != ReturnType.String) errors.Add("Invalid type declared" + position +" (string expected)");
+            if (name.Return != ReturnType.String) errors.Add("Invalid name declared" + position + " (string expected)");
+            if (faction.Return != ReturnType.String) errors.Add("Invalid faction declared" + position + " (string expected)");
+            if (!(damage is null) && damage.Return != ReturnType.Num) errors.Add("Invalid damage declared" + position + " (number expected)");
+
+            for (int i = 0; i < range.Count; i++)
+                if (range[i].Return != ReturnType.String) errors.Add("Invalid range declared" + position + " (string expected at range no. " + i +")");
+
+            return errors.Count == 0;
+        }
+
+        public void Execute()
+        {
+            Str _faction = (Str)this.faction.Evaluate();
+            Faction faction = _faction.Equals("Batista")? Faction.Batista : 
+                              _faction.Equals("Fidel")? Faction.Fidel : throw new EvaluationError("Invalid faction declared" + position + " (factions include: \"Fidel\", \"Batista\")");
+            List<Zone> zones = new List<Zone>();
+            double damage = this.damage is null? 0 : ((Num)this.damage.Evaluate()).Value;
+            string name = ((Str)this.name.Evaluate()).Value;
+
+            foreach (var item in range)
+            {
+                switch (((Str)item.Evaluate()).Value)
+                {
+                    case "Melee":
+                        zones.Add(Zone.Melee);
+                        break;
+                    case "Ranged":
+                        zones.Add(Zone.Range);
+                        break;
+                    case "Siege":
+                        zones.Add(Zone.Siege);
+                        break;
+                    default:
+                        throw new EvaluationError("Invalid range declared" + position + " (ranges include: \"Melee\", \"Ranged\", \"Siege\")");
+                }
+            }
+
+            switch (((Str)type.Evaluate()).Value)
+            {
+                case "Oro":
+                    cards.Add(new UnitCard(name, faction, CardType.Unit, zones, Level.Golden, damage));
+                    break;
+                case "Plata":
+                    cards.Add(new UnitCard(name, faction, CardType.Unit, zones, Level.Silver, damage));
+                    break;
+                case "Clima":
+                    cards.Add(new WeatherCard(name, faction, CardType.Weather, zones, damage));
+                    break;
+                case "Aumento":
+                    cards.Add(new BonusCard(name, faction, CardType.Bonus, zones, damage));
+                    break;
+                case "Señuelo":
+                    cards.Add(new BaitCard(name, faction, CardType.Bait, zones, damage));
+                    break;
+                case "Despeje":
+                    cards.Add(new ClearCard(name, faction, CardType.Clear, zones, damage));
+                    break;
+                case "Lider":
+                    cards.Add(new LeaderCard(name, faction, CardType.Leader));
+                    break;
+                default:
+                    throw new EvaluationError("Invalid type declared" + position + " (types include: \"Oro\", \"Plata\", \"Clima\", \"Aumento\", \"Despeje\", \"Señuelo\"), \"Lider\")"); //i'm sorry about the spanglish, but ustedes made me hacerlo
+            }
+
+            if (!(onActivation is null)) cards[cards.Count - 1].AssignEffect((Context context) => {
+                try
+                {
+                    onActivation.Execute();
+                    return true;
+                }
+                catch (EvaluationError)
+                {
+                    return false;
+                }
+            });
+
+            CardDeclaration.Add(name, Code);
+        }
+
+        string position => $"in card declaration at {coordinates.Item1}:{coordinates.Item2}";
+
+        public (int, int) Coordinates => coordinates;
+
+        public static void Reset()
+        {
+            cards = new List<Card>();
+            cardDeclaration = new Dictionary<string, string>();
+        }
+    }
+}
