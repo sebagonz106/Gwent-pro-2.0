@@ -6,7 +6,7 @@ using UnityEngine;
 public class Card : IEffect, ICardsWithOwner
 {
     public string Name { get; }
-    public Faction Faction { get; }
+    public Faction FactionEnum { get; }
     public CardType CardType { get; }
     public List<Zone> AvailableRange { get; }
     public List<Card> CurrentPosition { get; private set; }
@@ -23,12 +23,14 @@ public class Card : IEffect, ICardsWithOwner
         }
     }
 
-    public Player Owner => Utils.PlayerByFaction[Faction];
+    public string Faction => Utils.FactionName[FactionEnum];
+
+    public Player Owner => Utils.PlayerByFaction[FactionEnum];
 
     public Card(string name, Faction faction, CardType cardType, List<Zone> availableRange, double damage = 0, Effect effect = null)
     {
         this.Name = name;
-        this.Faction = faction;
+        this.FactionEnum = faction;
         this.CardType = cardType;
         this.AvailableRange = availableRange;
         AssignEffect(effect);

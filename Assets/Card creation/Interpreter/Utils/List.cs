@@ -44,7 +44,7 @@ namespace Gwent_Interpreter.Utils
         {
             if (player is null)
             {
-                (card.Faction == Faction.Fidel ? Player.Fidel.Battlefield : Player.Batista.Battlefield).ToGraveyard(card);
+                (card.FactionEnum == Faction.Fidel ? Player.Fidel.Battlefield : Player.Batista.Battlefield).ToGraveyard(card);
             }
             else player.Battlefield.ToGraveyard(card);
             list.Remove(card);
@@ -80,7 +80,7 @@ namespace Gwent_Interpreter.Utils
         {
             if (player is null)
             {
-                (list[index].Faction == Faction.Fidel ? Player.Fidel.Battlefield : Player.Batista.Battlefield).ToGraveyard(list[index]);
+                (list[index].FactionEnum == Faction.Fidel ? Player.Fidel.Battlefield : Player.Batista.Battlefield).ToGraveyard(list[index]);
             }
             else player.Battlefield.ToGraveyard(list[index]);
 

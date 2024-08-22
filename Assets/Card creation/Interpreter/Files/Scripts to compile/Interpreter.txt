@@ -53,7 +53,7 @@ Type: "Oro",
 
 Name: "Beluga",
 
-Faction: "Northern Realms",
+Faction: "Fidel",
 
 Power: 10,
 
@@ -77,7 +77,7 @@ Source: "board", // o "hand", "otherHand", "deck", "otherDeck", "field", "otherF
 
 Single: false, // aunque por defecto es false.
 
-Predicate: (unit) => unit. Faction == "Northern" @@ "Realms"
+Predicate: (unit) => unit. Faction == "Fi" @ "del"
 
 }
 
@@ -97,10 +97,6 @@ Predicate: (unit) => unit.Power < 1
 }
 
 },
-
-{
-
-}
 
 Effect: "Draw" // si se pone un string directo es equivalente a { Name: "Draw" }
 
