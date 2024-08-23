@@ -99,7 +99,7 @@ namespace Gwent_Interpreter
                     {
                         try
                         {
-                            main.Execute();
+                            CreatedCards.AddRange(main.CreatedCards());
                         }
                         catch (MyException error)
                         {
@@ -108,27 +108,17 @@ namespace Gwent_Interpreter
                         }
                     }
                 }
-                foreach (var item in CardStatement.Cards) //testing
-                {
-                    try
-                    {
-                        item.Effect(Player.Fidel.context);
-                    }
-                    catch (EvaluationError error)
-                    {
-                        Log(error.Message);
-                    }
-                }
             }
             return true;
         }
-        public List<Card> CreatedCards => main.CreatedCards();
+        public List<Card> CreatedCards { get; private set; }
 
         void Log(string text) => printer.Print(text);
-        void RemoveUnwantedMessage() => Console.Clear();
+        void RemoveUnwantedMessage() => printer.Clear();
 
-        static void Reset()
+        void Reset()
         {
+            CreatedCards = new List<Card>();
             CardStatement.Reset();
             EffectStatement.Reset();
             Input.Reset();

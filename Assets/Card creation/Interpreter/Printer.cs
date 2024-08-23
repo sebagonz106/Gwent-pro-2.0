@@ -13,12 +13,14 @@ namespace Gwent_Interpreter
         public Printer (TMP_Text terminal)
         {
             this.terminal = terminal;
-            Reset();
+            Clear();
         }
         public void Print(string message)
         {
-            terminal.text += message+='\n';
+            string[] messages = message.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var item in messages)
+                terminal.text += item + '\n';
         }
-        public void Reset() => terminal.text = "";
+        public void Clear() => terminal.text = "";
     }
 }

@@ -9,7 +9,7 @@ public class PlayerMB : MonoBehaviour
     public BoardMB board;
     public BattlefieldMB battlefield;
     public GameObject Hand;
-    static Dictionary<string, LeaderCard> leaders = new Dictionary<string, LeaderCard>
+    public static Dictionary<string, LeaderCard> Leaders = new Dictionary<string, LeaderCard>
     {
         {"Camilo Cienfuegos", (LeaderCard)CardsWarehouse.RebelCards[0] },
         {"Ernesto Che Guevara", (LeaderCard)CardsWarehouse.RebelCards[1] },
@@ -26,8 +26,8 @@ public class PlayerMB : MonoBehaviour
     {
         Name = this.gameObject.name;
         player = Utils.GetPlayerByName(Name);
-        if (PlayerPrefs.GetString(Name + " Leader") == "") player.Leader = Name == "Batista" ? leaders["Francisco Tabernilla"] : leaders["Ernesto Che Guevara"];
-        else player.Leader = leaders[PlayerPrefs.GetString(Name + " Leader")];
+        if (PlayerPrefs.GetString(Name + " Leader") == "") player.Leader = Name == "Batista" ? Leaders["Francisco Tabernilla"] : Leaders["Ernesto Che Guevara"];
+        else player.Leader = Leaders[PlayerPrefs.GetString(Name + " Leader")];
     }
 
     private void Start()

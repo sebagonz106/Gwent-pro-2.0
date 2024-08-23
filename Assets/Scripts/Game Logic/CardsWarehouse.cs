@@ -71,13 +71,16 @@ public static class CardsWarehouse
     static List<Card> FullDeck(List<Card> list)
     {
         List<Card> temp = new List<Card>();
-
-        list.RemoveRange(0, 2);
+        List<LeaderCard> leaders = new List<LeaderCard>();
 
         foreach (var card in list)
             if (card is UnitCard unit && unit.Level is Level.Silver)
                 temp.AddRange(new Card[] { unit, unit });
+            else if (card is LeaderCard leader)
+                leaders.Add(leader);
 
+        foreach (var item in leaders)
+            list.Remove(item);
         list.AddRange(temp);
         return list;
     }
