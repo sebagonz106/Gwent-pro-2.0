@@ -7,19 +7,29 @@ using System.IO;
 
 public class CardCreationController : MonoBehaviour
 {
+    [SerializeField] GameObject mainMenu;
+    [SerializeField] GameObject menu;
+    [SerializeField] GameObject consoleMenu;
     [SerializeField] TMP_Text terminal;
-    [SerializeField] TMP_InputField console;
     [SerializeField] TMP_Text preLoadedEffectsDisplay;
     [SerializeField] TMP_Text preLoadedCardsDisplay;
+    [SerializeField] TMP_Text preLoadingTerminal;
+    [SerializeField] TMP_InputField console;
     [SerializeField] TMP_InputField preLoadedEffectInput;
     [SerializeField] TMP_InputField preLoadedCardInput;
-    [SerializeField] TMP_Text preLoadingTerminal;
+    [SerializeField] TMP_InputField scriptLoadingPathInput;
+    [SerializeField] TMP_InputField imageLoadingPathInput;
+    [SerializeField] TMP_InputField infoLoadingPathInput;
 
     Gwent_Interpreter.Interptreter interpreter;
     List<Card> cards;
     List<string> cardsAdded;
     List<string> preLoadedCards;
     List<string> preLoadedEffects;
+    string mainPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files";
+    string scriptLoadingPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\New\\Scripts";
+    string imageLoadingPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\New\\Main image";
+    string infoLoadingPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\New\\Info";
     bool PreLoadedCompiled = true;
     public bool LeaderAdded;
 
@@ -35,9 +45,9 @@ public class CardCreationController : MonoBehaviour
         if (CardsWarehouse.BatistaCards.Count > 18) CardsWarehouse.BatistaCards.RemoveRange(18, CardsWarehouse.BatistaCards.Count - 18);
     }
 
-    public void Compile()
+    public void CompileScripts()
     {
-        string[] paths = Directory.GetFiles("D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\Scripts to compile");
+        string[] paths = Directory.GetFiles(scriptLoadingPath);
         Interptreter interpreter = new Interptreter(new Printer(terminal), preLoadedCards, preLoadedEffects);
         PreLoadedCompiled = true;
         foreach (var path in paths)
@@ -53,6 +63,11 @@ public class CardCreationController : MonoBehaviour
         {
             PreLoadedCompiled = true;
             cards.AddRange(interpreter.CreatedCards);
+        }
+        else
+        {
+            consoleMenu.SetActive(true);
+            menu.SetActive(false);
         }
     }
 
@@ -70,6 +85,7 @@ public class CardCreationController : MonoBehaviour
         }
     }
 
+    #region Other buttons
     public void AddOrDiscardPreLoadedEffect()
     {
         preLoadingTerminal.text = "";
@@ -80,6 +96,21 @@ public class CardCreationController : MonoBehaviour
         preLoadingTerminal.text = "";
         ReLoad("card", preLoadedCardInput, preLoadedCardsDisplay.text, preLoadedCards);
     }
+    public void ChangeScriptPath()
+    {
+        if (scriptLoadingPathInput.text.Length > 0) scriptLoadingPath = scriptLoadingPathInput.text;
+        else scriptLoadingPath = scriptLoadingPathInput.placeholder.GetComponent<TMP_Text>().text;
+    }
+    public void ChangeImagePath()
+    {
+        if (imageLoadingPathInput.text.Length > 0) imageLoadingPath = imageLoadingPathInput.text;
+        else imageLoadingPath = imageLoadingPathInput.placeholder.GetComponent<TMP_Text>().text;
+    }
+    public void ChangeInfoPath()
+    {
+        if (infoLoadingPathInput.text.Length > 0) infoLoadingPath = infoLoadingPathInput.text;
+        else infoLoadingPath = infoLoadingPathInput.placeholder.GetComponent<TMP_Text>().text;
+    }
 
     public void DefaultDeck()
     {
@@ -89,16 +120,17 @@ public class CardCreationController : MonoBehaviour
 
     public void DeleteFiles()
     {
-        string[] paths = Directory.GetFiles("D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\Effects");
+        string[] paths = Directory.GetFiles(mainPath +"\\Effects\\Scripts");
         foreach (var item in paths)
             File.Delete(item);
-        paths = Directory.GetFiles("D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\Cards");
+        paths = Directory.GetFiles(mainPath + "\\Cards\\Scripts");
         foreach (var item in paths)
             File.Delete(item);
 
         UpdatePreLoadedScripts(preLoadedEffectsDisplay, "Effects");
         UpdatePreLoadedScripts(preLoadedCardsDisplay, "Cards");
     }
+    #endregion
 
     public void AddCardsToGame()
     {
@@ -120,6 +152,17 @@ public class CardCreationController : MonoBehaviour
         ResetCards();
     }
 
+    public void BackFromCardCreation()
+    {
+        AddCardsToGame();
+        if (interpreter is null || interpreter.ValidLoad)
+        {
+            mainMenu.SetActive(true);
+            menu.SetActive(false);
+        }
+    }
+
+    #region Utils
     void ResetCards()
     {
         cards = new List<Card>();
@@ -129,7 +172,7 @@ public class CardCreationController : MonoBehaviour
     void UpdatePreLoadedScripts(TMP_Text text, string folder)
     {
         text.text = "";
-        string[] paths = Directory.GetFiles("D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\" + folder);
+        string[] paths = Directory.GetFiles(mainPath + "\\" + folder + "\\Scripts");
         if (paths.Length != 0)
         {
             foreach (var path in paths)
@@ -170,4 +213,5 @@ public class CardCreationController : MonoBehaviour
             }
         }
     }
+    #endregion
 }

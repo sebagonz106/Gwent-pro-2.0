@@ -45,8 +45,8 @@ namespace Gwent_Interpreter.Statements
                 createdCards = CardStatement.Cards.GetRange(previousCardCount, CardStatement.Cards.Count - previousCardCount);
                 executed = true;
 
-                string effectsWarning = WriteFilesMindingRepetition(EffectStatement.EffectDeclaration, lastEffectCount, "Effects\\", ".gwf");
-                string cardsWarning = WriteFilesMindingRepetition(CardStatement.CardDeclaration, previousCardCount, "Cards\\", ".gwc");
+                string effectsWarning = WriteFilesMindingRepetition(EffectStatement.EffectDeclaration, lastEffectCount, "Effects\\Scripts\\", ".gwf");
+                string cardsWarning = WriteFilesMindingRepetition(CardStatement.CardDeclaration, previousCardCount, "Cards\\Scripts\\", ".gwc");
 
                 lastEffectCount = EffectStatement.Effects.Count;
 

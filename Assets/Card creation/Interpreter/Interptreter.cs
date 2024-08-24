@@ -27,17 +27,18 @@ namespace Gwent_Interpreter
             {
                 if (!(previousEffects is null)) foreach (var item in previousEffects)
                     {
-                        StreamReader sr = new StreamReader(mainPath + "Effects\\" + item + ".gwf");
+                        StreamReader sr = new StreamReader(mainPath + "Effects\\Scripts\\" + item + ".gwf");
                         this.Evaluate(sr.ReadLine());
                         sr.Close();
                     }
 
                 if (!(previousCards is null)) foreach (var item in previousCards)
                     {
-                        StreamReader sr = new StreamReader(mainPath + "Cards\\" + item + ".gwc");
+                        StreamReader sr = new StreamReader(mainPath + "Cards\\Scripts\\" + item + ".gwc");
                         if (!this.Evaluate(sr.ReadLine()))
                         {
-                            Log("Invalid load of previous declarations. There is an unloaded effect used in a card.");
+                            RemoveUnwantedMessage();
+                            Log("Invalid load of previous declarations. There is an unloaded effect used in a card. Reload it with the proper effects and try again");
                             ValidLoad = false;
                         }
                         sr.Close();
@@ -45,6 +46,7 @@ namespace Gwent_Interpreter
             }
             catch(FileNotFoundException error)
             {
+                RemoveUnwantedMessage();
                 Log("Invalid load of previous declarations. " + error.Message);
                 ValidLoad = false;
             }
