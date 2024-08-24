@@ -103,22 +103,28 @@ namespace Gwent_Interpreter.Statements
             errors = new List<string>();
             string name = "";
             string warning = "";
-
-            if (this.name.Return == ReturnType.String)
+            try
             {
-                if (!this.name.CheckSemantic(out string error)) errors.Add(error);
-                name = ((Str)this.name.Evaluate()).Value;
+                if (this.name.Return == ReturnType.String)
+                {
+                    if (!this.name.CheckSemantic(out string error)) errors.Add(error);
+                    name = ((Str)this.name.Evaluate()).Value;
 
-                if (effects.ContainsKey(name)) errors.Add($"An effect with the same name as the one at {coordinates.Item1}:{coordinates.Item2} has already been declared");
+                    if (effects.ContainsKey(name)) warning+=$"An effect with the same name as the one at {coordinates.Item1}:{coordinates.Item2} has already been declared.\n";
+                }
+                else errors.Add($"Not a string at name in effect declaration at {coordinates.Item1}:{coordinates.Item2}");
             }
-            else errors.Add($"Not a string at name in effect declaration at {coordinates.Item1}:{coordinates.Item2}");
+            catch(ParsingError error)
+            {
+                errors.Add(error.Message);
+            }
             try
             {
                 if (!action.CheckSemantic(out List<string> temp)) errors.AddRange(temp);
             }
             catch (Warning warn)
             {
-                warning = warn.Message;
+                warning += warn.Message;
             }
 
             if (errors.Count == 0)
@@ -127,6 +133,11 @@ namespace Gwent_Interpreter.Statements
                 {
                     effects.Add(name, this);
                     effectDeclaration.Add(name, Code);
+                }
+                else
+                {
+                    effects[name] = this;
+                    effectDeclaration[name] = Code;
                 }
                 if (warning != "") throw new Warning(warning);
                 else return true;

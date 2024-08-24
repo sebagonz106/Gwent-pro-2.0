@@ -469,7 +469,7 @@ namespace Gwent_Interpreter
 
             if (MatchAndMove(TokenType.Log))
             {
-                stmt = new Log(Boolean());
+                stmt = new Log(tokens.Previous.Coordinates, Boolean());
             }
             else if (MatchAndStay(TokenType.Identifier))
             {
@@ -728,7 +728,7 @@ namespace Gwent_Interpreter
             return false;
         }
 
-        bool LookAhead(params TokenType[] typesToMatch) => typesToMatch.Contains(tokens.TryLookAhead.Type);
+        bool LookAhead(params TokenType[] typesToMatch) => tokens.TryLookAhead is null? false : typesToMatch.Contains(tokens.TryLookAhead.Type);
 
         bool MatchAndStay(params TokenType[] typesToMatch) => typesToMatch.Contains(tokens.Current.Type);
 

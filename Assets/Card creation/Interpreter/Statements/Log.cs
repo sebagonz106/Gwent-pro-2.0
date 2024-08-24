@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace Gwent_Interpreter.Statements
 {
@@ -8,15 +9,16 @@ namespace Gwent_Interpreter.Statements
     {
         public IExpression Value { get; private set; }
 
-        public (int, int) Coordinates => throw new NotImplementedException();
+        public (int, int) Coordinates { get; }
 
-        public Log(IExpression value)
+        public Log((int, int) coordinates, IExpression value)
         {
             Value = value;
+            Coordinates = coordinates;
         }
         public void Execute()
         {
-            Console.WriteLine(Value.Evaluate());
+            Debug.Log(Value.Evaluate());
         }
 
         public bool CheckSemantic(out List<string> errors)

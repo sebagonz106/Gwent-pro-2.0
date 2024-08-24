@@ -40,13 +40,47 @@ namespace Gwent_Interpreter.Statements
             if (onActivation is null) errors = new List<string>();
             else onActivation.CheckSemantic(out errors);
 
-            if (type.Return != ReturnType.String) errors.Add("Invalid type declared" + position +" (string expected)");
-            if (name.Return != ReturnType.String) errors.Add("Invalid name declared" + position + " (string expected)");
-            if (faction.Return != ReturnType.String) errors.Add("Invalid faction declared" + position + " (string expected)");
-            if (!(damage is null) && damage.Return != ReturnType.Num) errors.Add("Invalid damage declared" + position + " (number expected)");
-
-            for (int i = 0; i < range.Count; i++)
-                if (range[i].Return != ReturnType.String) errors.Add("Invalid range declared" + position + " (string expected at range no. " + i +")");
+            try
+            {
+                if (type.Return != ReturnType.String) errors.Add("Invalid type declared" + position + " (string expected)");
+            }
+            catch(ParsingError error)
+            {
+                errors.Add(error.Message);
+            }
+            try
+            {
+                if (name.Return != ReturnType.String) errors.Add("Invalid name declared" + position + " (string expected)");
+            }
+            catch (ParsingError error)
+            {
+                errors.Add(error.Message);
+            }
+            try
+            {
+                if (faction.Return != ReturnType.String) errors.Add("Invalid faction declared" + position + " (string expected)");
+            }
+            catch (ParsingError error)
+            {
+                errors.Add(error.Message);
+            }
+            try
+            {
+                if (!(damage is null) && damage.Return != ReturnType.Num) errors.Add("Invalid damage declared" + position + " (number expected)");
+            }
+            catch (ParsingError error)
+            {
+                errors.Add(error.Message);
+            }
+            try
+            {
+                for (int i = 0; i < range.Count; i++)
+                    if (range[i].Return != ReturnType.String) errors.Add("Invalid range declared" + position + " (string expected at range no. " + i + ")");
+            }
+            catch (ParsingError error)
+            {
+                errors.Add(error.Message);
+            }
 
             return errors.Count == 0;
         }
