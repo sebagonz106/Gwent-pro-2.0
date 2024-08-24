@@ -12,9 +12,9 @@ namespace Gwent_Interpreter
         Lexer lexer = new Lexer();
         Parser parser;
         Printer printer;
-        Input main;
+        Statements.Input main;
         string mainPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\";
-        bool validLoad = true;
+        public bool ValidLoad = true;
 
         public Interptreter(Printer printer, List<string> previousCards = null, List<string> previousEffects = null, string path = "")
         {
@@ -38,7 +38,7 @@ namespace Gwent_Interpreter
                         if (!this.Evaluate(sr.ReadLine()))
                         {
                             Log("Invalid load of previous declarations. There is an unloaded effect used in a card.");
-                            validLoad = false;
+                            ValidLoad = false;
                         }
                         sr.Close();
                     }
@@ -46,15 +46,39 @@ namespace Gwent_Interpreter
             catch(FileNotFoundException error)
             {
                 Log("Invalid load of previous declarations. " + error.Message);
-                validLoad = false;
+                ValidLoad = false;
             }
 
-            if (validLoad) RemoveUnwantedMessage();
+            if (ValidLoad) RemoveUnwantedMessage();
         }
 
         public bool Evaluate(string input)
         {
-            if (!validLoad) return false;
+            if (CheckSemantic(input))
+            {
+                try
+                {
+                    main.Execute();
+                }
+                catch (EvaluationError error)
+                {
+                    Log(error.Message);
+                    return false;
+                }
+                catch (Warning warn)
+                {
+                    Log(warn.Message);
+                }
+                CreatedCards.AddRange(main.CreatedCards());
+                return true;
+            }
+            else return false;
+        }
+
+        public bool CheckSemantic(string input)
+        {
+            if (!ValidLoad) return false;
+            else RemoveUnwantedMessage();
 
             List<Token> list = lexer.Tokenize(input, out string[] lexicalErrors);
 
@@ -62,7 +86,7 @@ namespace Gwent_Interpreter
             {
                 for (int i = 0; i < lexicalErrors.Length; i++)
                 {
-                    Log($"{i+1}. {lexicalErrors[i]}");
+                    Log($"{i + 1}. {lexicalErrors[i]}");
                 }
                 return false;
             }
@@ -95,22 +119,11 @@ namespace Gwent_Interpreter
                         foreach (var error in semanticErrors) Log(error);
                         return false;
                     }
-                    else
-                    {
-                        try
-                        {
-                            CreatedCards.AddRange(main.CreatedCards());
-                        }
-                        catch (MyException error)
-                        {
-                            Log(error.Message);
-                            return false;
-                        }
-                    }
+                    else return true;
                 }
             }
-            return true;
         }
+
         public List<Card> CreatedCards { get; private set; }
 
         void Log(string text) => printer.Print(text);
@@ -121,7 +134,7 @@ namespace Gwent_Interpreter
             CreatedCards = new List<Card>();
             CardStatement.Reset();
             EffectStatement.Reset();
-            Input.Reset();
+            Statements.Input.Reset();
         }
     }
 }

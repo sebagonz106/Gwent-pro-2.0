@@ -110,7 +110,6 @@ namespace Gwent_Interpreter.Statements
                 name = ((Str)this.name.Evaluate()).Value;
 
                 if (effects.ContainsKey(name)) errors.Add($"An effect with the same name as the one at {coordinates.Item1}:{coordinates.Item2} has already been declared");
-                else effects.Add(name, this);
             }
             else errors.Add($"Not a string at name in effect declaration at {coordinates.Item1}:{coordinates.Item2}");
             try
@@ -124,7 +123,11 @@ namespace Gwent_Interpreter.Statements
 
             if (errors.Count == 0)
             {
-                effectDeclaration.Add(name, Code);
+                if (!effects.ContainsKey(name))
+                {
+                    effects.Add(name, this);
+                    effectDeclaration.Add(name, Code);
+                }
                 if (warning != "") throw new Warning(warning);
                 else return true;
             }
