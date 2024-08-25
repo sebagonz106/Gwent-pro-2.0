@@ -13,7 +13,7 @@ namespace Gwent_Interpreter
         Parser parser;
         Printer printer;
         Statements.Input main;
-        string mainPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\";
+        string mainPath = "C:\\Users\\Public\\Documents\\1958 Files\\";
         public bool ValidLoad = true;
 
         public Interptreter(Printer printer, List<string> previousCards = null, List<string> previousEffects = null, string path = "")
@@ -38,7 +38,7 @@ namespace Gwent_Interpreter
                         if (!this.Evaluate(sr.ReadLine()))
                         {
                             RemoveUnwantedMessage();
-                            Log("Invalid load of previous declarations. There is an unloaded effect used in a card. Reload it with the proper effects and try again");
+                            Log("Invalid load of previous declarations. There is an unloaded effect used in a card. Reload the card with the proper effects and try again");
                             ValidLoad = false;
                         }
                         sr.Close();

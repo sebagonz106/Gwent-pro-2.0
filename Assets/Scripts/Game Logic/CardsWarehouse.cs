@@ -79,10 +79,10 @@ public static class CardsWarehouse
             else if (card is LeaderCard leader)
                 leaders.Add(leader);
 
+        temp.AddRange(list);
         foreach (var item in leaders)
-            list.Remove(item);
-        list.AddRange(temp);
-        return list;
+            temp.Remove(item);
+        return temp;
     }
     public static List<Card> GetDeck(string name) => name == "Batista" ? FullDeck(BatistaCards) : FullDeck(RebelCards);
 }

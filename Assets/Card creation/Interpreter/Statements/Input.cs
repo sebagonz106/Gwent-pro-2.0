@@ -13,7 +13,7 @@ namespace Gwent_Interpreter.Statements
         List<Card> createdCards;
         static int lastEffectCount=0;
 
-        static string mainPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\";
+        static string mainPath = "C:\\Users\\Public\\Documents\\1958 Files\\";
 
         public Input(List<IStatement> cards, List<IStatement> effects)
         {

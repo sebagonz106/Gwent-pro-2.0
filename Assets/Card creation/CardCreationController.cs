@@ -7,6 +7,7 @@ using System.IO;
 
 public class CardCreationController : MonoBehaviour
 {
+    [SerializeField] Shader cardShader;
     [SerializeField] GameObject mainMenu;
     [SerializeField] GameObject menu;
     [SerializeField] GameObject consoleMenu;
@@ -22,11 +23,12 @@ public class CardCreationController : MonoBehaviour
     [SerializeField] TMP_InputField infoLoadingPathInput;
 
     Gwent_Interpreter.Interptreter interpreter;
+    VisualAssigner visualAssigner;
     List<Card> cards;
     List<string> cardsAdded;
     List<string> preLoadedCards;
     List<string> preLoadedEffects;
-    string mainPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files";
+    string mainPath = "C:\\Users\\Public\\Documents\\1958 Files";
     string scriptLoadingPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\New\\Scripts";
     string imageLoadingPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\New\\Main image";
     string infoLoadingPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\New\\Info";
@@ -35,14 +37,18 @@ public class CardCreationController : MonoBehaviour
 
     public void Awake()
     {
+        Directory.CreateDirectory(mainPath + "\\Cards\\Scripts");
+        Directory.CreateDirectory(mainPath + "\\Cards\\Main image");
+        Directory.CreateDirectory(mainPath + "\\Cards\\Info");
+        Directory.CreateDirectory(mainPath + "\\Effects\\Scripts");
         ResetCards();
         LeaderAdded = false;
         cardsAdded = new List<string>();
         preLoadedEffects = new List<string>();
         UpdatePreLoadedScripts(preLoadedEffectsDisplay, "Effects");
         UpdatePreLoadedScripts(preLoadedCardsDisplay, "Cards");
-        if (CardsWarehouse.RebelCards.Count > 18) CardsWarehouse.RebelCards.RemoveRange(18, CardsWarehouse.RebelCards.Count - 18);
-        if (CardsWarehouse.BatistaCards.Count > 18) CardsWarehouse.BatistaCards.RemoveRange(18, CardsWarehouse.BatistaCards.Count - 18);
+        if (CardsWarehouse.RebelCards.Count > 22) CardsWarehouse.RebelCards.RemoveRange(22, CardsWarehouse.RebelCards.Count - 22);
+        if (CardsWarehouse.BatistaCards.Count > 22) CardsWarehouse.BatistaCards.RemoveRange(22, CardsWarehouse.BatistaCards.Count - 22);
     }
 
     public void CompileScripts()
@@ -52,8 +58,13 @@ public class CardCreationController : MonoBehaviour
         PreLoadedCompiled = true;
         foreach (var path in paths)
             if (path.Substring(path.Length - 5) == ".meta") continue;
-            else interpreter.Evaluate(File.ReadAllText(path));
-        cards.AddRange(interpreter.CreatedCards);
+            else if (!interpreter.Evaluate(File.ReadAllText(path)))
+            {
+                consoleMenu.SetActive(true);
+                menu.SetActive(false);
+            }
+        
+            AddCards(interpreter.CreatedCards, imageLoadingPath, infoLoadingPath, true);
     }
 
     public void CompilePreLoaded()
@@ -62,7 +73,7 @@ public class CardCreationController : MonoBehaviour
         if (interpreter.ValidLoad)
         {
             PreLoadedCompiled = true;
-            cards.AddRange(interpreter.CreatedCards);
+            AddCards(interpreter.CreatedCards, mainPath + "\\Cards\\Main image", mainPath + "\\Cards\\Info", false);
         }
         else
         {
@@ -81,7 +92,7 @@ public class CardCreationController : MonoBehaviour
         if (PreLoadedCompiled)
         {
             interpreter.Evaluate(console.text);
-            cards.AddRange(interpreter.CreatedCards);
+            AddCards(interpreter.CreatedCards, imageLoadingPath, infoLoadingPath, true);
         }
     }
 
@@ -167,6 +178,7 @@ public class CardCreationController : MonoBehaviour
     {
         cards = new List<Card>();
         preLoadedCards = new List<string>();
+        visualAssigner = new VisualAssigner(cardShader);
     }
 
     void UpdatePreLoadedScripts(TMP_Text text, string folder)
@@ -211,6 +223,15 @@ public class CardCreationController : MonoBehaviour
                 preLoadingTerminal.text = "The " + type + " '" + name + "' has been loaded.";
                 input.text = "";
             }
+        }
+    }
+
+    void AddCards(List<Card> list, string imagePath, string infoPath, bool save)
+    {
+        foreach (var card in list)
+        {
+            this.visualAssigner.AssignVisual(card, imagePath, infoPath, save);
+            cards.Add(card);
         }
     }
     #endregion
