@@ -11,6 +11,7 @@ public class Card : IEffect, ICardsWithOwner
     public List<Zone> AvailableRange { get; }
     public List<Card> CurrentPosition { get; private set; }
     public VisualInfo Info { get; private set; }
+    public string Description { get; }
     protected Effect effect;
     protected double initialDamage;
 
@@ -26,6 +27,8 @@ public class Card : IEffect, ICardsWithOwner
     public string Faction => Utils.FactionName[FactionEnum];
 
     public Player Owner => Utils.PlayerByFaction[FactionEnum];
+
+    public double InitialDamage { get => initialDamage;}
 
     public Card(string name, Faction faction, CardType cardType, List<Zone> availableRange, double damage = 0, Effect effect = null)
     {

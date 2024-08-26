@@ -8,7 +8,6 @@ public class UnitCard : Card
     double damageOnCount = 0;
 
     public Level Level { get; private set; }
-    public double InitialDamage { get => initialDamage; }
     public double DamageOnField { get => damageOnField; }
     public double Damage { get => damageOnCount; set => damageOnCount = value; }
 
