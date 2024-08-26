@@ -5,9 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class Menu : MonoBehaviour
 {
+    [SerializeField] LeaderCardSelectionMenu fidel;
+    [SerializeField] LeaderCardSelectionMenu batista;
+
     public void LocalMultiplayer()
     {
-        if (LeaderCardSelectionMenu.CheckStartGame()) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        if (fidel.CheckStartGame() && batista.CheckStartGame()) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
     public void Exit()
     {

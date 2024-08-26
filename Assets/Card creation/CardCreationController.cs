@@ -7,7 +7,8 @@ using System.IO;
 
 public class CardCreationController : MonoBehaviour
 {
-    [SerializeField] Shader cardShader;
+    #region Fields
+    [SerializeField] Material cardMaterial;
     [SerializeField] GameObject mainMenu;
     [SerializeField] GameObject menu;
     [SerializeField] GameObject consoleMenu;
@@ -33,7 +34,8 @@ public class CardCreationController : MonoBehaviour
     string imageLoadingPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\New\\Main image";
     string infoLoadingPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\New\\Info";
     bool PreLoadedCompiled = true;
-    public bool LeaderAdded;
+    #endregion
+    [SerializeField] GameObject test;
 
     public void Awake()
     {
@@ -42,7 +44,6 @@ public class CardCreationController : MonoBehaviour
         Directory.CreateDirectory(mainPath + "\\Cards\\Info");
         Directory.CreateDirectory(mainPath + "\\Effects\\Scripts");
         ResetCards();
-        LeaderAdded = false;
         cardsAdded = new List<string>();
         preLoadedEffects = new List<string>();
         UpdatePreLoadedScripts(preLoadedEffectsDisplay, "Effects");
@@ -96,7 +97,35 @@ public class CardCreationController : MonoBehaviour
         }
     }
 
+    public void AddCardsToGame()
+    {
+        if (!PreLoadedCompiled) CompilePreLoaded();
+        foreach (var card in cards)
+        {
+            if (card is LeaderCard leader)
+            {
+                PlayerMB.Leaders.Add(leader.Name, leader);
+            }
+            else if (card.FactionEnum is Faction.Fidel) CardsWarehouse.RebelCards.Add(card);
+            else CardsWarehouse.BatistaCards.Add(card);
+
+            cardsAdded.Add(card.Name);
+        }
+        UpdatePreLoadedScripts(preLoadedEffectsDisplay, "Effects");
+        UpdatePreLoadedScripts(preLoadedCardsDisplay, "Cards");
+        ResetCards();
+    }
+
     #region Other buttons
+    public void BackFromCardCreation()
+    {
+        AddCardsToGame();
+        if (interpreter is null || interpreter.ValidLoad)
+        {
+            mainMenu.SetActive(true);
+            menu.SetActive(false);
+        }
+    }
     public void AddOrDiscardPreLoadedEffect()
     {
         preLoadingTerminal.text = "";
@@ -131,10 +160,12 @@ public class CardCreationController : MonoBehaviour
 
     public void DeleteFiles()
     {
-        string[] paths = Directory.GetFiles(mainPath +"\\Effects\\Scripts");
-        foreach (var item in paths)
-            File.Delete(item);
-        paths = Directory.GetFiles(mainPath + "\\Cards\\Scripts");
+        List<string> paths = new List<string>();
+        paths.AddRange(Directory.GetFiles(mainPath +"\\Effects\\Scripts"));
+        paths.AddRange(Directory.GetFiles(mainPath + "\\Cards\\Scripts"));
+        paths.AddRange(Directory.GetFiles(mainPath + "\\Cards\\Main Image"));
+        paths.AddRange(Directory.GetFiles(mainPath + "\\Cards\\Info"));
+
         foreach (var item in paths)
             File.Delete(item);
 
@@ -143,42 +174,12 @@ public class CardCreationController : MonoBehaviour
     }
     #endregion
 
-    public void AddCardsToGame()
-    {
-        if (!PreLoadedCompiled) CompilePreLoaded();
-        foreach (var card in cards)
-        {
-            if (card is LeaderCard leader)
-            {
-                PlayerMB.Leaders.Add(leader.Name, leader);
-                LeaderAdded = true;
-            }
-            else if (card.FactionEnum is Faction.Fidel) CardsWarehouse.RebelCards.Add(card);
-            else CardsWarehouse.BatistaCards.Add(card);
-
-            cardsAdded.Add(card.Name);
-        }
-        UpdatePreLoadedScripts(preLoadedEffectsDisplay, "Effects");
-        UpdatePreLoadedScripts(preLoadedCardsDisplay, "Cards");
-        ResetCards();
-    }
-
-    public void BackFromCardCreation()
-    {
-        AddCardsToGame();
-        if (interpreter is null || interpreter.ValidLoad)
-        {
-            mainMenu.SetActive(true);
-            menu.SetActive(false);
-        }
-    }
-
     #region Utils
     void ResetCards()
     {
         cards = new List<Card>();
         preLoadedCards = new List<string>();
-        visualAssigner = new VisualAssigner(cardShader);
+        visualAssigner = new VisualAssigner(cardMaterial);
     }
 
     void UpdatePreLoadedScripts(TMP_Text text, string folder)
@@ -232,6 +233,7 @@ public class CardCreationController : MonoBehaviour
         {
             this.visualAssigner.AssignVisual(card, imagePath, infoPath, save);
             cards.Add(card);
+            test.GetComponent<Renderer>().material = card.Info.Material;
         }
     }
     #endregion

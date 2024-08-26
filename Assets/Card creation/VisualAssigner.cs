@@ -3,49 +3,75 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class VisualAssigner
 {
-    Shader shader;
+    Material material;
     string savingPath = "C:\\Users\\Public\\Documents\\1958 Files\\Cards";
 
-    public VisualAssigner(Shader shader)
+    public VisualAssigner(Material material)
     {
-        this.shader = shader;
+        this.material = material;
     }
+
     public void AssignVisual(Card card, string imagePath, string infoPath, bool save)
     {
-        Material m = new Material(shader);
-        Sprite s = null;
-        try
+        Sprite mainImage = null;
+        Sprite info = null;
+
+        if (save)
         {
-            if (save) AssignNew(ref m, ref s, imagePath, infoPath, card.Name);
-            else AssignPreLoaded(ref m, ref s, imagePath, infoPath, card.Name);
-
-            card.AssignInfo(new VisualInfo(m, s));
+            mainImage = GetSpriteAt(imagePath, card.Name, true);
+            info = GetSpriteAt(infoPath, card.Name, false);
         }
-        catch { }
-    }
-    void AssignPreLoaded(ref Material m, ref Sprite s, string imagePath, string infoPath, string name)
-    {
-        m = AssetDatabase.LoadAssetAtPath<Material>(imagePath + "\\" + name + ".mat");
-        s = AssetDatabase.LoadAssetAtPath<Sprite>(infoPath + "\\" + name + ".png");
-    }
-    void AssignNew(ref Material m, ref Sprite s, string imagePath, string infoPath, string name)
-    {
-        Sprite texture = GetSpriteAt(imagePath + "\\" + name);
-        m.mainTexture = texture.texture;
-        s = GetSpriteAt(infoPath + "\\" + name);
+        else
+        {
+            mainImage = GetSpriteAt(savingPath + "\\Main Image\\", card.Name, true, false, ".gwi");
+            info = GetSpriteAt(savingPath + "\\Info\\", card.Name, false, false, ".gwi");
+        }
 
-        AssetDatabase.CreateAsset(m, savingPath + "\\Main image\\" + name + ".mat");
-        AssetDatabase.CreateAsset(s, savingPath + "\\Info\\" + name + ".png");
+        if (!(mainImage is null || info is null)) card.AssignInfo(AssignMaterial(mainImage.texture, info));
     }
-    Sprite GetSpriteAt(string path)
-    {
-        string ext = ".png";
-        if (File.Exists(path + ".jpg")) ext = ".jpg";
-        else if (File.Exists(path + ".jpeg")) ext = ".jpeg";
 
-        return AssetDatabase.LoadAssetAtPath<Sprite>(path + ext);
+    VisualInfo AssignMaterial (Texture2D tex, Sprite info)
+    {
+        Material m = new Material(material)
+        {
+            mainTexture = tex
+        };
+        return new VisualInfo(m, info);
+    }
+
+    Sprite GetSpriteAt(string pathWithoutName, string nameWithoutExtension, bool isMainImage, bool saveImage = true, string ext = "")
+    {
+        string path = pathWithoutName + "\\" + nameWithoutExtension;
+        if (ext.Length==0)
+        {
+            ext = ".png";
+            if (File.Exists(path + ".jpg")) ext = ".jpg";
+            else if (File.Exists(path + ".jpeg")) ext = ".jpeg";
+        }
+        path += ext;
+
+        FileStream fs = File.OpenRead(path);
+        byte[] bytes = new byte[fs.Length];
+        fs.Read(bytes, 0, bytes.Length);
+        fs.Close();
+
+        Texture2D texture = new Texture2D(16, 16);
+        texture.LoadImage(bytes);
+        if (saveImage) SaveImage(bytes, isMainImage, nameWithoutExtension);
+        return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0));
+    }
+
+    void SaveImage(byte[] bytes, bool isMainImage, string name)
+    {
+        string path = savingPath;
+        if (isMainImage) path += "\\Main Image\\";
+        else path += "\\Info\\";
+        path += name + ".gwi";
+
+        File.WriteAllBytes(path, bytes);
     }
 }

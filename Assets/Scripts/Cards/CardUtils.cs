@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class VisualInfo
 {
+    public Sprite Main { get; private set; }
     public Material Material { get; private set; }
     public Sprite Information { get; private set; }
 
@@ -13,7 +14,11 @@ public class VisualInfo
         this.Information = information;
     }
 
-    public VisualInfo() { }
+    public VisualInfo(Sprite main, Sprite information)
+    {
+        Main = main;
+        Information = information;
+    }
 }
 
 public interface IEffect
