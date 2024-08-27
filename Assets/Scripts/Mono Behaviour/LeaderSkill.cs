@@ -5,12 +5,15 @@ using UnityEngine;
 public class LeaderSkillPanel : MonoBehaviour
 {
     [SerializeField] GameObject Info;
+    [SerializeField] GameObject skillButton;
     [SerializeField] BoardMB board;
 
     public void LeaderSkillWhenCardSelected(Player player, Card card, List<Card> list)
     {
         player.Leader.Effect(player.context.UpdatePlayerInstance(list, card));
         Info.SetActive(true);
+        board.board.ValidTurn = true;
+        skillButton.SetActive(false);
     }
 
     public void LeaderSkill()
@@ -23,6 +26,8 @@ public class LeaderSkillPanel : MonoBehaviour
         {
             leader.Effect(player.context);
             board.UpdateView();
+            board.board.ValidTurn = true;
+            skillButton.SetActive(false);
         }
         else
         {

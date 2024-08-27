@@ -57,6 +57,7 @@ public class CardInitializer : MonoBehaviour
 
     void AssignInfo(Card card)
     {
+        card.AssignPosition(player.Deck);
         if(card.Info is null)
         {
             try

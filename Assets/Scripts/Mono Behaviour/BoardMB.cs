@@ -70,18 +70,10 @@ public class BoardMB : MonoBehaviour
 
             if (list[i].Name == Utils.BaseCard.Name)
             {
-                child.GetComponent<Renderer>().material = Utils.BaseCard.Info.Material;
-                child.GetComponent<CardController>().IsOccupied = false;
+                child.GetComponent<CardController>().Desoccupy();
                 child.SetActive(setActiveOutOfCount);
             }
-            else
-            {
-                child.SetActive(true);
-                child.GetComponent<Renderer>().material = list[i].Info.Material;
-                child.GetComponent<CardController>().Info = list[i].Info.Information;
-                child.GetComponent<CardController>().IsOccupied = true;
-                if (name.Contains("Hand")) child.GetComponent<CardController>().AssignRangeForHandCard(list[i].AvailableRange);
-            }
+            else child.GetComponent<CardController>().Occupy(list[i]);
         }
     }
     public void DeactivatePlayableSlots(PlayerMB player)

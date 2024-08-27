@@ -188,5 +188,11 @@ public class Board
         looser.Score += scoreLooser;
         looser.StartedPlaying = false;
     }
+
+    public static void Reset()
+    {
+        instance = new Board();
+        Player.Reset();
+    }
     #endregion
 }

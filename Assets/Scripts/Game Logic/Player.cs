@@ -90,7 +90,11 @@ public class Player
                 Battlefield.Graveyard[k] = swapCard;
             }
 
-            Deck.AddRange(Battlefield.Graveyard);
+            foreach (var card in Battlefield.Graveyard)
+            {
+                card.AssignPosition(Deck);
+                Deck.Add(card);
+            }
             Battlefield.Graveyard.Clear();
         }
 
@@ -99,6 +103,7 @@ public class Player
         {
             int index = new System.Random().Next(Deck.Count - 1);
             Battlefield.Graveyard.Add(Deck[index]);
+            Deck[index].AssignPosition(Battlefield.Graveyard);
             Deck.RemoveAt(index);
             cardsToSteal--;
         }
@@ -109,6 +114,7 @@ public class Player
         {
             int index = new System.Random().Next(Deck.Count - 1);
             Hand[emptySlotsInHand[0]] = Deck[index];
+            Deck[index].AssignPosition(Hand);
             Deck.RemoveAt(index);
             emptySlotsInHand.RemoveAt(0);
         }
@@ -128,6 +134,7 @@ public class Player
         if (card is WeatherCard weather && Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
         {
             Board.Instance.Weather[targetPosition] = weather;
+            weather.AssignPosition(Board.Instance.Weather);
         }
         else if (!this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
         {
@@ -146,6 +153,12 @@ public class Player
     {
         this.emptySlotsInHand.Add(index);
         this.Hand[index] = Utils.BaseCard;
+    }
+
+    public static void Reset()
+    {
+        SetPlayer(ref fidel, batista, Faction.Fidel);
+        SetPlayer(ref batista, fidel, Faction.Batista);
     }
 
     public override bool Equals(object other)

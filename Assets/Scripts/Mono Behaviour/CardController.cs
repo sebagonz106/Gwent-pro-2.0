@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class CardController : MonoBehaviour
 {
+    CompiledCardVisual visual;
+    Material rebelMaterial;
+    Material batistaMaterial;
     CardsPositionWarehouse parent;
     Board board;
     Player player;
@@ -35,6 +38,11 @@ public class CardController : MonoBehaviour
         player = playerMB.player;
         indexOfThisInParent = (this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")? 2 - Array.IndexOf(parent.positions, this.gameObject) : Array.IndexOf(parent.positions, this.gameObject);
 
+        rebelMaterial = Resources.Load<Material>("Compiler prefabs/rebel new card");
+        batistaMaterial = Resources.Load<Material>("Compiler prefabs/batista new card");
+        visual = this.GetComponentInChildren<CompiledCardVisual>();
+        visual.gameObject.SetActive(false);
+
         if (this.gameObject.tag == "BattlefieldCard" || this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")
         {
             if (this.gameObject.name.Contains("Melee"))      this.rangeTypes = new List<Zone> { Zone.Melee } ;
@@ -44,13 +52,22 @@ public class CardController : MonoBehaviour
 
         else if (this.gameObject.tag == "LeaderCard")
         {
-            this.GetComponent<Renderer>().material = Resources.Load<Material>($"Materials/{playerMB.Name}/{player.Leader.Name}");
-            this.Info = Resources.Load<Sprite>($"Info/{playerMB.Name}/{player.Leader.Name}");
+            try
+            {
+                this.GetComponent<Renderer>().material = Resources.Load<Material>($"Materials/{playerMB.Name}/{player.Leader.Name}");
+                this.Info = Resources.Load<Sprite>($"Info/{playerMB.Name}/{player.Leader.Name}");
+            }
+            catch(NullReferenceException)
+            {
+                gameObject.GetComponent<Renderer>().material = player.Name == "Fidel" ? rebelMaterial : batistaMaterial;
+                visual.gameObject.SetActive(true);
+                visual.UpdateInfo(player.Leader);
+            }
             this.IsOccupied = true;
         }
     }
 
-    private void OnMouseDown()
+    public void OnMouseDown()
     {
         if (this.masterController.IsAnyInfoActive() || !(this.masterController.IsPlayersPanelActive()||this.player.LeaderCardSelected)) return;
 
@@ -63,12 +80,7 @@ public class CardController : MonoBehaviour
                 masterController.EffectException();
                 return;
             }
-
-            if (!board.ValidTurn && player.Equals(board.GetCurrentPlayer()) && !player.LeaderEffectUsedThisRound)
-            {
-                    OpenInfoPanel(true);
-            }
-            else OpenInfoPanel();
+            else OpenInfoPanel(player.Leader, !board.ValidTurn && player.Equals(board.GetCurrentPlayer()) && !player.LeaderEffectUsedThisRound);
         }
         #endregion
 
@@ -189,19 +201,17 @@ public class CardController : MonoBehaviour
                         }
                     }
 
-                    if (!BaitFound) OpenInfoPanel();
+                    if (!BaitFound) OpenInfoPanel(GetList()[indexOfThisInParent]);
                 }
                 #endregion
             }
-            else if (isOccupied) OpenInfoPanel();
+            else if (isOccupied) OpenInfoPanel(GetList()[indexOfThisInParent]);
             else GameManager.GetComponent<MasterController>().GeneralException();
         }
         #endregion
 
         else GameManager.GetComponent<MasterController>().GeneralException();
     }
-
-    public void AssignRangeForHandCard (List<Zone> list) { this.rangeTypes = list; }
 
     private void Disable(CardController cardController)
     {
@@ -213,7 +223,7 @@ public class CardController : MonoBehaviour
         cardController.transform.position = Vector3.MoveTowards(cardController.transform.position, cardController.upPosition, step);
     }
 
-    private void OpenInfoPanel(bool leader = false)
+    private void OpenInfoPanel(Card card, bool leader = false)
     {
         if (!isOccupied)
         {
@@ -222,7 +232,34 @@ public class CardController : MonoBehaviour
         }
 
         masterController.SavePanelOnWhenInformationDisplayed(false);
-        masterController.OpenInfo(this.Info, leader);
+        if (card.Info.Main is null) masterController.OpenInfo(this.Info, leader);
+        else masterController.OpenCompiledCardInfo(card, leader);
+    }
+
+    public void Occupy(Card card)
+    {
+        gameObject.SetActive(true);
+        IsOccupied = true;
+        if (name.Contains("Hand")) this.rangeTypes = card.AvailableRange;
+
+        if(card.Info.Main is null) 
+        {
+            this.gameObject.GetComponent<Renderer>().material = card.Info.Material;
+            Info = card.Info.Information;
+        }
+        else
+        {
+            visual.gameObject.SetActive(true);
+            visual.UpdateInfo(card);
+            gameObject.GetComponent<Renderer>().material = (card.FactionEnum is Faction.Fidel)? rebelMaterial : batistaMaterial;
+        }
+    }
+
+    public void Desoccupy()
+    {
+        gameObject.GetComponent<Renderer>().material = Utils.BaseCard.Info.Material;
+        IsOccupied = false;
+        if(!(visual is null)) visual.gameObject.SetActive(false);
     }
 
     List<Card> GetList () => this.gameObject.tag == "WeatherCard" ? board.Weather :

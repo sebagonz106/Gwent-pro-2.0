@@ -92,7 +92,7 @@ public class CardCreationController : MonoBehaviour
     {
         if (PreLoadedCompiled)
         {
-            interpreter.Evaluate(console.text);
+            if(interpreter.Evaluate(console.text)) console.text = "";
             AddCards(interpreter.CreatedCards, imageLoadingPath, infoLoadingPath, true);
         }
     }

@@ -11,10 +11,11 @@ public class MasterController : MonoBehaviour
     public Camera[] cameras = new Camera[3]; //Camera[0] between rounds, Camera[1] fidel, Camera[2] batista
 
     #region Panels
+    [SerializeField] CompiledCardVisual infoContainer;
     [SerializeField] GameObject playerPanel;
     [SerializeField] GameObject betweenRoundsPanel;
     [SerializeField] GameObject InfoPanel;
-    [SerializeField] GameObject LeaderInfoPanel;
+    [SerializeField] GameObject LeaderInfoButton;
     [SerializeField] GameObject batistaVictory;
     [SerializeField] GameObject fidelVictory;
     [SerializeField] GameObject effectException;
@@ -78,7 +79,7 @@ public class MasterController : MonoBehaviour
             cameras[1].gameObject.SetActive(true);
             board.RecieveTurn(board.Fidel);
         }
-        else //bug
+        else
         {
             cameras[0].gameObject.SetActive(true);
             betweenRoundsPanel.SetActive(true); 
@@ -111,13 +112,22 @@ public class MasterController : MonoBehaviour
     }
     public void OpenInfo(Sprite info, bool leader = false)
     {
-        GameObject infoPanel = leader ? LeaderInfoPanel : InfoPanel;
-        infoPanel.GetComponent<Image>().sprite = info;
-        infoPanel.SetActive(true);
+        InfoPanel.GetComponent<Image>().sprite = info;
+        InfoPanel.SetActive(true);
+        LeaderInfoButton.SetActive(leader);
+    }
+    public void OpenCompiledCardInfo(Card card, bool leader = false)
+    {
+        InfoPanel.GetComponent<Image>().sprite = Resources.Load<Sprite>("File");
+        InfoPanel.SetActive(true);
+        LeaderInfoButton.SetActive(leader);
+        infoContainer.gameObject.SetActive(true);
+        infoContainer.UpdateInfo(card);
     }
     public void CloseInfo()
     {
         PanelOnWhenInformationDisplayed.SetActive(true);
+        infoContainer.gameObject.SetActive(false);
     }
     public void RoundEndedNotification(string winnerName = "")
     {
@@ -184,6 +194,9 @@ public class MasterController : MonoBehaviour
     }
     public void BackToMainMenu()
     {
+        Board.Reset();
+        PlayerPrefs.SetString("Fidel Leader", "");
+        PlayerPrefs.SetString("Batista Leader", "");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
 

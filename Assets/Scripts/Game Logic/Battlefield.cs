@@ -28,6 +28,7 @@ public class Battlefield
         if (card.Equals(Utils.BaseCard)) return;
 
         Graveyard.Add(card);
+        card.AssignPosition(Graveyard);
         if (list.Equals(this.playerThatOwnsThisBattlefield.Hand)) this.playerThatOwnsThisBattlefield.EmptyHandAt(list.IndexOf(card));
         else
         {
@@ -94,12 +95,14 @@ public class Battlefield
             if (card.CardType == CardType.Unit)
             {
                 list[index] = card;
+                card.AssignPosition(list);
                 return true;
             }
             if (card.CardType == CardType.Clear) //Creator's license here: Clear will only protect from 
                                                  //weather effects the battlefield line where it is played
             {
                 list[index] = card;
+                card.AssignPosition(list);
                 ClearsPlayed[bonusAndClearIndex] = true;
                 return true;
             }
@@ -107,6 +110,7 @@ public class Battlefield
         if (card.CardType == CardType.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
         {
             Bonus[bonusAndClearIndex] = card;
+            card.AssignPosition(Bonus);
             return true;
         }
 

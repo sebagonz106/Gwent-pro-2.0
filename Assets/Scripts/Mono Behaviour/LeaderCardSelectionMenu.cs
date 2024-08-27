@@ -5,7 +5,7 @@ using TMPro;
 
 public class LeaderCardSelectionMenu : MonoBehaviour
 {
-    string leader;
+    public string leader = "";
     [SerializeField] TMP_InputField input;
     [SerializeField] string faction;
 
@@ -62,5 +62,13 @@ public class LeaderCardSelectionMenu : MonoBehaviour
         }
     }
 
-    public bool CheckStartGame() => (leader != "");
+    public bool CheckStartGame()
+    {
+        if (leader != "")
+        {
+            leader = "";
+            return true;
+        }
+        else return false;
+    }
 }
