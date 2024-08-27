@@ -31,7 +31,7 @@ public class VisualAssigner
             info = GetSpriteAt(savingPath + "\\Info\\", card.Name, false, false, ".gwi");
         }
 
-        if (!(mainImage is null || info is null)) card.AssignInfo(AssignMaterial(mainImage.texture, info));
+        if (!(mainImage is null || info is null)) card.AssignInfo(new VisualInfo(mainImage, info));
     }
 
     VisualInfo AssignMaterial (Texture2D tex, Sprite info)

@@ -52,17 +52,18 @@ public class CardController : MonoBehaviour
 
         else if (this.gameObject.tag == "LeaderCard")
         {
-            try
-            {
-                this.GetComponent<Renderer>().material = Resources.Load<Material>($"Materials/{playerMB.Name}/{player.Leader.Name}");
-                this.Info = Resources.Load<Sprite>($"Info/{playerMB.Name}/{player.Leader.Name}");
-            }
-            catch(NullReferenceException)
+            if(player.Leader.Info.Material is null)
             {
                 gameObject.GetComponent<Renderer>().material = player.Name == "Fidel" ? rebelMaterial : batistaMaterial;
                 visual.gameObject.SetActive(true);
                 visual.UpdateInfo(player.Leader);
             }
+            else
+            {
+                this.GetComponent<Renderer>().material = player.Leader.Info.Material;
+                this.Info = player.Leader.Info.Information;
+            }
+
             this.IsOccupied = true;
         }
     }

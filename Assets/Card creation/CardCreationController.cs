@@ -35,7 +35,6 @@ public class CardCreationController : MonoBehaviour
     string infoLoadingPath = "D:\\Gwent-Pro\\Gwent pro v2.0\\Assets\\Card creation\\Interpreter\\Files\\New\\Info";
     bool PreLoadedCompiled = true;
     #endregion
-    [SerializeField] GameObject test;
 
     public void Awake()
     {
@@ -104,7 +103,7 @@ public class CardCreationController : MonoBehaviour
         {
             if (card is LeaderCard leader)
             {
-                PlayerMB.Leaders.Add(leader.Name, leader);
+                Player.Leaders.Add(leader.Name, leader);
             }
             else if (card.FactionEnum is Faction.Fidel) CardsWarehouse.RebelCards.Add(card);
             else CardsWarehouse.BatistaCards.Add(card);
@@ -233,7 +232,6 @@ public class CardCreationController : MonoBehaviour
         {
             this.visualAssigner.AssignVisual(card, imagePath, infoPath, save);
             cards.Add(card);
-            test.GetComponent<Renderer>().material = card.Info.Material;
         }
     }
     #endregion

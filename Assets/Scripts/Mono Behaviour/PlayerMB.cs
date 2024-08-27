@@ -9,13 +9,6 @@ public class PlayerMB : MonoBehaviour
     public BoardMB board;
     public BattlefieldMB battlefield;
     public GameObject Hand;
-    public static Dictionary<string, LeaderCard> Leaders = new Dictionary<string, LeaderCard>
-    {
-        {"Camilo Cienfuegos", (LeaderCard)CardsWarehouse.RebelCards[0] },
-        {"Ernesto Che Guevara", (LeaderCard)CardsWarehouse.RebelCards[1] },
-        {"Eulogio Cantillo", (LeaderCard)CardsWarehouse.BatistaCards[0] },
-        {"Francisco Tabernilla", (LeaderCard)CardsWarehouse.BatistaCards[1] }
-    };
     public GameObject WonCoin1;
     public GameObject WonCoin2;
     public GameObject[] Body { get; private set; }
@@ -26,8 +19,21 @@ public class PlayerMB : MonoBehaviour
     {
         Name = this.gameObject.name;
         player = Utils.GetPlayerByName(Name);
-        if (PlayerPrefs.GetString(Name + " Leader") == "") player.Leader = Name == "Batista" ? Leaders["Francisco Tabernilla"] : Leaders["Ernesto Che Guevara"];
-        else player.Leader = Leaders[PlayerPrefs.GetString(Name + " Leader")];
+        if (PlayerPrefs.GetString(Name + " Leader") == "") player.Leader = Name == "Batista" ? Player.Leaders["Francisco Tabernilla"] : Player.Leaders["Ernesto Che Guevara"];
+        else player.Leader = Player.Leaders[PlayerPrefs.GetString(Name + " Leader")];
+
+        if (player.Leader.Info is null)
+        {
+            try
+            {
+                player.Leader.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{Name}/{player.Leader.Name}"),
+                                                        Resources.Load<Sprite>($"Info/{Name}/{player.Leader.Name}")));
+            }
+            catch (System.NullReferenceException)
+            {
+                player.Leader.AssignInfo(CardInitializer.GetRandomInfo(player.Leader.Faction));
+            }
+        }
     }
 
     private void Start()

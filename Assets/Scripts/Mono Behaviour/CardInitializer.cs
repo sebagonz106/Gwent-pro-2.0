@@ -12,7 +12,6 @@ public class CardInitializer : MonoBehaviour
 
     void Start()
     {
-        AssignInfo(player.Leader);
         cards = CardsWarehouse.GetDeck(playerMB.Name);
         foreach (Card item in cards) AssignInfo(item);
 
@@ -57,7 +56,6 @@ public class CardInitializer : MonoBehaviour
 
     void AssignInfo(Card card)
     {
-        card.AssignPosition(player.Deck);
         if(card.Info is null)
         {
             try
@@ -71,5 +69,5 @@ public class CardInitializer : MonoBehaviour
             }
         }
     }
-    VisualInfo GetRandomInfo(string faction) => throw new System.NotImplementedException();
+    public static VisualInfo GetRandomInfo(string faction) => throw new System.NotImplementedException();
 }

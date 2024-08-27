@@ -11,7 +11,7 @@ public class LeaderCardSelectionMenu : MonoBehaviour
 
     private void Update()
     {
-        input.gameObject.SetActive(PlayerMB.Leaders.Count > 4);
+        input.gameObject.SetActive(Player.Leaders.Count > 4);
     }
 
     public void SaveInfo()
@@ -39,9 +39,9 @@ public class LeaderCardSelectionMenu : MonoBehaviour
     {
         if (input.text.Length == 0) return;
 
-        if (PlayerMB.Leaders.ContainsKey(input.text.Trim()))
+        if (Player.Leaders.ContainsKey(input.text.Trim()))
         {
-            if (PlayerMB.Leaders[input.text].Faction == faction)
+            if (Player.Leaders[input.text].Faction == faction)
             {
                 leader = input.text;
                 input.text = "";

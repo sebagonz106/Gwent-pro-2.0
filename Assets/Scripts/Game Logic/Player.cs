@@ -22,6 +22,14 @@ public class Player
     private static Player fidel;
     private static Player batista;
 
+    public static Dictionary<string, LeaderCard> Leaders = new Dictionary<string, LeaderCard>
+    {
+        {"Camilo Cienfuegos", (LeaderCard)CardsWarehouse.RebelCards[0] },
+        {"Ernesto Che Guevara", (LeaderCard)CardsWarehouse.RebelCards[1] },
+        {"Eulogio Cantillo", (LeaderCard)CardsWarehouse.BatistaCards[0] },
+        {"Francisco Tabernilla", (LeaderCard)CardsWarehouse.BatistaCards[1] }
+    };
+
     public static Player Fidel => fidel == null ? SetPlayer(ref fidel, batista, Faction.Fidel) : fidel;
     public static Player Batista => batista == null ? SetPlayer(ref batista, fidel, Faction.Batista) : batista;
     public Faction PlayerFaction => playerFaction;
