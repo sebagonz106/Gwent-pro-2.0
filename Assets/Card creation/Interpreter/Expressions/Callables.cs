@@ -97,14 +97,19 @@ namespace Gwent_Interpreter.Expressions
             }
 
             if (method is null) throw new EvaluationError($"Method not found at {caller.Coordinates.Item1}:{caller.Coordinates.Item2}");
-            else //possible issues with void methods, maybe a previous check of the method.returntype would fix it in case of ocurrying
+            else
             {
                 try
                 {
-                    object result = method.Invoke(callee, this.arguments);
-                    if (result is double || result is int) return new Num(Convert.ToDouble(result));
-                    else if (result is string sResult) return new Str(sResult);
-                    else return result;
+                    if(method.ReturnType != typeof(void))
+                    {
+                        object result = method.Invoke(callee, this.arguments);
+                        if (result is double || result is int) return new Num(Convert.ToDouble(result));
+                        else if (result is string sResult) return new Str(sResult);
+                        else return result;
+                    }
+                    else method.Invoke(callee, this.arguments);
+                    return null;
                 }
                 catch (ArgumentException)
                 {

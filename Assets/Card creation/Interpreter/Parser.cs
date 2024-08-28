@@ -512,6 +512,16 @@ namespace Gwent_Interpreter
                 }
                 throw new ParsingError($"Invalid declaration: {variableToken.Value} at {variableToken.Coordinates.Item1}:{variableToken.Coordinates.Item2}");
             }
+            else if (variable is Indexer indexer)
+            {
+                if (MatchAndMove(TokenType.Assign, TokenType.Increase, TokenType.Decrease, TokenType.IncreaseOne, TokenType.DecreaseOne))
+                {
+                    Token operation = tokens.Previous;
+                    return new IndexerModifier(indexer, operation, (operation.Type is TokenType.IncreaseOne || operation.Type is TokenType.DecreaseOne) ? null : Boolean());
+                }
+                throw new ParsingError($"Invalid declaration: {tokens.Current.Value} at {tokens.Current.Coordinates.Item1}:{tokens.Current.Coordinates.Item2}");
+
+            }
             else throw new ParsingError($"Invalid declaration at {variable.Coordinates.Item1}:{variable.Coordinates.Item2}");
         }
         #endregion

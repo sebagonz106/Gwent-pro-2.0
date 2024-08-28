@@ -31,8 +31,8 @@ namespace Gwent_Interpreter.Utils
 
         public Card this[Num index]
         {
-            get => list[(int)index.Value];
-            set => list[(int)index.Value] = value;
+            get => list[Convert.ToInt32(index.Value)];
+            set => list[Convert.ToInt32(index.Value)] = value;
         }
         public Card this[int index]
         {
@@ -100,9 +100,8 @@ namespace Gwent_Interpreter.Utils
 
         bool ICollection<Card>.Remove(Card item)
         {
-            if (this.Contains(item)) this.Remove(item);
-
-            return this.Contains(item);
+            if (this.Contains(item)) { this.Remove(item); return true; }
+            else return false;
         }
 
         public IEnumerator<Card> GetEnumerator() => list.GetEnumerator();

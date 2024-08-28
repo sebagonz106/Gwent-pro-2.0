@@ -56,6 +56,11 @@ namespace Gwent_Interpreter.Expressions
             else return result;
         }
 
+        public void SetValue(IExpression expression)
+        {
+            ((GwentList)indexer.Evaluate())[(Num)index.Evaluate()] = (Card)expression.Evaluate();
+        }
+
         public override (int, int) Coordinates { get => coordinates; protected set => coordinates = value; }
     }
 }

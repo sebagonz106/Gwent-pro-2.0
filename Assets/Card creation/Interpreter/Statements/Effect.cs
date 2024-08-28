@@ -147,7 +147,7 @@ namespace Gwent_Interpreter.Statements
 
         public void Execute()
         {
-            if (!receivedTargetsAndParams) throw new EvaluationError($"Trying to run \"{name}\" effect whitout assigning parameters properly");
+            if (!receivedTargetsAndParams) throw new EvaluationError($"Trying to run \"{name.Evaluate()}\" effect whitout assigning parameters properly");
             else action.Execute();
         }
 

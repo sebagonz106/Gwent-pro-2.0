@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace Gwent_Interpreter.Statements
 {
@@ -55,8 +56,24 @@ namespace Gwent_Interpreter.Statements
         {
             foreach (var item in effects)
             {
-                item.Item1.Execute(); 
-                if(item.Item2.Coordinates != (0, 0)) item.Item2.Execute(); //postAction
+                try
+                {
+                    item.Item1.Execute();
+                }
+                catch(EvaluationError error)
+                {
+                    Debug.Log(error.Message);
+                }
+
+                try
+                {
+                    if (item.Item2.Coordinates != (0, 0)) item.Item2.Execute(); //postAction
+                }
+                catch (EvaluationError error)
+                {
+                    Debug.Log(error.Message);
+                }
+                if (item.Item2.Coordinates != (0, 0)) item.Item2.Execute(); //postAction
             }
         }
     }

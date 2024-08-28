@@ -28,9 +28,8 @@ namespace Gwent_Interpreter.GameLogic
             }
         }
 
-        public Player TriggerPlayer => board.GetCurrentPlayer();
-
         #region Game Properties
+        public Player TriggerPlayer => board.GetCurrentPlayer();
         public GwentList DeckOfPlayer(Player player) => new GwentList(player.Deck, player);
         public GwentList Deck => DeckOfPlayer(TriggerPlayer);
         public GwentList OtherDeck => DeckOfPlayer(board.GetCurrentEnemy());
