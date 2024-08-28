@@ -30,6 +30,7 @@ public class BaitCard : Card
         card.AssignPosition(Owner.Hand);
         if (card is UnitCard unit) unit.InitializeDamage(); //in case any permanent effects were applied on this card
         else if (card is ClearCard) Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[Owner.ZoneByList[list]]);
+        Board.Instance.UpdateTotalDamage();
         return true;
     }
 }

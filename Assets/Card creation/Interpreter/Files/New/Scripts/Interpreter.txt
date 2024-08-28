@@ -67,7 +67,7 @@ Effect: {
 
 Name: "Damage", // este efecto tiene que estar previamente definido.
 
-Amount: 5, // ... y tener estos parámetros.
+amount: 5, // ... y tener estos parámetros.
 
 }
 

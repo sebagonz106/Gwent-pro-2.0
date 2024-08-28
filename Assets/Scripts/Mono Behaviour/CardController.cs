@@ -44,7 +44,7 @@ public class CardController : MonoBehaviour
         board = Board.Instance;
         playerMB = parent.tag.Contains("Batista") ? masterController.board.Batista : masterController.board.Fidel;
         player = playerMB.player;
-        indexOfThisInParent = (this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")? 2 - Array.IndexOf(parent.positions, this.gameObject) : Array.IndexOf(parent.positions, this.gameObject);
+        indexOfThisInParent = Array.IndexOf(parent.positions, this.gameObject);
 
         if (this.gameObject.tag == "BattlefieldCard" || this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")
         {

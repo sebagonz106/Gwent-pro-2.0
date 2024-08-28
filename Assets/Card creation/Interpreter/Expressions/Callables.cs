@@ -131,12 +131,12 @@ namespace Gwent_Interpreter.Expressions
                 {
                     if(method.ReturnType != typeof(void))
                     {
-                        object result = method.Invoke(callee, this.arguments);
+                        object result = method.Invoke(callee, arguments);
                         if (result is double || result is int) return new Num(Convert.ToDouble(result));
                         else if (result is string sResult) return new Str(sResult);
                         else return result;
                     }
-                    else method.Invoke(callee, this.arguments);
+                    else method.Invoke(callee, arguments);
                     return null;
                 }
                 catch (ArgumentException)
