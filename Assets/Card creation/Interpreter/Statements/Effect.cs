@@ -4,7 +4,6 @@ using System.Text;
 using Gwent_Interpreter.GameLogic;
 using Gwent_Interpreter.Expressions;
 using Gwent_Interpreter.Utils;
-using UnityEngine;
 
 namespace Gwent_Interpreter.Statements
 {
@@ -80,8 +79,6 @@ namespace Gwent_Interpreter.Statements
             string warnings = "";
             string errors = "";
 
-            Debug.Log(name.Evaluate());
-
             foreach (var pair in _params)
             {
                 try
@@ -97,10 +94,8 @@ namespace Gwent_Interpreter.Statements
                 environment.Set(pair.Item1, pair.Item2);
             }
 
-            Debug.Log(errors);
             if (errors != "") throw new EvaluationError(errors);
             receivedTargetsAndParams = true;
-            Debug.Log("r " + receivedTargetsAndParams);
             if (warnings != "") throw new Warning(warnings);
         }
 
@@ -153,7 +148,6 @@ namespace Gwent_Interpreter.Statements
 
         public void Execute()
         {
-            Debug.Log("e " + receivedTargetsAndParams);
             if (!receivedTargetsAndParams) throw new EvaluationError($"Trying to run \"{name.Evaluate()}\" effect whitout assigning parameters properly");
             else action.Execute();
         }

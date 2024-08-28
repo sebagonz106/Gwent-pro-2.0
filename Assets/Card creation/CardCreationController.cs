@@ -89,6 +89,8 @@ public class CardCreationController : MonoBehaviour
 
     public void CompileOnConsole()
     {
+        if (console.text == "") return;
+
         if (PreLoadedCompiled)
         {
             if(interpreter.Evaluate(console.text)) console.text = "";

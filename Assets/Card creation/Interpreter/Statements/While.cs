@@ -27,7 +27,7 @@ namespace Gwent_Interpreter.Statements
             }
             catch (InvalidCastException)
             {
-                throw new EvaluationError("Incapable of converting conditional expression to boolean value.");
+                throw new EvaluationError("Incapable of converting conditional expression to boolean value. ");
             }
         }
 

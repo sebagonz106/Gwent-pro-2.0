@@ -15,7 +15,7 @@ public class Card : IEffect, ICardsWithOwner
     protected Effect effect;
     protected double initialDamage;
 
-    public int Power
+    public double Power
     {
         get => this is UnitCard unit ? Convert.ToInt32(unit.DamageOnField) : Convert.ToInt32(initialDamage);
         set

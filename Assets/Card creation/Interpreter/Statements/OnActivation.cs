@@ -62,6 +62,7 @@ namespace Gwent_Interpreter.Statements
                 }
                 catch(EvaluationError error)
                 {
+                    Debug.Log(item.Item1.Coordinates);
                     Debug.Log(error.Message);
                 }
 
@@ -73,7 +74,6 @@ namespace Gwent_Interpreter.Statements
                 {
                     Debug.Log(error.Message);
                 }
-                if (item.Item2.Coordinates != (0, 0)) item.Item2.Execute(); //postAction
             }
         }
     }

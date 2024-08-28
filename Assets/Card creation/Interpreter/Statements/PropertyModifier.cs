@@ -25,7 +25,8 @@ namespace Gwent_Interpreter.Statements
 
         public bool CheckSemantic(out List<string> errors)
         {
-            value.CheckSemantic(out errors);
+            errors = new List<string>();
+            if(!(value is null)) value.CheckSemantic(out errors);
             if(!validOperations.Contains(operation.Type)) errors.Add($"Invalid declaration at {operation.Coordinates.Item1}:{operation.Coordinates.Item2}");
 
             if (errors.Count > 0) return false;
@@ -46,25 +47,32 @@ namespace Gwent_Interpreter.Statements
             {
                 object value = this.value is null? null : this.value.Evaluate();
 
-                switch (operation.Type)
+                try
                 {
-                    case TokenType.Assign:
-                        type.GetProperty(property.caller.Value).SetValue(callee, value);
-                        break;
-                    case TokenType.Increase:
-                        type.GetProperty(property.caller.Value).SetValue(callee, ((Num)callee).Sum((Num)value));
-                        break;
-                    case TokenType.Decrease:
-                        type.GetProperty(property.caller.Value).SetValue(callee, ((Num)callee).Resta((Num)value));
-                        break;
-                    case TokenType.IncreaseOne:
-                        type.GetProperty(property.caller.Value).SetValue(callee, ((Num)callee).Sum(new Num(1)));
-                        break;
-                    case TokenType.DecreaseOne:
-                        type.GetProperty(property.caller.Value).SetValue(callee, ((Num)callee).Resta(new Num(1)));
-                        break;
-                    default:
-                        throw new EvaluationError($"Invalid declaration at {Coordinates.Item1}:{Coordinates.Item2}");
+                    switch (operation.Type)
+                    {
+                        case TokenType.Assign:
+                            type.GetProperty(property.caller.Value).SetValue(callee, value);
+                            break;
+                        case TokenType.Increase:
+                            type.GetProperty(property.caller.Value).SetValue(callee, ((Num)property.Evaluate()).Sum((Num)value).Value);
+                            break;
+                        case TokenType.Decrease:
+                            type.GetProperty(property.caller.Value).SetValue(callee, ((Num)property.Evaluate()).Resta((Num)value).Value);
+                            break;
+                        case TokenType.IncreaseOne:
+                            type.GetProperty(property.caller.Value).SetValue(callee, ((Num)property.Evaluate()).Sum(new Num(1)).Value);
+                            break;
+                        case TokenType.DecreaseOne:
+                            type.GetProperty(property.caller.Value).SetValue(callee, ((Num)property.Evaluate()).Resta(new Num(1)).Value);
+                            break;
+                        default:
+                            throw new EvaluationError($"Invalid declaration at {Coordinates.Item1}:{Coordinates.Item2}");
+                    }
+                }
+                catch (InvalidCastException)
+                {
+                    throw new EvaluationError($"'{type.GetProperty(property.caller.Value).Name}' is not a number.");
                 }
             }
             else throw new EvaluationError($"Property not found at {property.caller.Coordinates.Item1}:{property.caller.Coordinates.Item2}");
