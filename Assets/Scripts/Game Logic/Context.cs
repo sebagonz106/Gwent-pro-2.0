@@ -15,7 +15,7 @@ public class Context
         this.Board = Board.Instance;
         this.CurrentPlayer = player;
         this.EnemyPlayer = enemy;
-        this.CurrentPosition = this.Board.Weather;
+        this.CurrentPosition = player.Deck;
         this.CurrentCard = Utils.BaseCard;
     }
 

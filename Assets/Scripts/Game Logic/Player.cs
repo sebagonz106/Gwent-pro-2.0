@@ -118,13 +118,14 @@ public class Player
 
         if (cardsToSteal == 0) return false;
 
-        for (int count = cardsToSteal; count > 0; count--)
+        while (cardsToSteal> 0)
         {
             int index = new System.Random().Next(Deck.Count - 1);
             Hand[emptySlotsInHand[0]] = Deck[index];
             Deck[index].AssignPosition(Hand);
             Deck.RemoveAt(index);
             emptySlotsInHand.RemoveAt(0);
+            cardsToSteal--;
         }
 
         return true;
@@ -133,6 +134,13 @@ public class Player
     public bool PlayCard(int originPosition, int targetPosition, Zone rangeType, out bool effectFailed)
     {
         effectFailed = false;
+
+        /* i'm sorry but i have to say it: i f***ing hate Unity. i don't know why, every time i load a compiled card, the context of the player 
+         * that uses it is deleted and when trying to use the effect of the played card, the game breaks. this might be a hell of a patch
+         * but I assure you i haven't found another way and I need this damn thing up and running. forgive my language, i've been looking
+         * for this piece of sh*t error for a week and i was already freaking out. god bless you with a long live without having to use Unity <3
+         */
+        if (context is null) context = new Context(this, Board.Instance.GetCurrentEnemy());
 
         if (!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard || Board.Instance.ValidTurn) //in case of unexpected behaviours. bait cards will be played through their effect
         {
@@ -149,7 +157,15 @@ public class Player
             return false;
         }
 
-        effectFailed = !card.Effect(this.context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
+        try
+        {
+            effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
+        }
+        catch
+        {
+            Effects.GetEffect(card.Name)(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
+            effectFailed = false;
+        }
 
         Board.Instance.ValidTurn = true;
         Board.Instance.UpdateTotalDamage();

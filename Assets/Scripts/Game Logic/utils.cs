@@ -50,6 +50,7 @@ public static class Utils
 
     public static Player GetPlayerByName(string name) => name == "Fidel" ? Player.Fidel : Player.Batista;
     public static Player GetEnemyByName(string name) => name == "Batista" ? Player.Fidel : Player.Batista;
+    public static Player GetEnemyOf(Player player) => Player.Fidel.Equals(player) ? Player.Batista : Player.Fidel;
     public static Dictionary<Faction, Player> PlayerByFaction = new Dictionary<Faction, Player> { { Faction.Fidel, Player.Fidel }, { Faction.Batista, Player.Batista } };
     public static Dictionary<Faction, string> FactionName = new Dictionary<Faction, string> { { Faction.Fidel, "Fidel" }, { Faction.Batista, "Batista" } };
 }

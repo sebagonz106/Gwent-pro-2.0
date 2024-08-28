@@ -162,7 +162,13 @@ public class Board
 
         foreach (Card card in this.Weather) //applies weather effects
         {
-            if (card is WeatherCard weather) weather.WeatherEffect(player.context.UpdatePlayerInstance(this.Weather, weather));
+            if (card is WeatherCard weather)
+            {
+                //same patch as in PlayCard
+                if(weather.Owner.context is null) weather.Owner.context = new Context(weather.Owner, Utils.GetEnemyOf(weather.Owner));
+
+                weather.WeatherEffect(weather.Owner.context.UpdatePlayerInstance(this.Weather, weather));
+            }
         }
 
         for (int i = 0; i < player.Battlefield.Zones.Length; i++)

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class CardsWarehouse
@@ -75,7 +76,7 @@ public static class CardsWarehouse
 
         foreach (var card in list)
             if (card is UnitCard unit && unit.Level is Level.Silver)
-                temp.AddRange(new Card[] { unit, unit });
+                temp.AddRange(Enumerable.Repeat<Card>(unit, 2));
             else if (card is LeaderCard leader)
                 leaders.Add(leader);
 

@@ -25,6 +25,14 @@ public class CardController : MonoBehaviour
 
     public bool IsOccupied { get => isOccupied; set => isOccupied = value; }
 
+    private void Awake() //maybe solves the visual problem on hands first activation
+    {
+        rebelMaterial = Resources.Load<Material>("Compiler prefabs/rebel new card");
+        batistaMaterial = Resources.Load<Material>("Compiler prefabs/batista new card");
+        visual = this.GetComponentInChildren<CompiledCardVisual>();
+        visual.gameObject.SetActive(false);
+    }
+
     private void Start()
     {
         upPosition.x = this.transform.position.x;
@@ -37,11 +45,6 @@ public class CardController : MonoBehaviour
         playerMB = parent.tag.Contains("Batista") ? masterController.board.Batista : masterController.board.Fidel;
         player = playerMB.player;
         indexOfThisInParent = (this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")? 2 - Array.IndexOf(parent.positions, this.gameObject) : Array.IndexOf(parent.positions, this.gameObject);
-
-        rebelMaterial = Resources.Load<Material>("Compiler prefabs/rebel new card");
-        batistaMaterial = Resources.Load<Material>("Compiler prefabs/batista new card");
-        visual = this.GetComponentInChildren<CompiledCardVisual>();
-        visual.gameObject.SetActive(false);
 
         if (this.gameObject.tag == "BattlefieldCard" || this.gameObject.tag == "WeatherCard" || this.gameObject.tag == "BonusCard")
         {
@@ -250,7 +253,11 @@ public class CardController : MonoBehaviour
         }
         else
         {
-            visual.gameObject.SetActive(true);
+            try
+            {
+                visual.gameObject.SetActive(true);
+            }
+            catch { Debug.Log(this.name); }
             visual.UpdateInfo(card);
             gameObject.GetComponent<Renderer>().material = (card.FactionEnum is Faction.Fidel)? rebelMaterial : batistaMaterial;
         }

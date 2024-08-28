@@ -23,17 +23,7 @@ public static class Effects
     };
 
     public static void AddEffect(string name, Effect effect) { effects.Add(name, effect); }
-    public static Effect GetEffect(string name)
-    {
-        try
-        {
-            return effects[name];
-        }
-        catch (System.ArgumentOutOfRangeException)
-        {
-            return effects["Empty"];
-        }
-    }
+    public static Effect GetEffect(string name) => effects.ContainsKey(name) ? effects[name] : effects["Empty"];
     #endregion
 
     #region Rebel effects
