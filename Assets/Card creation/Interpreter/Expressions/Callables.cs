@@ -72,11 +72,37 @@ namespace Gwent_Interpreter.Expressions
             this.arguments = arguments;
         }
 
-        public override bool CheckSemantic (out List<string> error) => throw new Warning($"You must make sure object at {caller.Coordinates.Item1}:{caller.Coordinates.Item2 - 1} contains the requested method or a compile time error may occur");
+        public override bool CheckSemantic (out List<string> errors)
+        {
+            errors = new List<string>();
+            string warning = $"You must make sure object at {caller.Coordinates.Item1}:{caller.Coordinates.Item2 - 1} contains the requested method or a compile time error may occur.\n";
+            try
+            {
+                callee.CheckSemantic(out errors);
+            }
+            catch (Warning) { }
 
+            if(!(arguments is null)) foreach (var item in arguments)
+                {
+                    try
+                    {
+                        if (!item.CheckSemantic(out string error)) errors.Add(error);
+                    }
+                    catch(Warning warn) { warning += warn.Message + '\n'; }
+                }
+
+            if (errors.Count > 0) return false;
+            else throw new Warning(warning);
+        }
         public override object Evaluate()
         {
             object callee = this.callee.Evaluate();
+            object[] arguments = new object[this.arguments.Length];
+
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                arguments[i] = this.arguments[i].Evaluate();
+            }
 
             Type type;
             if (callee is GwentList) type = typeof(GwentList);

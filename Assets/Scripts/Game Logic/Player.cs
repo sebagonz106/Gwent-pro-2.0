@@ -121,15 +121,14 @@ public class Player
         while (cardsToSteal> 0)
         {
             int index = new System.Random().Next(Deck.Count - 1);
-            Hand[emptySlotsInHand[0]] = Deck[index];
-            Deck[index].AssignPosition(Hand);
+            AddToHand(Deck[index]);
             Deck.RemoveAt(index);
-            emptySlotsInHand.RemoveAt(0);
             cardsToSteal--;
         }
 
         return true;
     }
+
 
     public bool PlayCard(int originPosition, int targetPosition, Zone rangeType, out bool effectFailed)
     {
@@ -173,10 +172,28 @@ public class Player
         return true;
     }
 
+    public void AddToHand(Card card)
+    {
+        if (emptySlotsInHand.Count == 0) return;
+
+        Hand[emptySlotsInHand[0]] = card;
+        card.AssignPosition(Hand);
+        emptySlotsInHand.RemoveAt(0);
+    }
+
     public void EmptyHandAt(int index)
     {
         this.emptySlotsInHand.Add(index);
         this.Hand[index] = Utils.BaseCard;
+    }
+
+    public void UpdateEmptySlots()
+    {
+        emptySlotsInHand = new List<int>(10);
+        for (int i = 0; i < Hand.Count; i++)
+        {
+            if (Hand[i].Equals(Utils.BaseCard)) emptySlotsInHand.Add(i);
+        }
     }
 
     public static void Reset()

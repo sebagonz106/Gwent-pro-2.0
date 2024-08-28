@@ -42,15 +42,12 @@ namespace Gwent_Interpreter.Utils
 
         public void Remove(Card card)
         {
-            if (player is null)
-            {
-                (card.FactionEnum == Faction.Fidel ? Player.Fidel.Battlefield : Player.Batista.Battlefield).ToGraveyard(card);
-            }
-            else player.Battlefield.ToGraveyard(card);
-            list.Remove(card);
+            if (player is null) player = card.FactionEnum == Faction.Fidel ? Player.Fidel : Player.Batista;
+
+            player.Battlefield.ToGraveyard(card);
         }
         public GwentList Find(Predicate<Card> predicate) => new GwentList(list.FindAll(predicate), player);
-        public void Push(Card card) => list.Add(card);
+        public void Push(Card card) => Insert(list.Count-1, card);
         public Card Pop()
         {
             Card card = list[list.Count - 1];
@@ -70,29 +67,51 @@ namespace Gwent_Interpreter.Utils
                 list[i] = swapCard;
             }
         }
-        public void SendBottom(Card card) => list.Insert(0, card);
+        public void SendBottom(Card card) => Insert(0, card);
 
         public int IndexOf(Card item) => list.IndexOf(item);
 
-        public void Insert(int index, Card item) => list.Insert(index, item);
-
-        public void RemoveAt(int index)
+        public void Insert(int index, Card item)
         {
-            if (player is null)
+            if (list[index].Name == "Empty") list[index] = item;
+            else
             {
-                (list[index].FactionEnum == Faction.Fidel ? Player.Fidel.Battlefield : Player.Batista.Battlefield).ToGraveyard(list[index]);
+                Card temp = list[index];
+                list[index] = item;
+                MyAdd(temp, index+1);
             }
-            else player.Battlefield.ToGraveyard(list[index]);
 
-            list.RemoveAt(index);
+            if (player is null) player = list[index].FactionEnum == Faction.Fidel ? Player.Fidel : Player.Batista;
+            if (list.Equals(player.Hand)) player.UpdateEmptySlots();
         }
+
+        public void RemoveAt(int index) => Remove(list[index]);
+
+        public void Insert(Num num, Card card) => Insert(Convert.ToInt32(num.Value), card);
+
+        public void RemoveAt(Num num) => RemoveAt(Convert.ToInt32(num.Value));
 
         public void Add(Card item)
         {
-            throw new NotImplementedException();
+            if (!(player is null) && player.Hand.Equals(list)) player.AddToHand(item);
+            else MyAdd(item);
         }
 
-        public void Clear() => list.Clear();
+        void MyAdd(Card item, int startIndex=0)
+        {
+            for (int i = startIndex; i - startIndex < list.Count; i++)
+            {
+                if (list[i % list.Count].Name == "Empty") { list[i % list.Count] = item; break; }
+            }
+        }
+
+        public void Clear()
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                Remove(list[i]);
+            }
+        }
 
         public bool Contains(Card item) => list.Contains(item);
 
