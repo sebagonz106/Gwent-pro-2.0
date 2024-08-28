@@ -45,7 +45,8 @@ namespace Gwent_Interpreter.Expressions
             object callee = this.callee.Evaluate();
 
             Type type;
-            if (callee is GwentList) type = typeof(GwentList);
+            if (callee is GwentInterpreterContext) type = typeof(GwentInterpreterContext);
+            else if (callee is GwentList) type = typeof(GwentList);
             else if (callee is Card) type = typeof(Card);
             else if (callee is Str) type = typeof(Str);
             else if (callee is Num) type = typeof(Num);
@@ -105,7 +106,8 @@ namespace Gwent_Interpreter.Expressions
             }
 
             Type type;
-            if (callee is GwentList) type = typeof(GwentList);
+            if (callee is GwentInterpreterContext) type = typeof(GwentInterpreterContext);
+            else if (callee is GwentList) type = typeof(GwentList);
             else if (callee is Card) type = typeof(Card);
             else if (callee is Str) type = typeof(Str);
             else if (callee is Num) type = typeof(Num);
