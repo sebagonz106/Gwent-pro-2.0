@@ -46,7 +46,8 @@ namespace Gwent_Interpreter
         }
         public void Delete(Token variable)
         {
-            //...
+            if (usedVariables.ContainsKey(variable.Value)) usedVariables.Remove(variable.Value);
+            else if (SearchInParents(variable.Value)) parent.Delete(variable);
         }
         public IExpression this[string name]
         {

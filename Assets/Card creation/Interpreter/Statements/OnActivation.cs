@@ -56,24 +56,8 @@ namespace Gwent_Interpreter.Statements
         {
             foreach (var item in effects)
             {
-                try
-                {
-                    item.Item1.Execute();
-                }
-                catch(EvaluationError error)
-                {
-                    Debug.Log(item.Item1.Coordinates);
-                    Debug.Log(error.Message);
-                }
-
-                try
-                {
-                    if (item.Item2.Coordinates != (0, 0)) item.Item2.Execute(); //postAction
-                }
-                catch (EvaluationError error)
-                {
-                    Debug.Log(error.Message);
-                }
+                item.Item1.Execute();
+                if (item.Item2.Coordinates != (0, 0)) item.Item2.Execute(); //postAction
             }
         }
     }

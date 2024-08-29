@@ -98,14 +98,12 @@ namespace Gwent_Interpreter.Expressions
         }
         public override object Evaluate()
         {
-            Debug.Log(caller);
             object callee = this.callee.Evaluate();
-            object[] arguments = new object[this.arguments.Length];
+            object[] arguments = new object[this.arguments is null? 0 : this.arguments.Length];
 
             for (int i = 0; i < arguments.Length; i++)
             {
                 arguments[i] = this.arguments[i].Evaluate();
-                Debug.Log(arguments[i].ToString());
             }
 
             Type type;
@@ -127,7 +125,7 @@ namespace Gwent_Interpreter.Expressions
                 method = type.GetMethod(caller.Value, new Type[0]);
             }
 
-            if (method is null) throw new EvaluationError($"Method not found at {caller.Coordinates.Item1}:{caller.Coordinates.Item2}");
+            if (method is null) throw new EvaluationError($"Method '" +caller.Value + $"' not found at {caller.Coordinates.Item1}:{caller.Coordinates.Item2}");
             else
             {
                 try

@@ -39,18 +39,7 @@ namespace Gwent_Interpreter.Statements
 
         public void Execute()
         {
-            foreach (var item in stmts)
-            {
-                try
-                {
-                    Debug.Log(item.Coordinates + " " + item.ToString());
-                    item.Execute();
-                }
-                catch(Exception exc)
-                {
-                    Debug.Log(exc.Message);
-                }
-            }
+            foreach (var item in stmts) item.Execute();
         }
     }
 }

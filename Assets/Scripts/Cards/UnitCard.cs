@@ -34,7 +34,7 @@ public class UnitCard : Card
     public void ModifyOnFieldDamage(double newDamage, bool modifyCurrentDamageAsWell = true)
     {
         // damageOnField - damage = modification suffered on board 
-        if (modifyCurrentDamageAsWell) this.Damage = (newDamage - (this.damageOnField - this.Damage) > 0 ? newDamage - (this.damageOnField - this.Damage) : 0);
+        if (modifyCurrentDamageAsWell) this.Damage = (newDamage - this.damageOnField + this.Damage > 0) ? (newDamage - this.damageOnField + this.Damage) : 0;
 
         this.damageOnField = newDamage;
     }

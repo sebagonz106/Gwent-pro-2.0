@@ -156,15 +156,7 @@ public class Player
             return false;
         }
 
-        try
-        {
-            effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
-        }
-        catch
-        {
-            Effects.GetEffect(card.Name)(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
-            effectFailed = false;
-        }
+        effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
 
         Board.Instance.ValidTurn = true;
         Board.Instance.UpdateTotalDamage();

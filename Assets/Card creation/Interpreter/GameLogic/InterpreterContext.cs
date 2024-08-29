@@ -9,12 +9,11 @@ namespace Gwent_Interpreter.GameLogic
 {
     public class GwentInterpreterContext : IExpression
     {
-        public Dictionary<Faction, Player> Players;
+        public static IEnumerable<Player> Players() { yield return Player.Fidel; yield return Player.Batista; }
         Board board;
 
         GwentInterpreterContext()
         {
-            Players = new Dictionary<Faction, Player> { { Faction.Fidel, Player.Fidel }, { Faction.Batista, Player.Batista } };
             board = Getter.BoardInstance;
         }
 
@@ -47,7 +46,7 @@ namespace Gwent_Interpreter.GameLogic
             get
             {
                 List<Card> list = new List<Card>();
-                foreach (var player in Players.Values)
+                foreach (var player in Players())
                 {
                     list.AddRange(player.Battlefield.CardsInBattlefield);
                 }

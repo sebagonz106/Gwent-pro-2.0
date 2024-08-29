@@ -40,8 +40,9 @@ namespace Gwent_Interpreter.Statements
             {
                 environment.Set(item, new ObjectAtom(collection.Current, (-1,-1)));
                 body.Execute();
-                environment.Delete(item);
             }
+
+            environment.Delete(item);
         }
 
         public bool CheckSemantic(out List<string> errors)

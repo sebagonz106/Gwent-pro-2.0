@@ -25,11 +25,12 @@ public class Battlefield
     #region Clearing methods
     public void ToGraveyard(Card card, List<Card> list)
     {
-        if (card.Equals(Utils.BaseCard)) return;
+        if (card.Equals(Utils.BaseCard) || list.Equals(Graveyard)) return;
 
         Graveyard.Add(card);
         card.AssignPosition(Graveyard);
         if (list.Equals(this.playerThatOwnsThisBattlefield.Hand)) this.playerThatOwnsThisBattlefield.EmptyHandAt(list.IndexOf(card));
+        else if (list.Equals(this.playerThatOwnsThisBattlefield.Deck)) this.playerThatOwnsThisBattlefield.Deck.Remove(card);
         else
         {
             if (card is ClearCard) RemoveClearEffect(Utils.IndexByZone[this.playerThatOwnsThisBattlefield.ZoneByList[list]]);
@@ -164,21 +165,34 @@ public class Battlefield
             List<Card> list = new List<Card>();
             foreach (var zone in Zones)
             {
-                list.AddRange(zone);
+                foreach (var item in zone)
+                {
+                    if (!item.Equals(Utils.BaseCard)) list.Add(item);
+                }
             }
-            list.AddRange(Bonus);
+            foreach (var item in Bonus)
+            {
+                if (!item.Equals(Utils.BaseCard)) list.Add(item);
+            }
             foreach (var card in Board.Instance.Weather)
             {
-                if (card is ICardsWithOwner common && common.Owner == playerThatOwnsThisBattlefield) list.Add(card);
+                if (!card.Equals(Utils.BaseCard) && card is ICardsWithOwner common && common.Owner.Equals(playerThatOwnsThisBattlefield)) list.Add(card);
             }
             return list;
         }
     }
     public void ToGraveyard(Card card)
     {
-        if (Bonus.Contains(card)) this.ToGraveyard(card, Bonus);
-        else if (Board.Instance.Weather.Contains(card)) this.ToGraveyard(card, Board.Instance.Weather);
-        else foreach (var zone in Zones) if (zone.Contains(card)) this.ToGraveyard(card, zone);
+        if (card.CurrentPosition is null)
+        {
+            if (Bonus.Contains(card)) this.ToGraveyard(card, Bonus);
+            else if (Board.Instance.Weather.Contains(card)) this.ToGraveyard(card, Board.Instance.Weather);
+            else if (playerThatOwnsThisBattlefield.Hand.Contains(card)) this.ToGraveyard(card, playerThatOwnsThisBattlefield.Hand);
+            else if (playerThatOwnsThisBattlefield.Deck.Contains(card)) this.ToGraveyard(card, playerThatOwnsThisBattlefield.Deck);
+            else foreach (var zone in Zones) if (zone.Contains(card)) this.ToGraveyard(card, zone);
+            //if card is already in graveyard, it will stay there
+        }
+        else ToGraveyard(card, card.CurrentPosition);
     }
 
     bool Compare(double a, bool biggest, double b) => biggest ? a > b : a < b;
