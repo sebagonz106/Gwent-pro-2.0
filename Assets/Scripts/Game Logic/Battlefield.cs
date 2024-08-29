@@ -181,6 +181,6 @@ public class Battlefield
         else foreach (var zone in Zones) if (zone.Contains(card)) this.ToGraveyard(card, zone);
     }
 
-    bool Compare(double a, bool biggestOrSmallest, double b) => biggestOrSmallest ? a > b : a < b;
+    bool Compare(double a, bool biggest, double b) => biggest ? a > b : a < b;
     #endregion
 }

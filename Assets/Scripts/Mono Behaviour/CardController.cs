@@ -246,18 +246,15 @@ public class CardController : MonoBehaviour
         IsOccupied = true;
         if (name.Contains("Hand")) this.rangeTypes = card.AvailableRange;
 
-        if(card.Info.Main is null) 
+        if(card.Info.Main is null)
         {
+            visual.gameObject.SetActive(false);
             this.gameObject.GetComponent<Renderer>().material = card.Info.Material;
             Info = card.Info.Information;
         }
         else
         {
-            try
-            {
-                visual.gameObject.SetActive(true);
-            }
-            catch { Debug.Log(this.name); }
+            visual.gameObject.SetActive(true);
             visual.UpdateInfo(card);
             gameObject.GetComponent<Renderer>().material = (card.FactionEnum is Faction.Fidel)? rebelMaterial : batistaMaterial;
         }

@@ -15,7 +15,7 @@ namespace Gwent_Interpreter.GameLogic
         GwentInterpreterContext()
         {
             Players = new Dictionary<Faction, Player> { { Faction.Fidel, Player.Fidel }, { Faction.Batista, Player.Batista } };
-            board = BoardGetter.BoardInstance;
+            board = Getter.BoardInstance;
         }
 
         static GwentInterpreterContext context;

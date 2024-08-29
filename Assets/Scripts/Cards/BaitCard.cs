@@ -25,9 +25,8 @@ public class BaitCard : Card
     {
         Card card = list[index];
         if (card is BaitCard) return false;
-        list[index] = this;
-        Debug.Log(Owner.Hand.IndexOf(this));
         Owner.Hand[Owner.Hand.IndexOf(this)] = card;
+        list[index] = this;
         card.AssignPosition(Owner.Hand);
         if (card is UnitCard unit) unit.InitializeDamage(); //in case any permanent effects were applied on this card
         else if (card is ClearCard) Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[Owner.ZoneByList[list]]);

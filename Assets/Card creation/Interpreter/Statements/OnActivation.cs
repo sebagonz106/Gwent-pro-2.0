@@ -52,7 +52,7 @@ namespace Gwent_Interpreter.Statements
             return errors.Count == 0;
         }
 
-        public void Execute()
+        public void Execute() //falla al jugar la carta luego de recuperarla con un señuelo, intentar resetear el scope despues de la ejecucion
         {
             foreach (var item in effects)
             {

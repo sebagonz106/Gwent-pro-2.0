@@ -32,7 +32,7 @@ namespace Gwent_Interpreter
             }
         }
 
-        public void ResetGlobal() { global = new Environment(); }
+        public static void ResetGlobal() { global = new Environment(); }
         public void Set(Token variable, IExpression value)
         {
             if (variable.Value == "context") throw new ParsingError($"'context' is a reserved keyword, change it at {variable.Coordinates.Item1}:{variable.Coordinates.Item2}");
@@ -43,6 +43,10 @@ namespace Gwent_Interpreter
             }
             else if (SearchInParents(variable.Value)) ModifyInParents(variable.Value, value);
             else this.usedVariables.Add(variable.Value, value);
+        }
+        public void Delete(Token variable)
+        {
+            //...
         }
         public IExpression this[string name]
         {

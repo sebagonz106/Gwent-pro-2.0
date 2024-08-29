@@ -47,10 +47,10 @@ public static class Utils
 
     public static string[] ZonesName = { "Weather", "Batista Bonus", "Batista Melee", "Batista Range", "Batista Siege", "Fidel Bonus", "Fidel Melee", "Fidel Range", "Fidel Siege" };
     public static Dictionary<Zone, int> IndexByZone = new Dictionary<Zone, int> { { Zone.Melee, 0 }, { Zone.Range, 1 }, { Zone.Siege, 2 } };
+    public static Dictionary<Faction, string> FactionName = new Dictionary<Faction, string> { { Faction.Fidel, "Fidel" }, { Faction.Batista, "Batista" } };
 
+    public static Player GetPlayerByFaction(Faction faction) => faction is Faction.Fidel ? Player.Fidel : Player.Batista;
     public static Player GetPlayerByName(string name) => name == "Fidel" ? Player.Fidel : Player.Batista;
     public static Player GetEnemyByName(string name) => name == "Batista" ? Player.Fidel : Player.Batista;
     public static Player GetEnemyOf(Player player) => Player.Fidel.Equals(player) ? Player.Batista : Player.Fidel;
-    public static Dictionary<Faction, Player> PlayerByFaction = new Dictionary<Faction, Player> { { Faction.Fidel, Player.Fidel }, { Faction.Batista, Player.Batista } };
-    public static Dictionary<Faction, string> FactionName = new Dictionary<Faction, string> { { Faction.Fidel, "Fidel" }, { Faction.Batista, "Batista" } };
 }

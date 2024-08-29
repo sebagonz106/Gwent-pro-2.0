@@ -149,7 +149,12 @@ namespace Gwent_Interpreter.Statements
         public void Execute()
         {
             if (!receivedTargetsAndParams) throw new EvaluationError($"Trying to run \"{name.Evaluate()}\" effect whitout assigning parameters properly");
-            else action.Execute();
+            else
+            {
+                Environment temp = environment;
+                action.Execute();
+                environment = temp;
+            }
         }
 
         public static void Reset()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace Gwent_Interpreter.Statements
 {
@@ -40,7 +41,15 @@ namespace Gwent_Interpreter.Statements
         {
             foreach (var item in stmts)
             {
-                item.Execute();
+                try
+                {
+                    Debug.Log(item.Coordinates + " " + item.ToString());
+                    item.Execute();
+                }
+                catch(Exception exc)
+                {
+                    Debug.Log(exc.Message);
+                }
             }
         }
     }

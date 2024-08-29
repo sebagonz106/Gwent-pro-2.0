@@ -17,7 +17,7 @@ public class Card : IEffect, ICardsWithOwner
 
     public double Power
     {
-        get => this is UnitCard unit ? Convert.ToInt32(unit.DamageOnField) : Convert.ToInt32(initialDamage);
+        get => this is UnitCard unit ? unit.DamageOnField : initialDamage;
         set
         {
             if (this is UnitCard unit) unit.ModifyOnFieldDamage(value);
@@ -26,7 +26,7 @@ public class Card : IEffect, ICardsWithOwner
 
     public string Faction => Utils.FactionName[FactionEnum];
 
-    public Player Owner => Utils.PlayerByFaction[FactionEnum];
+    public Player Owner => Utils.GetPlayerByFaction(FactionEnum);
 
     public double InitialDamage { get => initialDamage;}
 

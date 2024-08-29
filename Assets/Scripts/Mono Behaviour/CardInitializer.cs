@@ -30,6 +30,8 @@ public class CardInitializer : MonoBehaviour
 
         cards.RemoveRange(25, cards.Count-25);
         player.Deck.AddRange(this.cards);
+
+        foreach (var item in cards) Debug.Log(item.Name);
     }
 
     private void OnMouseDown()

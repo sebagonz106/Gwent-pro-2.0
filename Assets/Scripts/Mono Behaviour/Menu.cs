@@ -10,6 +10,7 @@ public class Menu : MonoBehaviour
 
     public void LocalMultiplayer()
     {
+        Player.Reset();
         if (fidel.CheckStartGame() && batista.CheckStartGame()) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
     public void Exit()

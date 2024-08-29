@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace Gwent_Interpreter.Utils
 {
@@ -17,7 +18,7 @@ namespace Gwent_Interpreter.Utils
 
         Card IList<Card>.this[int index] { get => list[index]; set => list[index] = value; }
 
-        public GwentList(List<Card> list, Player player = null)
+        public GwentList(List<Card> list, Player player = null) //fix so that EmptyCards are omited
         {
             this.list = list;
             if (player is null) board = Board.Instance;
@@ -44,14 +45,25 @@ namespace Gwent_Interpreter.Utils
         {
             if (player is null) player = card.FactionEnum == Faction.Fidel ? Player.Fidel : Player.Batista;
 
+            Debug.Log(card.Name);
             player.Battlefield.ToGraveyard(card);
         }
         public GwentList Find(Predicate<Card> predicate) => new GwentList(list.FindAll(predicate), player);
         public void Push(Card card) => Insert(list.Count-1, card);
         public Card Pop()
         {
-            Card card = list[list.Count - 1];
-            list.RemoveAt(list.Count - 1);
+            Card card = null;
+            for (int i = list.Count-1; i >= 0; i--)
+            {
+                card = list[i];
+                if (card.Equals(Getter.BaseCard)) continue;
+                else
+                {
+                    list[i] = Getter.BaseCard;
+                    break;
+                }
+            }
+            Debug.Log(card.Name);
             return card;
         }
         public void Shuffe()
@@ -59,13 +71,17 @@ namespace Gwent_Interpreter.Utils
             int randomNumber;
             Card swapCard;
 
+            Debug.Log("sb");
+
             for (int i = list.Count - 1; i >= 0; i--)
             {
                 randomNumber = (new System.Random()).Next(list.Count - 1);
                 swapCard = list[randomNumber];
                 list[randomNumber] = list[i];
                 list[i] = swapCard;
+                Debug.Log(swapCard.Name);
             }
+            Debug.Log("se");
         }
         public void SendBottom(Card card) => Insert(0, card);
 
@@ -73,6 +89,9 @@ namespace Gwent_Interpreter.Utils
 
         public void Insert(int index, Card item)
         {
+            if (item.Equals(Getter.BaseCard)) return;
+            Debug.Log(item.Name);
+            Debug.Log(index);
             if (list[index].Name == "Empty") list[index] = item;
             else
             {
@@ -93,14 +112,17 @@ namespace Gwent_Interpreter.Utils
 
         public void Add(Card item)
         {
-            if (!(player is null) && player.Hand.Equals(list)) player.AddToHand(item);
+            if (item.Equals(Getter.BaseCard)) return;
+            else if (!(player is null) && player.Hand.Equals(list)) player.AddToHand(item);
             else MyAdd(item);
         }
 
         void MyAdd(Card item, int startIndex=0)
         {
+            Debug.Log(item.Name);
             for (int i = startIndex; i - startIndex < list.Count; i++)
             {
+                Debug.Log(i % list.Count);
                 if (list[i % list.Count].Name == "Empty") { list[i % list.Count] = item; break; }
             }
         }

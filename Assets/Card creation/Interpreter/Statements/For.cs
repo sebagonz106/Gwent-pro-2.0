@@ -40,6 +40,7 @@ namespace Gwent_Interpreter.Statements
             {
                 environment.Set(item, new ObjectAtom(collection.Current, (-1,-1)));
                 body.Execute();
+                environment.Delete(item);
             }
         }
 

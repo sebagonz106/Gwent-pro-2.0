@@ -4,6 +4,7 @@ using System.Text;
 using System.Reflection;
 using Gwent_Interpreter.GameLogic;
 using Gwent_Interpreter.Utils;
+using UnityEngine;
 
 namespace Gwent_Interpreter.Expressions
 {
@@ -97,12 +98,14 @@ namespace Gwent_Interpreter.Expressions
         }
         public override object Evaluate()
         {
+            Debug.Log(caller);
             object callee = this.callee.Evaluate();
             object[] arguments = new object[this.arguments.Length];
 
             for (int i = 0; i < arguments.Length; i++)
             {
                 arguments[i] = this.arguments[i].Evaluate();
+                Debug.Log(arguments[i].ToString());
             }
 
             Type type;
