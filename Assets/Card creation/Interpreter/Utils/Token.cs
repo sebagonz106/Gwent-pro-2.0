@@ -28,7 +28,7 @@ namespace Gwent_Interpreter
         {
             //Native DLS keywords:
             {"card",  TokenType.Card}, {"effect",  TokenType.EffectDeclaration}, {"Effect",  TokenType.EffectParam}, {"Name",  TokenType.Name}, {"Params",  TokenType.Params},
-            {"Action",  TokenType.Action}, {"Type",  TokenType.Type}, {"Faction",  TokenType.Faction}, {"Power",  TokenType.Power}, {"Range",  TokenType.Range},
+            {"Action",  TokenType.Action}, {"Type",  TokenType.Type}, {"Faction",  TokenType.Faction}, {"Power",  TokenType.Power}, {"Range",  TokenType.Range}, {"Description",  TokenType.Description},
             {"OnActivation",  TokenType.OnActivation}, {"Selector",  TokenType.Selector}, {"Source",  TokenType.Source}, {"Single",  TokenType.Single},
             {"Predicate",  TokenType.Predicate}, {"PostAction",  TokenType.PostAction},
             //Common expressions:
@@ -53,7 +53,7 @@ namespace Gwent_Interpreter
     public enum TokenType
     {
         //Native DLS keywords:
-        Card, EffectDeclaration, EffectParam, Name, Params, Amount, Action, Type, Faction, Power, Range, OnActivation, Selector, Source, Single, Predicate, PostAction,
+        Card, EffectDeclaration, EffectParam, Name, Params, Amount, Action, Type, Faction, Power, Range, Description, OnActivation, Selector, Source, Single, Predicate, PostAction,
         //Common expressions:
         Number, String, If, Else, For, In, While, Lambda, End, Log,
         //Separation symbols:

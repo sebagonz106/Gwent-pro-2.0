@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 
 namespace Gwent_Interpreter.Utils
 {
@@ -74,7 +73,6 @@ namespace Gwent_Interpreter.Utils
                 }
             }
 
-            Debug.Log(card.Name);
             return card;
         }
         public void Shuffle()

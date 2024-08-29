@@ -13,6 +13,7 @@ namespace Gwent_Interpreter.Statements
         IExpression faction;
         List<IExpression> range;
         IExpression damage;
+        IExpression description;
         OnActivation onActivation;
         public string Code { get; }
 
@@ -21,7 +22,7 @@ namespace Gwent_Interpreter.Statements
 
         public static Dictionary<string, string> CardDeclaration => cardDeclaration; 
 
-        public CardStatement((int, int) coordinates, IExpression type, IExpression name, IExpression faction, List<IExpression> range, IExpression damage, OnActivation onActivation, string code)
+        public CardStatement((int, int) coordinates, IExpression type, IExpression name, IExpression faction, List<IExpression> range, IExpression damage, IExpression description, OnActivation onActivation, string code)
         {
             this.coordinates = coordinates;
             this.type = type;
@@ -29,6 +30,7 @@ namespace Gwent_Interpreter.Statements
             this.faction = faction;
             this.range = range;
             this.damage = damage;
+            this.description = description;
             this.onActivation = onActivation;
             Code = code;
         }
@@ -138,6 +140,8 @@ namespace Gwent_Interpreter.Statements
                 default:
                     throw new EvaluationError("Invalid type declared" + position + " (types include: \"Oro\", \"Plata\", \"Clima\", \"Aumento\", \"Despeje\", \"Señuelo\"), \"Lider\")"); //i'm sorry about the spanglish, but ustedes made me hacerlo
             }
+
+            if (!(description is null)) cards[cards.Count - 1].AssignDescription(((Str)description.Evaluate()).Value);
 
             if (!(onActivation is null)) cards[cards.Count - 1].AssignEffect((Context context) => {
                 try

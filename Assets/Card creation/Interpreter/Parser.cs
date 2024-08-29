@@ -166,6 +166,7 @@ namespace Gwent_Interpreter
             IExpression faction = null;
             List<IExpression> range = new List<IExpression>();
             IExpression power = null;
+            IExpression description = null;
             OnActivation onActivation = null;
 
             do
@@ -181,6 +182,8 @@ namespace Gwent_Interpreter
                     else if (MatchAndMove(TokenType.Faction)) faction = AssignExpression(faction is null, "faction");
 
                     else if (MatchAndMove(TokenType.Power)) power = AssignExpression(power is null, "power");
+
+                    else if (MatchAndMove(TokenType.Description)) description = AssignExpression(description is null, "description");
 
                     else if (MatchAndMove(TokenType.Range)) //can be called several times
                     {
@@ -235,7 +238,7 @@ namespace Gwent_Interpreter
             if (faction is null) throw new ParsingError("Invalid card declaration at " + coordinates.Item1 + ":" + coordinates.Item2 + " (A faction must be declared)");
             if (range is null) throw new ParsingError("Invalid card declaration at " + coordinates.Item1 + ":" + coordinates.Item2 + " (An range must be declared)");
 
-            return new CardStatement(coordinates, type, name, faction, range, power, onActivation, GiveAndResetInputValue());
+            return new CardStatement(coordinates, type, name, faction, range, power, description, onActivation, GiveAndResetInputValue());
         }
 
         (EffectActivation, EffectActivation) EffectAssignation()
@@ -775,7 +778,7 @@ namespace Gwent_Interpreter
 
         IExpression AssignExpression(bool condition, string name)
         {
-            if (!condition) throw new ParsingError("A" + name + " has already been declared" + positionForErrorBuilder);
+            if (!condition) throw new ParsingError("A" + name + " has already been declared " + positionForErrorBuilder);
 
             IExpression newExpr = null;
 

@@ -4,7 +4,6 @@ using System.Text;
 using System.Reflection;
 using Gwent_Interpreter.GameLogic;
 using Gwent_Interpreter.Utils;
-using UnityEngine;
 
 namespace Gwent_Interpreter.Expressions
 {

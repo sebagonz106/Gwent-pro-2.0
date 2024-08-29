@@ -263,6 +263,7 @@ public class CardController : MonoBehaviour
     public void Desoccupy()
     {
         gameObject.GetComponent<Renderer>().material = Utils.BaseCard.Info.Material;
+        this.Info = null;
         IsOccupied = false;
         if(!(visual is null)) visual.gameObject.SetActive(false);
     }

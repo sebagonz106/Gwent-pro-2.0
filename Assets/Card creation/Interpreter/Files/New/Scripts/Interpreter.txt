@@ -91,7 +91,7 @@ Source: "parent",
 
 Single: false,
 
-Predicate: (unit) => unit.Power < 7
+Predicate: (unit) => unit.Power <= 2
 }
 
 }
