@@ -40,7 +40,7 @@ public static class Utils
     {
         get
         {
-            if(baseCard.Info is null) baseCard.AssignInfo(new VisualInfo(Resources.Load<Material>("DiselectedBattlefieldCard"), null));
+            if(baseCard.Info is null) baseCard.AssignInfo(new VisualInfo(Resources.Load<Material>("DiselectedBattlefieldCard"), null, "base"));
             return baseCard;
         }
     }

@@ -8,16 +8,43 @@ public class VisualInfo
     public Material Material { get; private set; }
     public Sprite Information { get; private set; }
 
-    public VisualInfo(Material material, Sprite information)
+    public VisualInfo(Material material, Sprite information, string faction)
     {
-        this.Material = material;
-        this.Information = information;
+        if (faction != "base" && (material is null || information is null)) this.Receive(GetRandomInfo(faction));
+        else
+        {
+            this.Material = material;
+            this.Information = information;
+        }
     }
 
-    public VisualInfo(Sprite main, Sprite information)
+    public VisualInfo(Sprite main, Sprite information, string faction)
     {
-        Main = main;
-        Information = information;
+        if (main is null || information is null) this.Receive(GetRandomInfo(faction));
+        else
+        {
+            Main = main;
+            Information = information;
+        }
+    }
+
+    public VisualInfo(Sprite main, string faction)
+    {
+        if (main is null) this.Receive(GetRandomInfo(faction));
+        else
+        {
+            Main = Information = main;
+        }
+    }
+
+    static VisualInfo GetRandomInfo(string faction) => new VisualInfo(Resources.Load<Sprite>("Random/" + faction + "/" + Random.Range(1, 17)), faction);
+    //17 is the amount of random pictures selected. in case of adding pictures, this number must be changed.
+
+    void Receive(VisualInfo visualInfo)
+    {
+        this.Material = visualInfo.Material;
+        this.Main = visualInfo.Main;
+        this.Information = visualInfo.Information;
     }
 }
 

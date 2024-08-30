@@ -22,18 +22,9 @@ public class PlayerMB : MonoBehaviour
         if (PlayerPrefs.GetString(Name + " Leader") == "") player.Leader = Name == "Batista" ? Player.Leaders["Francisco Tabernilla"] : Player.Leaders["Ernesto Che Guevara"];
         else player.Leader = Player.Leaders[PlayerPrefs.GetString(Name + " Leader")];
 
-        if (player.Leader.Info is null)
-        {
-            try
-            {
-                player.Leader.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{Name}/{player.Leader.Name}"),
-                                                        Resources.Load<Sprite>($"Info/{Name}/{player.Leader.Name}")));
-            }
-            catch (System.NullReferenceException)
-            {
-                player.Leader.AssignInfo(CardInitializer.GetRandomInfo(player.Leader.Faction));
-            }
-        }
+        if (player.Leader.Info is null) player.Leader.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{Name}/{player.Leader.Name}"),
+                                                                                Resources.Load<Sprite>($"Info/{Name}/{player.Leader.Name}"), 
+                                                                                player.Leader.Faction));
     }
 
     private void Start()

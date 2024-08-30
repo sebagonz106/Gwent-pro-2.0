@@ -21,7 +21,7 @@ public class CompiledCardVisual : MonoBehaviour
         cardName.text = card.Name;
         damage.text = card.InitialDamage.ToString();
         description.text = card.Description;
-        mainImage.sprite = card.Info.Main is null ? card.Info.Information : card.Info.Main;
+        mainImage.sprite = isInfo ? card.Info.Information : card.Info.Main;
 
         if (card.FactionEnum is Faction.Fidel) faction.sprite = SpritesWarehouse.Instance.Rebels;
         else faction.sprite = SpritesWarehouse.Instance.Batista;

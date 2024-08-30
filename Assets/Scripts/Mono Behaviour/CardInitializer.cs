@@ -56,18 +56,8 @@ public class CardInitializer : MonoBehaviour
 
     void AssignInfo(Card card)
     {
-        if(card.Info is null)
-        {
-            try
-            {
-                card.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{playerMB.Name}/{card.Name}"),
-                                               Resources.Load<Sprite>($"Info/{playerMB.Name}/{card.Name}")));
-            }
-            catch (System.NullReferenceException)
-            {
-                card.AssignInfo(GetRandomInfo(card.Faction));
-            }
-        }
+        if(card.Info is null) card.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{playerMB.Name}/{card.Name}"),
+                                                             Resources.Load<Sprite>($"Info/{playerMB.Name}/{card.Name}"), 
+                                                             card.Faction));
     }
-    public static VisualInfo GetRandomInfo(string faction) => throw new System.NotImplementedException();
 }

@@ -20,27 +20,31 @@ public class VisualAssigner
         Sprite mainImage = null;
         Sprite info = null;
 
-        if (save)
+        try
         {
-            mainImage = GetSpriteAt(imagePath, card.Name, true);
-            info = GetSpriteAt(infoPath, card.Name, false);
+            if (save)
+            {
+                mainImage = GetSpriteAt(imagePath, card.Name, true);
+                info = GetSpriteAt(infoPath, card.Name, false);
+            }
+            else
+            {
+                mainImage = GetSpriteAt(savingPath + "\\Main Image\\", card.Name, true, false, ".gwi");
+                info = GetSpriteAt(savingPath + "\\Info\\", card.Name, false, false, ".gwi");
+            }
         }
-        else
-        {
-            mainImage = GetSpriteAt(savingPath + "\\Main Image\\", card.Name, true, false, ".gwi");
-            info = GetSpriteAt(savingPath + "\\Info\\", card.Name, false, false, ".gwi");
-        }
+        catch { }
 
-        if (!(mainImage is null || info is null)) card.AssignInfo(new VisualInfo(mainImage, info));
+        if (!(mainImage is null || info is null)) card.AssignInfo(new VisualInfo(mainImage, info, card.Faction));
     }
 
-    VisualInfo AssignMaterial (Texture2D tex, Sprite info)
+    VisualInfo AssignMaterial (Texture2D tex, Sprite info, string faction)
     {
         Material m = new Material(material)
         {
             mainTexture = tex
         };
-        return new VisualInfo(m, info);
+        return new VisualInfo(m, info, faction);
     }
 
     Sprite GetSpriteAt(string pathWithoutName, string nameWithoutExtension, bool isMainImage, bool saveImage = true, string ext = "")
@@ -51,6 +55,11 @@ public class VisualAssigner
             ext = ".png";
             if (File.Exists(path + ".jpg")) ext = ".jpg";
             else if (File.Exists(path + ".jpeg")) ext = ".jpeg";
+            else if (File.Exists(path + ".bmp")) ext = ".bmp";
+            else if (File.Exists(path + ".svg")) ext = ".svg";
+            else if (File.Exists(path + ".gif")) ext = ".gif";
+            else if (File.Exists(path + ".gwi")) ext = ".gwi";
+            else return null;
         }
         path += ext;
 
