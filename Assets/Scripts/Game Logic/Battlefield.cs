@@ -36,6 +36,8 @@ public class Battlefield
             if (card is ClearCard) RemoveClearEffect(Utils.IndexByZone[this.playerThatOwnsThisBattlefield.ZoneByList[list]]);
             list[list.IndexOf(card)] = Utils.BaseCard;
         }
+
+        if (card is UnitCard unit) unit.InitializeDamage();
     }
 
     public void ToGraveyard(List<Card> list)
@@ -91,27 +93,18 @@ public class Battlefield
     {
         int bonusAndClearIndex = Utils.IndexByZone[this.playerThatOwnsThisBattlefield.ZoneByList[list]];
 
-        if (list[index].Equals(Utils.BaseCard))
-        {
-            if (card.CardType == CardType.Unit)
-            {
-                list[index] = card;
-                card.AssignPosition(list);
-                return true;
-            }
-            if (card.CardType == CardType.Clear) //Creator's license here: Clear will only protect from 
-                                                 //weather effects the battlefield line where it is played
-            {
-                list[index] = card;
-                card.AssignPosition(list);
-                ClearsPlayed[bonusAndClearIndex] = true;
-                return true;
-            }
-        }
         if (card.CardType == CardType.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
         {
             Bonus[bonusAndClearIndex] = card;
             card.AssignPosition(Bonus);
+            return true;
+        }
+        else if (list[index].Equals(Utils.BaseCard))
+        {
+            list[index] = card;
+            card.AssignPosition(list);
+            if (card.CardType == CardType.Clear) ClearsPlayed[bonusAndClearIndex] = true; //Creator's license here: Clear will only protect from 
+                                                                                         //weather effects the battlefield line where it is played
             return true;
         }
 

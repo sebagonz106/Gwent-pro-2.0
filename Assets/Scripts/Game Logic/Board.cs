@@ -182,6 +182,8 @@ public class Board
                 }
             }
         }
+
+        if (player.TotalDamage < 0) player.TotalDamage = 0;
     }
 
     public Player GetCurrentPlayer() => IsBatistaPlayingOrAboutToPlay ? Player.Batista : Player.Fidel;

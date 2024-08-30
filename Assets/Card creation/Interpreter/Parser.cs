@@ -225,7 +225,7 @@ namespace Gwent_Interpreter
                         if (!Comma()) throw new ParsingError("Invalid OnActivation declaration" + positionForErrorBuilder + " (',' expected)");
                     }
 
-                    else throw new ParsingError("Invalid card declaration" + positionForErrorBuilder + " ('Name', 'Type', 'Faction', 'Range', 'Power' or 'OnActivation' expected)");
+                    else throw new ParsingError("Invalid card declaration" + positionForErrorBuilder + " ('Name', 'Type', 'Faction', 'Range', 'Power', 'Description' or 'OnActivation' expected)");
                 }
                 catch (ParsingError error)
                 {

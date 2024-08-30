@@ -20,7 +20,7 @@ public class Card : IEffect, ICardsWithOwner
         get => this is UnitCard unit ? unit.DamageOnField : initialDamage;
         set
         {
-            if (this is UnitCard unit) unit.ModifyOnFieldDamage(value);
+            if (this is UnitCard unit && unit.Level is Level.Silver) unit.ModifyOnFieldDamage(value);
         }
     }
 

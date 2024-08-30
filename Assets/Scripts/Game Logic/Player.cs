@@ -155,12 +155,12 @@ public class Player
         {
             return false;
         }
-
+        EmptyHandAt(originPosition);
         effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
 
         Board.Instance.ValidTurn = true;
         Board.Instance.UpdateTotalDamage();
-        EmptyHandAt(originPosition);
+        UpdateEmptySlots();
         return true;
     }
 

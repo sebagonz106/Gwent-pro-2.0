@@ -59,6 +59,8 @@ Power: 10,
 
 Range: ["Melee", "Ranged"],
 
+Description: "La peor carta que existe. Jugarla es literalmente un atentado contra ti mismo. Extremadamente no recomendada.",
+
 OnActivation: [
 
 {
