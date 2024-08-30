@@ -117,25 +117,25 @@ namespace Gwent_Interpreter.Statements
             switch (((Str)type.Evaluate()).Value)
             {
                 case "Oro":
-                    cards.Add(new UnitCard(name, faction, CardType.Unit, zones, Level.Golden, damage));
+                    cards.Add(new UnitCard(name, faction, Type.Unit, zones, Level.Golden, damage));
                     break;
                 case "Plata":
-                    cards.Add(new UnitCard(name, faction, CardType.Unit, zones, Level.Silver, damage));
+                    cards.Add(new UnitCard(name, faction, Type.Unit, zones, Level.Silver, damage));
                     break;
                 case "Clima":
-                    cards.Add(new WeatherCard(name, faction, CardType.Weather, zones, damage));
+                    cards.Add(new WeatherCard(name, faction, Type.Weather, zones, damage));
                     break;
                 case "Aumento":
-                    cards.Add(new BonusCard(name, faction, CardType.Bonus, zones, damage));
+                    cards.Add(new BonusCard(name, faction, Type.Bonus, zones, damage));
                     break;
                 case "Señuelo":
-                    cards.Add(new BaitCard(name, faction, CardType.Bait, zones, damage));
+                    cards.Add(new BaitCard(name, faction, Type.Bait, zones, damage));
                     break;
                 case "Despeje":
-                    cards.Add(new ClearCard(name, faction, CardType.Clear, zones, damage));
+                    cards.Add(new ClearCard(name, faction, Type.Clear, zones, damage));
                     break;
                 case "Lider":
-                    cards.Add(new LeaderCard(name, faction, CardType.Leader));
+                    cards.Add(new LeaderCard(name, faction, Type.Leader));
                     break;
                 default:
                     throw new EvaluationError("Invalid type declared" + position + " (types include: \"Oro\", \"Plata\", \"Clima\", \"Aumento\", \"Despeje\", \"Señuelo\"), \"Lider\")"); //i'm sorry about the spanglish, but ustedes made me hacerlo

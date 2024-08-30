@@ -8,7 +8,7 @@ public class Card : IEffect, ICardsWithOwner
     #region Fields
     public string Name { get; }
     public Faction FactionEnum { get; }
-    public CardType CardType { get; }
+    public Type Type { get; }
     public List<Zone> AvailableRange { get; }
     public List<Card> CurrentPosition { get; private set; }
     public VisualInfo Info { get; private set; }
@@ -29,23 +29,23 @@ public class Card : IEffect, ICardsWithOwner
 
     public string Faction => Utils.FactionName[FactionEnum];
 
-    public string Type
+    public string CardType
     {
         get
         {
-            switch (CardType)
+            switch (Type)
             {
-                case CardType.Unit: return ((UnitCard)this).Level is Level.Silver ? "Plata" : "Oro";
+                case Type.Unit: return ((UnitCard)this).Level is Level.Silver ? "Plata" : "Oro";
 
-                case CardType.Bonus: return "Aumento";
+                case Type.Bonus: return "Aumento";
                     
-                case CardType.Leader: return "Lider";
+                case Type.Leader: return "Lider";
                     
-                case CardType.Weather: return "Clima";
+                case Type.Weather: return "Clima";
 
-                case CardType.Clear: return "Despeje";
+                case Type.Clear: return "Despeje";
                     
-                case CardType.Bait: return "Señuelo";
+                case Type.Bait: return "Señuelo";
                     
                 default: return "";
             }
@@ -58,11 +58,11 @@ public class Card : IEffect, ICardsWithOwner
     #endregion
 
     #region Builder and object related methods
-    public Card(string name, Faction faction, CardType cardType, List<Zone> availableRange, double damage = 0, Effect effect = null)
+    public Card(string name, Faction faction, Type cardType, List<Zone> availableRange, double damage = 0, Effect effect = null)
     {
         this.Name = name;
         this.FactionEnum = faction;
-        this.CardType = cardType;
+        this.Type = cardType;
         this.AvailableRange = availableRange;
         AssignEffect(effect);
         initialDamage = damage;
@@ -71,14 +71,14 @@ public class Card : IEffect, ICardsWithOwner
     public override bool Equals(object other)
     {
         return other is Card card && this.Name == card.Name 
-                                  && this.CardType == card .CardType 
+                                  && this.Type == card .Type 
                                   && this.FactionEnum == card.FactionEnum 
                                   && (CurrentPosition is null? true : this.CurrentPosition.Equals(card.CurrentPosition));
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine<string, string, CardType>(Name, Faction, CardType);
+        return HashCode.Combine<string, string, Type>(Name, Faction, Type);
     }
 
     public override string ToString()

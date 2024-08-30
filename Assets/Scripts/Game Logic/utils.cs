@@ -8,7 +8,7 @@ public enum Faction
     Batista,
 }
 
-public enum CardType
+public enum Type
 {
     Unit,
     Bonus,
@@ -35,7 +35,7 @@ public delegate bool Effect(Context context);
 
 public static class Utils 
 {
-    static Card baseCard = new Card("", Faction.Fidel, CardType.Unit, new List<Zone>());
+    static Card baseCard = new Card("", Faction.Fidel, Type.Unit, new List<Zone>());
     public static Card BaseCard
     {
         get

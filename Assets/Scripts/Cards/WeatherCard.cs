@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class WeatherCard : Card
 {
-    public WeatherCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, double initialDamage = 2, Effect effect = null) :
+    public WeatherCard(string name, Faction faction, Type cardType, List<Zone> availableRange, double initialDamage = 2, Effect effect = null) :
                  base(name, faction, cardType, availableRange, initialDamage, effect)
     {
     }

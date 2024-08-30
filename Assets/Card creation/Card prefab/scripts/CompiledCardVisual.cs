@@ -26,25 +26,25 @@ public class CompiledCardVisual : MonoBehaviour
         if (card.FactionEnum is Faction.Fidel) faction.sprite = SpritesWarehouse.Instance.Rebels;
         else faction.sprite = SpritesWarehouse.Instance.Batista;
 
-        switch (card.CardType)
+        switch (card.Type)
         {
-            case CardType.Unit:
+            case Type.Unit:
                 type.sprite = ((UnitCard)card).Level is Level.Golden ? SpritesWarehouse.Instance.Golden : SpritesWarehouse.Instance.Silver;
                 break;
-            case CardType.Bonus:
+            case Type.Bonus:
                 type.sprite = SpritesWarehouse.Instance.Bonus;
                 break;
-            case CardType.Leader:
+            case Type.Leader:
                 type.sprite = SpritesWarehouse.Instance.Leader;
                 hasRange = false;
                 break;
-            case CardType.Weather:
+            case Type.Weather:
                 type.sprite = SpritesWarehouse.Instance.Weather;
                 break;
-            case CardType.Clear:
+            case Type.Clear:
                 type.sprite = SpritesWarehouse.Instance.Clear;
                 break;
-            case CardType.Bait:
+            case Type.Bait:
                 type.sprite = SpritesWarehouse.Instance.Bait;
                 break;
             default:

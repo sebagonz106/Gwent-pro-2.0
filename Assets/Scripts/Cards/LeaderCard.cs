@@ -6,7 +6,7 @@ public class LeaderCard : Card
 {
     public bool NeedsCardSelection { get; private set; }
 
-    public LeaderCard(string name, Faction faction, CardType cardType, bool needsCardSelection = false, double initialDamage = 0, Effect effect = null) :
+    public LeaderCard(string name, Faction faction, Type cardType, bool needsCardSelection = false, double initialDamage = 0, Effect effect = null) :
                  base(name, faction, cardType, new List<Zone>(), initialDamage, effect)
     {
         NeedsCardSelection = needsCardSelection;

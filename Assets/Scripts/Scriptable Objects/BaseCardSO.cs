@@ -7,7 +7,7 @@ public class CardSO : ScriptableObject
 {
     public new string name;
     public Faction faction;
-    public CardType cardType;
+    public Type cardType;
     public List<Zone> availableRange;
     public Material material;
     public Sprite information;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BaitCard : Card
 {
-    public BaitCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, double initialDamage = 0, Effect effect = null) :
+    public BaitCard(string name, Faction faction, Type cardType, List<Zone> availableRange, double initialDamage = 0, Effect effect = null) :
                base(name, faction, cardType, availableRange, initialDamage, effect)
     {
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ClearCard : Card
 {
-    public ClearCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, double initialDamage = 0, Effect effect = null) :
+    public ClearCard(string name, Faction faction, Type cardType, List<Zone> availableRange, double initialDamage = 0, Effect effect = null) :
                 base(name, faction, cardType, availableRange, initialDamage, effect)
     {
     }

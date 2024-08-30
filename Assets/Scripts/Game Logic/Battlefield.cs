@@ -93,7 +93,7 @@ public class Battlefield
     {
         int bonusAndClearIndex = Utils.IndexByZone[this.playerThatOwnsThisBattlefield.ZoneByList[list]];
 
-        if (card.CardType == CardType.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
+        if (card.Type == Type.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
         {
             Bonus[bonusAndClearIndex] = card;
             card.AssignPosition(Bonus);
@@ -103,7 +103,7 @@ public class Battlefield
         {
             list[index] = card;
             card.AssignPosition(list);
-            if (card.CardType == CardType.Clear) ClearsPlayed[bonusAndClearIndex] = true; //Creator's license here: Clear will only protect from 
+            if (card.Type == Type.Clear) ClearsPlayed[bonusAndClearIndex] = true; //Creator's license here: Clear will only protect from 
                                                                                          //weather effects the battlefield line where it is played
             return true;
         }

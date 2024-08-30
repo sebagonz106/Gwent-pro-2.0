@@ -84,7 +84,7 @@ public static class Effects
         List<Card> currentPosition = context.CurrentPosition;
         Player player = context.CurrentPlayer;
 
-        BonusCard riot = new BonusCard("Huelga revolucionaria", Faction.Fidel, CardType.Bonus, new List<Zone> { Zone.Melee, Zone.Range, Zone.Siege }, 1.8);
+        BonusCard riot = new BonusCard("Huelga revolucionaria", Faction.Fidel, Type.Bonus, new List<Zone> { Zone.Melee, Zone.Range, Zone.Siege }, 1.8);
         riot.AssignInfo(new VisualInfo(Resources.Load<Material>($"Materials/{player.Name}/{riot.Name}"),
                                        Resources.Load<Sprite>($"Info/{player.Name}/{riot.Name}"),
                                        riot.Faction));

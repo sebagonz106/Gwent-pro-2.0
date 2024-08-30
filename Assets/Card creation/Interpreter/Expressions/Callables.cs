@@ -44,7 +44,7 @@ namespace Gwent_Interpreter.Expressions
         {
             object callee = this.callee.Evaluate();
 
-            Type type;
+            System.Type type;
             if (callee is GwentInterpreterContext) type = typeof(GwentInterpreterContext);
             else if (callee is GwentList) type = typeof(GwentList);
             else if (callee is Card) type = typeof(Card);
@@ -105,7 +105,7 @@ namespace Gwent_Interpreter.Expressions
                 arguments[i] = this.arguments[i].Evaluate();
             }
 
-            Type type;
+            System.Type type;
             if (callee is GwentInterpreterContext) type = typeof(GwentInterpreterContext);
             else if (callee is GwentList) type = typeof(GwentList);
             else if (callee is Card) type = typeof(Card);
@@ -121,7 +121,7 @@ namespace Gwent_Interpreter.Expressions
             }
             catch (AmbiguousMatchException)
             {
-                method = type.GetMethod(caller.Value, new Type[0]);
+                method = type.GetMethod(caller.Value, new System.Type[0]);
             }
 
             if (method is null) throw new EvaluationError($"Method '" +caller.Value + $"' not found at {caller.Coordinates.Item1}:{caller.Coordinates.Item2}");

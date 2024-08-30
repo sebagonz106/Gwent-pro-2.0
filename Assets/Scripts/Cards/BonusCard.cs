@@ -6,7 +6,7 @@ public class BonusCard : Card
 {
     public double Increase { get; private set; }
 
-    public BonusCard(string name, Faction faction, CardType cardType, List<Zone> availableRange, double increase = 1, Effect effect = null) : base(name, faction, cardType, availableRange, increase, effect)
+    public BonusCard(string name, Faction faction, Type cardType, List<Zone> availableRange, double increase = 1, Effect effect = null) : base(name, faction, cardType, availableRange, increase, effect)
     {
         Increase = increase == 0 ? 1 : increase >= 10 ? increase / 10 : increase;
     }

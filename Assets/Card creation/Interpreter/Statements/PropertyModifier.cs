@@ -36,7 +36,7 @@ namespace Gwent_Interpreter.Statements
         {
             object callee = property.callee.Evaluate();
 
-            Type type;
+            System.Type type;
             if (callee is GwentList) type = typeof(GwentList);
             else if (callee is Card) type = typeof(Card);
             else if (callee is Str) type = typeof(Str);
