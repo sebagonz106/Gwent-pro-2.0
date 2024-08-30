@@ -16,9 +16,9 @@ public class LeaderCard : Card
     {
         try
         {
-            return NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :
-                                        StealCard(context.CurrentPlayer) 
-                 & effect.Invoke(context);
+            if (effect is null) return NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :
+                                                            StealCard(context.CurrentPlayer);
+            else return effect.Invoke(context);
         }
         catch 
         {

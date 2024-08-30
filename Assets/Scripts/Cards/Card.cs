@@ -60,7 +60,11 @@ public class Card : IEffect, ICardsWithOwner
 
     public virtual bool Effect(Context context)
     {
-        return effect is null ? true : effect.Invoke(context);
+        try
+        {
+            return effect is null ? true : effect.Invoke(context);
+        }
+        catch { return false; }
     }
 
     public void AssignPosition(List<Card> currentPosition) => this.CurrentPosition = currentPosition is null ? Owner.Hand : currentPosition;

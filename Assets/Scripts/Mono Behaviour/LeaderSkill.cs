@@ -25,7 +25,8 @@ public class LeaderSkillPanel : MonoBehaviour
         if (!leader.NeedsCardSelection)
         {
             leader.Effect(player.context);
-            board.UpdateView();
+            Board.Instance.UpdateTotalDamage();
+            board.UpdateView(true);
             board.board.ValidTurn = true;
             skillButton.SetActive(false);
         }
