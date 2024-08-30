@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Card : IEffect, ICardsWithOwner
 {
+    #region Fields
     public string Name { get; }
     public Faction FactionEnum { get; }
     public CardType CardType { get; }
@@ -14,7 +15,9 @@ public class Card : IEffect, ICardsWithOwner
     public string Description { get; private set; }
     protected Effect effect;
     protected double initialDamage;
+    #endregion
 
+    #region Properties to use in compiler
     public double Power
     {
         get => this is UnitCard unit ? unit.DamageOnField : initialDamage;
@@ -26,10 +29,35 @@ public class Card : IEffect, ICardsWithOwner
 
     public string Faction => Utils.FactionName[FactionEnum];
 
+    public string Type
+    {
+        get
+        {
+            switch (CardType)
+            {
+                case CardType.Unit: return ((UnitCard)this).Level is Level.Silver ? "Plata" : "Oro";
+
+                case CardType.Bonus: return "Aumento";
+                    
+                case CardType.Leader: return "Lider";
+                    
+                case CardType.Weather: return "Clima";
+
+                case CardType.Clear: return "Despeje";
+                    
+                case CardType.Bait: return "Señuelo";
+                    
+                default: return "";
+            }
+        }
+    }
+
     public Player Owner => Utils.GetPlayerByFaction(FactionEnum);
 
     public double InitialDamage { get => initialDamage;}
+    #endregion
 
+    #region Builder and object related methods
     public Card(string name, Faction faction, CardType cardType, List<Zone> availableRange, double damage = 0, Effect effect = null)
     {
         this.Name = name;
@@ -57,6 +85,7 @@ public class Card : IEffect, ICardsWithOwner
     {
         return Name + " (" + Faction + ')';
     }
+    #endregion
 
     public virtual bool Effect(Context context)
     {
@@ -67,6 +96,7 @@ public class Card : IEffect, ICardsWithOwner
         catch { return false; }
     }
 
+    #region Assign methods
     public void AssignPosition(List<Card> currentPosition) => this.CurrentPosition = currentPosition is null ? Owner.Hand : currentPosition;
 
     public void AssignInfo(VisualInfo info) => this.Info = info;
@@ -78,4 +108,5 @@ public class Card : IEffect, ICardsWithOwner
         if (description.Length > 200) description = description.Substring(0, 197) + "...";
         this.Description = description;
     }
+    #endregion
 }
