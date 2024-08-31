@@ -94,8 +94,17 @@ namespace GwentAI
         {
             throw new System.NotImplementedException();
         }
+        public Zone AddBait(BaitCard bait, List<Card> list, int position)
+        {
+            throw new System.NotImplementedException();
+        }
+        public void AddBait(BaitCard bait, Zone zone, int position)
+        {
+            throw new System.NotImplementedException();
+        }
         #endregion
 
+        #region Removing
         public void Remove(Card card, Zone range)
         {
             if (card is WeatherCard) weather.Remove(card);
@@ -110,5 +119,10 @@ namespace GwentAI
                 else if (card is BonusCard) bonus[range] = null;
             }
         }
+        public void Undo()
+        {
+
+        }
+        #endregion
     }
 }
