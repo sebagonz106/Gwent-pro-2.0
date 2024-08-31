@@ -14,6 +14,7 @@ public class LeaderCard : Card
 
     public override bool Effect(Context context)
     {
+        Board.Instance.Receive(this);
         try
         {
             if (effect is null) return NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :

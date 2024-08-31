@@ -28,9 +28,11 @@ public class BaitCard : Card
         Owner.Hand[Owner.Hand.IndexOf(this)] = card;
         list[index] = this;
         card.AssignPosition(Owner.Hand);
+        this.AssignPosition(list);
         if (card is UnitCard unit) unit.InitializeDamage(); //in case any permanent effects were applied on this card
         else if (card is ClearCard) Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[Owner.ZoneByList[list]]);
         Board.Instance.UpdateTotalDamage();
+        Board.Instance.Receive(new BaitOperation(this, card, list, index));
         return true;
     }
 }

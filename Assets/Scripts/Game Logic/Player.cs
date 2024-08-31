@@ -150,11 +150,13 @@ public class Player
         {
             Board.Instance.Weather[targetPosition] = weather;
             weather.AssignPosition(Board.Instance.Weather);
+            Board.Instance.Receive(new AddOperation(weather, Board.Instance.Weather, targetPosition));
         }
         else if (!this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
         {
             return false;
         }
+        Board.Instance.Receive(new RemoveOperation(card, Hand, originPosition));
         EmptyHandAt(originPosition);
         effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
 

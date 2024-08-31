@@ -167,6 +167,11 @@ public class BoardMB : MonoBehaviour
         }
     }
 
+    public void UndoTurn()
+    {
+        Board.Instance.Undo();
+        UpdateView(true);
+    }
     #endregion
 
     void ModifyVisibility(GameObject[] collection, bool visibility)

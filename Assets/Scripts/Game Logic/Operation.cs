@@ -15,31 +15,41 @@ public abstract class Operation
 
 public class AddOperation : Operation
 {
-    public AddOperation (Card card, List<Card> list, int position)
+    bool deckOrGraveyard;
+    public AddOperation (Card card, List<Card> list, int position, bool deckOrGraveyard = false)
     {
         this.card = card;
         this.list = list;
         this.position = position;
+        this.deckOrGraveyard = deckOrGraveyard;
     }
     public override void Restore()
     {
-        list[position] = Utils.BaseCard;
+        if (deckOrGraveyard) list.RemoveAt(position);
+        else list[position] = Utils.BaseCard;
+
         if (card is UnitCard unit) unit.RestoreLast();
+        else if (card is ClearCard clear) clear.Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[clear.Owner.ZoneByList[list]]);
     }
 }
 
 public class RemoveOperation : Operation
 {
-    public RemoveOperation(Card card, List<Card> list, int position)
+    bool deckOrGraveyard;
+    public RemoveOperation(Card card, List<Card> list, int position, bool deckOrGraveyard = false)
     {
         this.card = card;
         this.list = list;
         this.position = position;
+        this.deckOrGraveyard = deckOrGraveyard;
     }
     public override void Restore()
     {
-        list[position] = card;
+        if (deckOrGraveyard) list.Add(card);
+        else list[position] = card;
+
         card.AssignPosition(list);
+        if(card is ClearCard clear) clear.Owner.Battlefield.ClearsPlayed[Utils.IndexByZone[clear.Owner.ZoneByList[list]]] = true;
     }
 }
 
@@ -55,10 +65,24 @@ public class BaitOperation : Operation
     }
     public override void Restore()
     {
+        card.Owner.Hand[card.Owner.Hand.IndexOf(removedCard)] = card;
         list[position] = removedCard;
         removedCard.AssignPosition(list);
-        if (removedCard is UnitCard unit) unit.RestoreLast();
+        card.AssignPosition(card.Owner.Hand);
+        if (card is ClearCard clear) clear.Owner.Battlefield.ClearsPlayed[Utils.IndexByZone[clear.Owner.ZoneByList[list]]] = true;
+    }
+}
 
+public class DamageModification : Operation
+{
+    public DamageModification(UnitCard unit)
+    {
+        this.card = unit;
+    }
+
+    public override void Restore()
+    {
+        ((UnitCard)card).RestoreLast();
     }
 }
 

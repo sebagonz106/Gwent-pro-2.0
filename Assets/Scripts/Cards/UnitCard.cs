@@ -15,7 +15,7 @@ public class UnitCard : Card
                base(name, faction, cardType, availableRange, initialDamage, effect)
     {
         damageOnField = new Stack<double>();
-        this.damageOnField.Push(initialDamage);
+        ModifyDamageOnField(initialDamage);
         ResetDamage();
         this.Level = level;
     }
@@ -29,7 +29,7 @@ public class UnitCard : Card
 
     public void InitializeDamage()
     {
-        damageOnField.Push(initialDamage);
+        ModifyDamageOnField(initialDamage);
         ResetDamage();
     }
 
@@ -38,12 +38,18 @@ public class UnitCard : Card
         // damageOnField - damage = modification suffered on board 
         if (modifyCurrentDamageAsWell) this.Damage = (newDamage - this.damageOnField.Peek() + this.Damage > 0) ? (newDamage - this.damageOnField.Peek() + this.Damage) : 0;
 
-        this.damageOnField.Push(newDamage);
+        ModifyDamageOnField(newDamage);
     }
 
     public void RestoreLast()
     {
         damageOnField.Pop();
         ResetDamage();
+    }
+
+    public void ModifyDamageOnField(double newDamage)
+    {
+        damageOnField.Push(newDamage);
+        Board.Instance.Receive(new DamageModification(this));
     }
 }

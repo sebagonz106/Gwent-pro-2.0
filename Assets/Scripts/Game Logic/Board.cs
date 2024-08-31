@@ -62,6 +62,7 @@ public class Board
 
             RoundCount++;
             newRound = false;
+            currentTurn = new TurnInfo();
         }
     }
 
@@ -74,6 +75,7 @@ public class Board
         {
             if (IsBatistaPlayingOrAboutToPlay) IsBatistaPlayingOrAboutToPlay = Player.Fidel.EndRound;
             else IsBatistaPlayingOrAboutToPlay = !Player.Batista.EndRound;
+            currentTurn = new TurnInfo();
         }
         return true;
     }
@@ -205,14 +207,16 @@ public class Board
     #endregion
 
     #region Operation controller
-    TurnInfo currentTurn;
+    TurnInfo currentTurn = new TurnInfo();
 
     public void Receive(Operation operation) => currentTurn.Receive(operation);
+    public void Receive(LeaderCard card) => currentTurn.LeaderEffect();
 
     public void Undo()
     {
         if(currentTurn.LeaderEffectApplied) GetCurrentPlayer().LeaderEffectUsedThisRound = false;
         currentTurn.Restore();
+        UpdateTotalDamage();
     }
     #endregion
 }
