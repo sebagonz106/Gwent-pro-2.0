@@ -203,4 +203,16 @@ public class Board
         Player.Reset();
     }
     #endregion
+
+    #region Operation controller
+    TurnInfo currentTurn;
+
+    public void Receive(Operation operation) => currentTurn.Receive(operation);
+
+    public void Undo()
+    {
+        if(currentTurn.LeaderEffectApplied) GetCurrentPlayer().LeaderEffectUsedThisRound = false;
+        currentTurn.Restore();
+    }
+    #endregion
 }

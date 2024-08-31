@@ -4,17 +4,19 @@ using UnityEngine;
 
 public class UnitCard : Card
 {
-    double damageOnField = 0;
+    Stack<double> damageOnField;
     double damageOnCount = 0;
 
     public Level Level { get; private set; }
-    public double DamageOnField { get => damageOnField; }
+    public double DamageOnField { get => damageOnField.Peek(); }
     public double Damage { get => damageOnCount; set => damageOnCount = value; }
 
     public UnitCard(string name, Faction faction, Type cardType, List<Zone> availableRange, Level level, double initialDamage = 0, Effect effect = null) :
                base(name, faction, cardType, availableRange, initialDamage, effect)
     {
-        this.damageOnField = this.damageOnCount = initialDamage;
+        damageOnField = new Stack<double>();
+        this.damageOnField.Push(initialDamage);
+        ResetDamage();
         this.Level = level;
     }
 
@@ -22,20 +24,26 @@ public class UnitCard : Card
                               //has been summed to the total damage of the player at the moment it's being calculated, 
                               //then it will return to the initial value
     {
-        this.Damage = this.damageOnField;
+        this.Damage = this.damageOnField.Peek();
     }
 
     public void InitializeDamage()
     {
-        this.damageOnField = this.initialDamage;
+        damageOnField.Push(initialDamage);
         ResetDamage();
     }
 
     public void ModifyOnFieldDamage(double newDamage, bool modifyCurrentDamageAsWell = true)
     {
         // damageOnField - damage = modification suffered on board 
-        if (modifyCurrentDamageAsWell) this.Damage = (newDamage - this.damageOnField + this.Damage > 0) ? (newDamage - this.damageOnField + this.Damage) : 0;
+        if (modifyCurrentDamageAsWell) this.Damage = (newDamage - this.damageOnField.Peek() + this.Damage > 0) ? (newDamage - this.damageOnField.Peek() + this.Damage) : 0;
 
-        this.damageOnField = newDamage;
+        this.damageOnField.Push(newDamage);
+    }
+
+    public void RestoreLast()
+    {
+        damageOnField.Pop();
+        ResetDamage();
     }
 }
