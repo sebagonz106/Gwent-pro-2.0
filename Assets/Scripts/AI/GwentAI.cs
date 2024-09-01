@@ -4,15 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GwentAI
+namespace Gwent_AI
 {
-    #region Interfaces
-    interface IContext
-    {
-        List<Card> Hand { get; set; }
-        List<Card> Board { get; set; }
-        List<Card> Graveyard { get; set; }
-    }
+    #region Interface
     interface IPlayer
     {
         Card Play(IContext context);
@@ -33,7 +27,20 @@ namespace GwentAI
             board = new AIBoard(faction);
         }
 
-        public Card Play(IContext context) => Play(context, out bool leaderEffect, 0).Item1;
+        public Card Play(IContext context) => Play(context, out bool leaderEffect).Item1;
+
+        public bool DIrectPlay(IContext context, out string info)
+        {
+            (Card, Zone, Card) value = MyPlay(context, 2, out bool leaderEffect);
+            info = faction + " se pasó y no jugará más.";
+
+            if (leaderEffect) info = faction + " usó el efecto de su líder.";
+            else if (value.Item1 is BaitCard) info = faction + " usó el señuelo '" + value.Item1.Name + "' para recuperar la carta '" + value.Item3.Name + "'.";
+            else if (value.Item1 is Card) info = faction + " jugó la carta '" + value.Item1.Name + "' en la zona de " + (value.Item2 is Zone.Melee ? "cuerpo a cuerpo." : (value.Item2 is Zone.Range ? "rango." : "asedio."));
+            else return false;
+
+            return true;
+        }
 
         public (Card, Zone, Card) Play(IContext context, out bool leaderEffect, int count = 2)
         {
@@ -63,7 +70,7 @@ namespace GwentAI
                 bool tempLeaderEffect = false;
 
                 board.NewTurn();
-                if (i == context.Hand.Count && !player.LeaderEffectUsedThisRound) tempLeaderEffect = LeaderEffect(context, count, out card);
+                if (i == context.Hand.Count && !player.LeaderEffectUsedThisRound) tempLeaderEffect = LeaderEffect(context, count, out tempTarget);
                 else if (context.Hand[i].Equals(Utils.BaseCard))
                 {
                     board.Undo();
@@ -95,9 +102,9 @@ namespace GwentAI
                 board.Undo();
             }
 
-            if (leaderEffect) player.Leader.Effect(player.context.UpdatePlayerInstance(player.ListByZone[zone], toPlay));
+            if (leaderEffect) player.Leader.Effect(player.context.UpdatePlayerInstance(target.CurrentPosition, target));
             else if (toPlay is BaitCard bait) board.AddBait(bait, target);
-            else if (toPlay != null) board.AddNormalCard(toPlay, out Zone temp);
+            else if (toPlay != null) board.AddNormalCard(toPlay, zone);
 
             return (toPlay, zone, target);
         }

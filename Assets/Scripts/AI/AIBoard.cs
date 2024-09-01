@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GwentAI
+namespace Gwent_AI
 {
     class AIBoard
     {
@@ -99,6 +99,8 @@ namespace GwentAI
         }
 
         public bool AddBait(BaitCard bait, Card target) => bait.Effect(player.context.UpdatePlayerInstance(target.CurrentPosition, target));
+
+        public bool AddNormalCard(Card card, Zone bestZone) => player.PlayCard(player.Hand.IndexOf(card), GetEmptyPosition(bestZone), bestZone, out bool temp);
         #endregion
 
         #region Removing
