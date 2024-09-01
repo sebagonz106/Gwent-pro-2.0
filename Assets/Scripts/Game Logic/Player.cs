@@ -133,37 +133,42 @@ public class Player
     public bool PlayCard(int originPosition, int targetPosition, Zone rangeType, out bool effectFailed)
     {
         effectFailed = false;
+        if (targetPosition < 0 || originPosition < 0) return false;
 
-        /* i'm sorry but i have to say it: i f***ing hate Unity. i don't know why, every time i load a compiled card, the context of the player 
-         * that uses it is deleted and when trying to use the effect of the played card, the game breaks. this might be a hell of a patch
-         * but I assure you i haven't found another way and I need this damn thing up and running. forgive my language, i've been looking
-         * for this piece of sh*t error for a week and i was already freaking out. god bless you with a long live without having to use Unity <3
-         */
-        if (context is null) context = new Context(this, Board.Instance.GetCurrentEnemy());
-
-        if (!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard || Board.Instance.ValidTurn) //in case of unexpected behaviours. bait cards will be played through their effect
+        try
         {
-            return false;
-        }
+            /* i'm sorry but i have to say it: i f***ing hate Unity. i don't know why, every time i load a compiled card, the context of the player 
+             * that uses it is deleted and when trying to use the effect of the played card, the game breaks. this might be a hell of a patch
+             * but I assure you i haven't found another way and I need this damn thing up and running. forgive my language, i've been looking
+             * for this piece of sh*t error for a week and i was already freaking out. god bless you with a long live without having to use Unity <3
+             */
+            if (context is null) context = new Context(this, Board.Instance.GetCurrentEnemy());
 
-        if (card is WeatherCard weather && Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
-        {
-            Board.Instance.Weather[targetPosition] = weather;
-            weather.AssignPosition(Board.Instance.Weather);
-            Board.Instance.Receive(new AddOperation(weather, Board.Instance.Weather, targetPosition));
-        }
-        else if (!this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
-        {
-            return false;
-        }
-        Board.Instance.Receive(new RemoveOperation(card, Hand, originPosition));
-        EmptyHandAt(originPosition);
-        effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
+            if (!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard || Board.Instance.ValidTurn) //in case of unexpected behaviours. bait cards will be played through their effect
+            {
+                return false;
+            }
 
-        Board.Instance.ValidTurn = true;
-        Board.Instance.UpdateTotalDamage();
-        UpdateEmptySlots();
-        return true;
+            if (card is WeatherCard weather && Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
+            {
+                Board.Instance.Weather[targetPosition] = weather;
+                weather.AssignPosition(Board.Instance.Weather);
+                Board.Instance.Receive(new AddOperation(weather, Board.Instance.Weather, targetPosition));
+            }
+            else if (!this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
+            {
+                return false;
+            }
+            Board.Instance.Receive(new RemoveOperation(card, Hand, originPosition));
+            EmptyHandAt(originPosition);
+            effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
+
+            Board.Instance.ValidTurn = true;
+            Board.Instance.UpdateTotalDamage();
+            UpdateEmptySlots();
+            return true;
+        }
+        catch { return false; }
     }
 
     public void AddToHand(Card card)

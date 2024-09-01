@@ -217,6 +217,7 @@ public class CardController : MonoBehaviour
         else GameManager.GetComponent<MasterController>().GeneralException();
     }
 
+    #region Misc
     private void Disable(CardController cardController)
     {
         cardController.isSelected = false;
@@ -271,4 +272,5 @@ public class CardController : MonoBehaviour
     List<Card> GetList () => this.gameObject.tag == "WeatherCard" ? board.Weather :
                              this.gameObject.tag == "BonusCard" ? this.player.Battlefield.Bonus : 
                              this.player.ListByZone[rangeTypes[0]];
+    #endregion
 }

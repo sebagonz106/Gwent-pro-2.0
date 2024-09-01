@@ -10,7 +10,9 @@ namespace GwentAI
     {
         #region Fields
         string faction = "";
+        Player player;
 
+        #region Not need for this implementation
         Dictionary<Zone, List<Card>> zones = new Dictionary<Zone, List<Card>>(3)
         {
             {Zone.Melee, new List<Card>() },
@@ -31,77 +33,72 @@ namespace GwentAI
             {Zone.Siege, null }
         };
         #endregion
+        #endregion
 
         #region Receiving info
+        public AIBoard(string faction)
+        {
+            player = Utils.GetPlayerByName(faction);
+            this.faction = faction;
+        }
+
         public void Receive(Board board, string faction)
         {
-
+            throw new NotImplementedException();
         }
 
         public void Receive(List<Card> board, string faction)
         {
-
-        }
-
-        public AIBoard(string faction)
-        {
-            this.faction = faction;
+            throw new NotImplementedException();
         }
         #endregion
 
         #region Damage values
         public double GetEnemyDamage()
         {
-            return 0;
+            return player.TotalDamage;
         }
 
         public double GetDamage()
         {
-            return 0;
+            return Utils.GetEnemyOf(player).TotalDamage;
         }
+
+        public double GetDifference() => GetDamage() - GetEnemyDamage();
         #endregion
 
         #region Adding cards
-        public Zone Add(Card card)
+        public bool AddNormalCard(Card card, out Zone bestZone)
         {
-            switch (card.Type)
+            bestZone = Zone.Melee;
+            if (card.Type is Type.Bait || card.Type is Type.Bait) throw new System.ArgumentException();
+
+            double biggestDifference = int.MinValue;
+            foreach (Zone zone in card.AvailableRange)
             {
-                case Type.Unit: return Add((UnitCard)card);
-
-                case Type.Bonus: return Add((BonusCard)card);
-
-                case Type.Weather: return Add((WeatherCard)card);
-
-                case Type.Clear: return Add((ClearCard)card);
-
-                default: throw new System.NotImplementedException();
+                NewTurn();
+                if(player.PlayCard(player.Hand.IndexOf(card), GetEmptyPosition(zone), zone, out bool effectFailed) && biggestDifference <= GetDifference())
+                {
+                    biggestDifference = GetDifference();
+                    bestZone = zone;
+                }
+                Undo();
             }
+
+            return player.PlayCard(player.Hand.IndexOf(card), GetEmptyPosition(bestZone), bestZone, out bool temp);
         }
 
-        Zone Add(UnitCard unit)
+        int GetEmptyPosition(Zone zone)
         {
-            throw new System.NotImplementedException();
+            List<Card> list = player.ListByZone[zone];
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].Equals(Utils.BaseCard)) return i;
+            }
+            return -1;
         }
-        Zone Add(BonusCard bonus)
-        {
-            throw new System.NotImplementedException();
-        }
-        Zone Add(WeatherCard weather)
-        {
-            throw new System.NotImplementedException();
-        }
-        Zone Add(ClearCard clear)
-        {
-            throw new System.NotImplementedException();
-        }
-        public Zone AddBait(BaitCard bait, List<Card> list, int position)
-        {
-            throw new System.NotImplementedException();
-        }
-        public void AddBait(BaitCard bait, Zone zone, int position)
-        {
-            throw new System.NotImplementedException();
-        }
+
+        public bool AddBait(BaitCard bait, Card target) => bait.Effect(player.context.UpdatePlayerInstance(target.CurrentPosition, target));
         #endregion
 
         #region Removing
@@ -121,8 +118,11 @@ namespace GwentAI
         }
         public void Undo()
         {
-
+            Board.Instance.Undo();
+            Board.Instance.RemoveLastTurn();
         }
         #endregion
+
+        public void NewTurn() => Board.Instance.NewTurn();
     }
 }

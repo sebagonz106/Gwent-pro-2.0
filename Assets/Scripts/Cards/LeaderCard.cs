@@ -15,6 +15,7 @@ public class LeaderCard : Card
     public override bool Effect(Context context)
     {
         Board.Instance.Receive(this);
+        context.CurrentPlayer.LeaderEffectUsedThisRound = true;
         try
         {
             if (effect is null) return NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :
@@ -31,15 +32,13 @@ public class LeaderCard : Card
     {
         if (player.LeaderEffectUsedThisRound || !this.NeedsCardSelection || !player.Battlefield.StaysInBattlefieldModifier(card, list)) return false;
 
-        player.LeaderEffectUsedThisRound = true;
-        return true;
+        else return true;
     }
 
     private bool StealCard(Player player)
     {
         if (player.LeaderEffectUsedThisRound || this.NeedsCardSelection || !player.GetCard()) return false;
 
-        player.LeaderEffectUsedThisRound = true;
-        return true;
+        else return true;
     }
 }

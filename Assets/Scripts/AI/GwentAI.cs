@@ -35,37 +35,47 @@ namespace GwentAI
 
         public Card Play(IContext context) => Play(context, out bool leaderEffect, 0).Item1;
 
-        public (Card, Zone, int) Play(IContext context, out bool leaderEffect, int count = 2)
+        public (Card, Zone, Card) Play(IContext context, out bool leaderEffect, int count = 2)
         {
-            board.Receive(gameBoard, faction);
-            (Card, Zone, int) value = MyPlay(context, count, out leaderEffect);
+            board.NewTurn();
+            (Card, Zone, Card) value = MyPlay(context, count, out leaderEffect);
             board.Undo();
             return value;
         }
 
-        (Card, Zone, int) MyPlay(IContext context, int count, out bool leaderEffect)
+        (Card, Zone, Card) MyPlay(IContext context, int count, out bool leaderEffect)
         {
             leaderEffect = false;
             Card toPlay = null;
             Zone zone = Zone.Melee;
-            int position = -1;
+            Card target = null;
             double difference = board.GetDamage() - board.GetEnemyDamage();
 
-            for (int i = 0; i <= context.Hand.Count; i++)
+            if((difference>0 && gameBoard.GetCurrentEnemy().EndRound) || !(Utils.GetEnemyOf(player).Score - player.Score >= 2) && 
+                                                                          (difference <-25||(difference<-12 && new System.Random().Next(0, 10) == 6)))
+                return (toPlay, zone, target);
+
+            else for (int i = 0; i <= context.Hand.Count; i++)
             {
                 Card card = null;
                 Zone thisZone = Zone.Melee;
-                int thisPosition = -1;
+                Card tempTarget = null;
                 bool tempLeaderEffect = false;
 
+                board.NewTurn();
                 if (i == context.Hand.Count && !player.LeaderEffectUsedThisRound) tempLeaderEffect = LeaderEffect(context, count, out card);
+                else if (context.Hand[i].Equals(Utils.BaseCard))
+                {
+                    board.Undo();
+                    continue;
+                }
                 else
                 {
                     card = context.Hand[i];
-                    if (card is BaitCard bait) thisPosition = PlayBait(context, count - 1, bait, out zone);
+                    if (card is BaitCard bait) tempTarget =  PlayBait(context, count - 1, bait);
                     else
                     {
-                        thisZone = board.Add(card);
+                        if(board.AddNormalCard(card, out Zone bestZone)) thisZone = bestZone;
                         MyPlay(context, count - 1, out bool temp);
                     }
                 }
@@ -79,21 +89,17 @@ namespace GwentAI
                     difference = thisDifference;
                     toPlay = card;
                     zone = thisZone;
-                    position = thisPosition;
+                    target = tempTarget;
                     leaderEffect = tempLeaderEffect;
                 }
                 board.Undo();
             }
 
-            if (leaderEffect)
-            {
-                player.Leader.Effect(player.context.UpdatePlayerInstance(player.ListByZone[zone], toPlay));
-                player.LeaderEffectUsedThisRound = true;
-            }
-            else if (toPlay is BaitCard bait) board.AddBait(bait, zone, position);
-            else if (toPlay != null) board.Add(toPlay);
+            if (leaderEffect) player.Leader.Effect(player.context.UpdatePlayerInstance(player.ListByZone[zone], toPlay));
+            else if (toPlay is BaitCard bait) board.AddBait(bait, target);
+            else if (toPlay != null) board.AddNormalCard(toPlay, out Zone temp);
 
-            return (toPlay, zone, position);
+            return (toPlay, zone, target);
         }
 
         bool LeaderEffect(IContext context, int count, out Card card)
@@ -106,8 +112,8 @@ namespace GwentAI
                 {
                     if(item.Faction == faction)
                     {
-                        if(card is null || card.Power < item.Power || (card.Power == item.Power && card is UnitCard unit && unit.Level is Level.Silver && 
-                                                                                                   item is UnitCard other && other.Level is Level.Golden))
+                        if(card is null || card.InitialDamage < item.InitialDamage || (card.InitialDamage == item.InitialDamage && card is UnitCard unit && unit.Level is Level.Silver && 
+                                                                                                                                   item is UnitCard other && other.Level is Level.Golden))
                         {
                             card = item;
                         }
@@ -118,25 +124,27 @@ namespace GwentAI
             if (!error)
             {
                 player.Leader.Effect(player.context.UpdatePlayerInstance(card.CurrentPosition, card));
-                player.LeaderEffectUsedThisRound = true;
                 MyPlay(context, count - 1, out bool temp);
-                player.LeaderEffectUsedThisRound = false;
             }
 
             return !error;
         }
 
-        int PlayBait(IContext context, int count, BaitCard bait, out Zone zone)
+        Card PlayBait(IContext context, int count, BaitCard bait)
         {
-            int position = -1;
-            zone = Zone.Melee;
+            Card bestCard = null;
             double difference = board.GetDamage() - board.GetEnemyDamage();
 
             for (int i = 0; i < player.Battlefield.CardsInBattlefield.Count; i++)
             {
                 Card card = player.Battlefield.CardsInBattlefield[i];
                 if (card.Type is Type.Bait) continue;
-                Zone thisZone = board.AddBait(bait, card.CurrentPosition, card.CurrentPosition.IndexOf(card));
+                board.NewTurn();
+                if(!board.AddBait(bait, card))
+                {
+                    board.Undo();
+                    continue;
+                }
                 MyPlay(context, count-1, out bool temp);
 
                 double thisDifference = board.GetDamage() - board.GetEnemyDamage();
@@ -145,14 +153,13 @@ namespace GwentAI
                                                  (Utils.GetEnemyOf(player).Score - player.Score >= 2)))
                 {
                     difference = thisDifference;
-                    position = card.CurrentPosition.IndexOf(card);
-                    zone = thisZone;
+                    bestCard = card;
                 }
                 board.Undo();
             }
 
-            if (position != -1) board.AddBait(bait, zone, position);
-            return position;
+            if (!(bestCard is null)) board.AddBait(bait, bestCard);
+            return bestCard;
         }
     }
 }

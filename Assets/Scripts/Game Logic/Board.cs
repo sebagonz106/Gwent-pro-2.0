@@ -18,7 +18,12 @@ public class Board
     public int RoundCount { get => roundCount; private set => roundCount = value; }
     public bool ValidTurn { get; set; }
 
-    private Board() { IsBatistaPlayingOrAboutToPlay = true; }
+    private Board()
+    {
+        IsBatistaPlayingOrAboutToPlay = true;
+        turnInfo = new Stack<TurnInfo>();
+        turnInfo.Push(new TurnInfo());
+    }
 
     public void SetZonesList()
     {
@@ -62,7 +67,7 @@ public class Board
 
             RoundCount++;
             newRound = false;
-            currentTurn = new TurnInfo();
+            NewTurn();
         }
     }
 
@@ -75,7 +80,7 @@ public class Board
         {
             if (IsBatistaPlayingOrAboutToPlay) IsBatistaPlayingOrAboutToPlay = Player.Fidel.EndRound;
             else IsBatistaPlayingOrAboutToPlay = !Player.Batista.EndRound;
-            currentTurn = new TurnInfo();
+            NewTurn();
         }
         return true;
     }
@@ -207,10 +212,14 @@ public class Board
     #endregion
 
     #region Operation controller
-    TurnInfo currentTurn = new TurnInfo();
+    TurnInfo currentTurn => turnInfo.Peek();
+    Stack<TurnInfo> turnInfo = new Stack<TurnInfo>();
 
     public void Receive(Operation operation) => currentTurn.Receive(operation);
     public void Receive(LeaderCard card) => currentTurn.LeaderEffect();
+
+    public void NewTurn() => turnInfo.Push(new TurnInfo());
+    public TurnInfo RemoveLastTurn() => turnInfo.Pop();
 
     public void Undo()
     {
