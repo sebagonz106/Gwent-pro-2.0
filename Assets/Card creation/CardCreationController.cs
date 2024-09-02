@@ -103,12 +103,11 @@ public class CardCreationController : MonoBehaviour
         if (!PreLoadedCompiled) CompilePreLoaded();
         foreach (var card in cards)
         {
-            if (card is LeaderCard leader)
-            {
-                Player.Leaders.Add(leader.Name, leader);
-            }
-            else if (card.FactionEnum is Faction.Fidel) CardsWarehouse.RebelCards.Add(card);
-            else CardsWarehouse.BatistaCards.Add(card);
+            if (card is LeaderCard leader && !Player.Leaders.ContainsKey(leader.Name)) Player.Leaders.Add(leader.Name, leader);
+
+            else if (card.FactionEnum is Faction.Fidel && !CardsWarehouse.RebelCards.Contains(card)) CardsWarehouse.RebelCards.Add(card);
+
+            else if (!CardsWarehouse.RebelCards.Contains(card)) CardsWarehouse.BatistaCards.Add(card);
 
             cardsAdded.Add(card.Name);
         }

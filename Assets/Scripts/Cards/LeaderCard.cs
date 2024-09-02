@@ -10,34 +10,39 @@ public class LeaderCard : Card
                  base(name, faction, cardType, new List<Zone>(), initialDamage, effect)
     {
         NeedsCardSelection = needsCardSelection;
+        this.effect = effect;
     }
 
     public override bool Effect(Context context)
     {
-        Board.Instance.Receive(this);
-        context.CurrentPlayer.LeaderEffectUsedThisRound = true;
-        try
+        Board.Instance.Receive(new LeaderEffectOperation(this));
+        if (!context.CurrentPlayer.LeaderEffectUsedThisRound)
         {
-            if (effect is null) return NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :
-                                                            StealCard(context.CurrentPlayer);
-            else return effect.Invoke(context);
+            context.CurrentPlayer.LeaderEffectUsedThisRound = true;
+            try
+            {
+                if (effect is null) return NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :
+                                                                StealCard(context.CurrentPlayer);
+                else return effect.Invoke(context);
+            }
+            catch
+            {
+                return false;
+            }
         }
-        catch 
-        {
-            return false;
-        }
+        else return false;
     }
 
     private bool KeepInBattlefield(Player player, Card card, List<Card> list)
     {
-        if (player.LeaderEffectUsedThisRound || !this.NeedsCardSelection || !player.Battlefield.StaysInBattlefieldModifier(card, list)) return false;
+        if (!this.NeedsCardSelection || !player.Battlefield.StaysInBattlefieldModifier(card, list)) return false;
 
         else return true;
     }
 
     private bool StealCard(Player player)
     {
-        if (player.LeaderEffectUsedThisRound || this.NeedsCardSelection || !player.GetCard()) return false;
+        if (this.NeedsCardSelection || !player.GetCard()) return false;
 
         else return true;
     }

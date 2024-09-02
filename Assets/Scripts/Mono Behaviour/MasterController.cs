@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class MasterController : MonoBehaviour
 {
     public Camera[] cameras = new Camera[3]; //Camera[0] between rounds, Camera[1] fidel, Camera[2] batista
+    Camera GetCameraOf(string player) => player == "Fidel" ? cameras[1] : player == "Batista" ? cameras[2] : cameras[0];
 
     #region Panels
     [SerializeField] CompiledCardVisual infoContainer;
@@ -20,6 +21,7 @@ public class MasterController : MonoBehaviour
     [SerializeField] GameObject fidelVictory;
     [SerializeField] GameObject effectException;
     [SerializeField] GameObject generalException;
+    [SerializeField] GameObject undoButton;
     [SerializeField] TMP_Text roundEndedNotification;
     [SerializeField] TMP_Text BatistaScoreInPlayersPanel;
     [SerializeField] TMP_Text FidelScoreInPlayersPanel;
@@ -30,10 +32,17 @@ public class MasterController : MonoBehaviour
     #endregion
 
     public BoardMB board;
+    bool aIActive;
+    [SerializeField] AIController aI;
 
     public GameObject PanelOnWhenInformationDisplayed { get => panelOnWhenInformationDisplayed; private set => panelOnWhenInformationDisplayed = value; }
     bool isBatistaPlayingOrAboutToPlay => Board.Instance.IsBatistaPlayingOrAboutToPlay;
     bool validTurn => Board.Instance.ValidTurn;
+
+    private void Awake()
+    {
+        aIActive = PlayerPrefs.GetString("AI").Length > 0;
+    }
 
     private void Start()
     {
@@ -44,13 +53,18 @@ public class MasterController : MonoBehaviour
         };
     }
 
-    public void EndTurn()
+    private void Update()
+    {
+        undoButton.SetActive(Board.Instance.ValidTurn && !betweenRoundsPanel.activeInHierarchy);
+    }
+
+    public void EndTurn(bool roundEnded = false)
     {
         if (!board.EndTurn(board.CurrentPlayer)) return;
+        UpdateScoreInText();
 
         cameras[1].gameObject.SetActive(false);
         cameras[2].gameObject.SetActive(false);
-        UpdateScoreInText();
         playerPanel.SetActive(false);
         betweenRoundsPanel.SetActive(true);
         cameras[0].gameObject.SetActive(true);
@@ -60,7 +74,7 @@ public class MasterController : MonoBehaviour
     {
         if (!board.EndRound(board.CurrentPlayer)) return;
 
-        EndTurn();
+        EndTurn(true);
     }
 
     public void ReceiveTurn()
@@ -93,15 +107,14 @@ public class MasterController : MonoBehaviour
             if (this.gameObject.transform.GetChild(i).gameObject.activeInHierarchy)
             {
                 this.PanelOnWhenInformationDisplayed = this.gameObject.transform.GetChild(i).gameObject;
-                this.gameObject.transform.GetChild(i).gameObject.SetActive(leaveActive);
+                PanelOnWhenInformationDisplayed.SetActive(leaveActive);
                 break;
             }
         }
     }
     public void EffectException()
     {
-        SavePanelOnWhenInformationDisplayed();
-        PanelOnWhenInformationDisplayed.SetActive(false);
+        SavePanelOnWhenInformationDisplayed(false);
         effectException.SetActive(true);
     }
     public void GeneralException()

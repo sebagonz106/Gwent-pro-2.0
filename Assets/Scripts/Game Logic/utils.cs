@@ -53,4 +53,23 @@ public static class Utils
     public static Player GetPlayerByName(string name) => name == "Fidel" ? Player.Fidel : Player.Batista;
     public static Player GetEnemyByName(string name) => name == "Batista" ? Player.Fidel : Player.Batista;
     public static Player GetEnemyOf(Player player) => Player.Fidel.Equals(player) ? Player.Batista : Player.Fidel;
+
+    public static void ShuffleList(List<Card> list, bool saveOperation = false) //Modern Fisher-Yates shuffle algorithm
+    {
+        List<Card> initialList = new List<Card>();
+        foreach (var card in list) initialList.Add(card);
+
+        int randomNumber;
+        Card swapCard;
+
+        for (int i = list.Count - 1; i >= 0; i--)
+        {
+            randomNumber = (new System.Random()).Next(list.Count - 1);
+            swapCard = list[randomNumber];
+            list[randomNumber] = list[i];
+            list[i] = swapCard;
+        }
+
+        if (saveOperation) Board.Instance.Receive(new ShuffleOperation(initialList, list));
+    }
 }

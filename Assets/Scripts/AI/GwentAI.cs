@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Gwent_AI
 {
@@ -20,6 +21,7 @@ namespace Gwent_AI
 
         Player player => faction == "Fidel" ? Player.Fidel : Player.Batista;
         Board gameBoard => Board.Instance;
+        bool IsPlaying => faction == "Fidel" ? !gameBoard.IsBatistaPlayingOrAboutToPlay : gameBoard.IsBatistaPlayingOrAboutToPlay;
 
         public GwentAI(string faction)
         {
@@ -29,7 +31,7 @@ namespace Gwent_AI
 
         public Card Play(IContext context) => Play(context, out bool leaderEffect).Item1;
 
-        public bool DIrectPlay(IContext context, out string info)
+        public bool DirectPlay(IContext context, out string info)
         {
             (Card, Zone, Card) value = MyPlay(context, 2, out bool leaderEffect);
             info = faction + " se pasó y no jugará más.";
@@ -58,8 +60,8 @@ namespace Gwent_AI
             Card target = null;
             double difference = board.GetDamage() - board.GetEnemyDamage();
 
-            if((difference>0 && gameBoard.GetCurrentEnemy().EndRound) || !(Utils.GetEnemyOf(player).Score - player.Score >= 2) && 
-                                                                          (difference <-25||(difference<-12 && new System.Random().Next(0, 10) == 6)))
+            if(count<0 || (difference>0 && gameBoard.GetCurrentEnemy().EndRound) || !(Utils.GetEnemyOf(player).Score - player.Score >= 2) && 
+                                                                                     (difference <-25||(difference<-12 && new System.Random().Next(0, 10) == 6)))
                 return (toPlay, zone, target);
 
             else for (int i = 0; i <= context.Hand.Count; i++)
@@ -70,7 +72,12 @@ namespace Gwent_AI
                 bool tempLeaderEffect = false;
 
                 board.NewTurn();
-                if (i == context.Hand.Count && !player.LeaderEffectUsedThisRound) tempLeaderEffect = LeaderEffect(context, count, out tempTarget);
+                if (i == context.Hand.Count)
+                {
+                        Debug.Log(i);
+                    if (!player.LeaderEffectUsedThisRound && context.Hand.Count<10)
+                        tempLeaderEffect = LeaderEffect(context, count, out tempTarget);
+                }
                 else if (context.Hand[i].Equals(Utils.BaseCard))
                 {
                     board.Undo();
@@ -102,7 +109,7 @@ namespace Gwent_AI
                 board.Undo();
             }
 
-            if (leaderEffect) player.Leader.Effect(player.context.UpdatePlayerInstance(target.CurrentPosition, target));
+            if (leaderEffect) player.Leader.Effect(player.Leader.NeedsCardSelection ? player.context.UpdatePlayerInstance(target.CurrentPosition, target) : player.context);
             else if (toPlay is BaitCard bait) board.AddBait(bait, target);
             else if (toPlay != null) board.AddNormalCard(toPlay, zone);
 
@@ -130,7 +137,7 @@ namespace Gwent_AI
             }
             if (!error)
             {
-                player.Leader.Effect(player.context.UpdatePlayerInstance(card.CurrentPosition, card));
+                player.Leader.Effect(player.Leader.NeedsCardSelection? player.context.UpdatePlayerInstance(card.CurrentPosition, card) : player.context);
                 MyPlay(context, count - 1, out bool temp);
             }
 

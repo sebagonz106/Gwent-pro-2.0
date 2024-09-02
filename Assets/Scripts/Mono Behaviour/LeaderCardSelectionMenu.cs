@@ -71,4 +71,10 @@ public class LeaderCardSelectionMenu : MonoBehaviour
         }
         else return false;
     }
+
+    public void SelectAsEnemy()
+    {
+        PlayerPrefs.SetString("AI", faction);
+        Menu.AISelected = true;
+    }
 }

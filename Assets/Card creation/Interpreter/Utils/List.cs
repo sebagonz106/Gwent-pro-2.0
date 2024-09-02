@@ -75,19 +75,7 @@ namespace Gwent_Interpreter.Utils
 
             return card;
         }
-        public void Shuffle()
-        {
-            int randomNumber;
-            Card swapCard;
-
-            for (int i = list.Count - 1; i >= 0; i--)
-            {
-                randomNumber = (new System.Random()).Next(list.Count - 1);
-                swapCard = list[randomNumber];
-                list[randomNumber] = list[i];
-                list[i] = swapCard;
-            }
-        }
+        public void Shuffle() => Getter.Shuffle(this.list);
         public void SendBottom(Card card) => Insert(0, card);
 
         public int IndexOf(Card item) => list.IndexOf(item);

@@ -87,16 +87,7 @@ public class Player
         if (Deck.Count <= cardsToSteal) //If there are no longer cards left in deck, this conditional shuffles
                                         //graveyard cards and add them to the deck so the game goes on
         {
-            int randomNumber;
-            Card swapCard;
-
-            for (int k = Battlefield.Graveyard.Count - 1; k >= 0; k--)
-            {
-                randomNumber = new System.Random().Next(Battlefield.Graveyard.Count - 1);
-                swapCard = Battlefield.Graveyard[randomNumber];
-                Battlefield.Graveyard[randomNumber] = Battlefield.Graveyard[k];
-                Battlefield.Graveyard[k] = swapCard;
-            }
+            Utils.ShuffleList(Battlefield.Graveyard);
 
             foreach (var card in Battlefield.Graveyard)
             {
@@ -110,18 +101,17 @@ public class Player
                                                       //a random card in deck to graveyard until a proper value for cardsToSteal is achieved
         {
             int index = new System.Random().Next(Deck.Count - 1);
-            Battlefield.Graveyard.Add(Deck[index]);
-            Deck[index].AssignPosition(Battlefield.Graveyard);
-            Deck.RemoveAt(index);
+            Battlefield.ToGraveyard(Deck[index], Deck);
             cardsToSteal--;
         }
 
-        if (cardsToSteal == 0) return false;
+        if (cardsToSteal == 0 || emptySlotsInHand.Count<cardsToSteal) return false;
 
         while (cardsToSteal> 0)
         {
             int index = new System.Random().Next(Deck.Count - 1);
             AddToHand(Deck[index]);
+            Board.Instance.Receive(new RemoveOperation(Deck[index], Deck, index, true));
             Deck.RemoveAt(index);
             cardsToSteal--;
         }
@@ -159,7 +149,6 @@ public class Player
             {
                 return false;
             }
-            Board.Instance.Receive(new RemoveOperation(card, Hand, originPosition));
             EmptyHandAt(originPosition);
             effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
 
@@ -173,15 +162,21 @@ public class Player
 
     public void AddToHand(Card card)
     {
-        if (emptySlotsInHand.Count == 0) return;
+        if (emptySlotsInHand.Count == 0)
+        {
+            Battlefield.ToGraveyard(card, card.CurrentPosition);
+            return;
+        }
 
         Hand[emptySlotsInHand[0]] = card;
         card.AssignPosition(Hand);
+        Board.Instance.Receive(new AddOperation(card, Hand, emptySlotsInHand[0]));
         emptySlotsInHand.RemoveAt(0);
     }
 
     public void EmptyHandAt(int index)
     {
+        Board.Instance.Receive(new RemoveOperation(Hand[index], Hand, index));
         this.emptySlotsInHand.Add(index);
         this.Hand[index] = Utils.BaseCard;
     }

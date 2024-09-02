@@ -15,18 +15,7 @@ public class CardInitializer : MonoBehaviour
         cards = CardsWarehouse.GetDeck(playerMB.Name);
         foreach (Card item in cards) AssignInfo(item);
 
-        #region Modern Fisher-Yates shuffle algorithm
-            int randomNumber;
-            Card swapCard;
-
-            for (int i = cards.Count - 1; i >= 0; i--)
-            {
-                randomNumber = Random.Range(0, cards.Count-1);
-                swapCard = cards[randomNumber];
-                cards[randomNumber] = cards[i];
-                cards[i] = swapCard;
-            }
-        #endregion
+        Utils.ShuffleList(cards);
 
         cards.RemoveRange(25, cards.Count-25);
         player.Deck.AddRange(this.cards);

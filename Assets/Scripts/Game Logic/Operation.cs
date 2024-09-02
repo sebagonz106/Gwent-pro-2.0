@@ -28,8 +28,7 @@ public class AddOperation : Operation
         if (deckOrGraveyard) list.RemoveAt(position);
         else list[position] = Utils.BaseCard;
 
-        if (card is UnitCard unit) unit.RestoreLast();
-        else if (card is ClearCard clear) clear.Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[clear.Owner.ZoneByList[list]]);
+        if (card is ClearCard clear && !deckOrGraveyard && !list.Equals(clear.Owner.Hand)) clear.Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[clear.Owner.ZoneByList[list]]);
     }
 }
 
@@ -49,7 +48,7 @@ public class RemoveOperation : Operation
         else list[position] = card;
 
         card.AssignPosition(list);
-        if(card is ClearCard clear) clear.Owner.Battlefield.ClearsPlayed[Utils.IndexByZone[clear.Owner.ZoneByList[list]]] = true;
+        if(card is ClearCard clear && !deckOrGraveyard && !list.Equals(clear.Owner.Hand)) clear.Owner.Battlefield.ClearsPlayed[Utils.IndexByZone[clear.Owner.ZoneByList[list]]] = true;
     }
 }
 
@@ -86,10 +85,42 @@ public class DamageModification : Operation
     }
 }
 
+public class LeaderEffectOperation : Operation
+{
+    public LeaderEffectOperation(LeaderCard card)
+    {
+        this.card = card;
+    }
+
+    public override void Restore()
+    {
+        card.Owner.LeaderEffectUsedThisRound = false;
+        if (((LeaderCard)card).NeedsCardSelection) card.Owner.Battlefield.StaysInBattlefieldRemove();
+    }
+}
+
+public class ShuffleOperation : Operation
+{
+    List<Card> previousOrder;
+
+    public ShuffleOperation(List<Card> previousOrder, List<Card> list)
+    {
+        this.list = list;
+        this.previousOrder = previousOrder;
+    }
+
+    public override void Restore()
+    {
+        for (int i = 0; i < previousOrder.Count; i++)
+        {
+            list[i] = previousOrder[i];
+        }
+    }
+}
+
 public class TurnInfo
 {
     Stack<Operation> operations;
-    public bool LeaderEffectApplied { get; private set; }
 
     public TurnInfo()
     {
@@ -101,8 +132,6 @@ public class TurnInfo
         operations.Push(operation);
     }
 
-    public void LeaderEffect() => LeaderEffectApplied = true;
-
     public void Restore()
     {
         while (operations.Count > 0)
@@ -110,6 +139,5 @@ public class TurnInfo
             Operation operation = operations.Pop();
             operation.Restore();
         }
-        LeaderEffectApplied = false;
     }
 }

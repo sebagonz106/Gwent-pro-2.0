@@ -158,6 +158,19 @@ public class Board
             UpdateTotalDamage(Player.Batista);
             player = Player.Fidel;
         }
+        else
+        {
+            foreach (Card card in this.Weather) //applies weather effects
+            {
+                if (card is WeatherCard weather)
+                {
+                    //same patch as in PlayCard
+                    if (weather.Owner.context is null) weather.Owner.context = new Context(weather.Owner, Utils.GetEnemyOf(weather.Owner));
+
+                    weather.WeatherEffect(weather.Owner.context.UpdatePlayerInstance(this.Weather, weather));
+                }
+            }
+        }
 
         player.TotalDamage = 0;
 
@@ -165,17 +178,6 @@ public class Board
         for (int i = 0; i < bonus.Length; i++)
         {
             bonus[i] = (player.Battlefield.Bonus[i] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[i]).Increase : 1;
-        }
-
-        foreach (Card card in this.Weather) //applies weather effects
-        {
-            if (card is WeatherCard weather)
-            {
-                //same patch as in PlayCard
-                if(weather.Owner.context is null) weather.Owner.context = new Context(weather.Owner, Utils.GetEnemyOf(weather.Owner));
-
-                weather.WeatherEffect(weather.Owner.context.UpdatePlayerInstance(this.Weather, weather));
-            }
         }
 
         for (int i = 0; i < player.Battlefield.Zones.Length; i++)
@@ -216,16 +218,15 @@ public class Board
     Stack<TurnInfo> turnInfo = new Stack<TurnInfo>();
 
     public void Receive(Operation operation) => currentTurn.Receive(operation);
-    public void Receive(LeaderCard card) => currentTurn.LeaderEffect();
 
     public void NewTurn() => turnInfo.Push(new TurnInfo());
     public TurnInfo RemoveLastTurn() => turnInfo.Pop();
 
     public void Undo()
     {
-        if(currentTurn.LeaderEffectApplied) GetCurrentPlayer().LeaderEffectUsedThisRound = false;
         currentTurn.Restore();
         UpdateTotalDamage();
+        ValidTurn = false;
     }
     #endregion
 }

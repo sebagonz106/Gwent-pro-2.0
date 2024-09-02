@@ -47,7 +47,7 @@ public class UnitCard : Card
         ResetDamage();
     }
 
-    public void ModifyDamageOnField(double newDamage)
+    void ModifyDamageOnField(double newDamage)
     {
         damageOnField.Push(newDamage);
         Board.Instance.Receive(new DamageModification(this));

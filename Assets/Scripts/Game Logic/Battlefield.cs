@@ -27,15 +27,10 @@ public class Battlefield
     {
         if (card.Equals(Utils.BaseCard) || list.Equals(Graveyard)) return;
 
-        Graveyard.Add(card);
-        card.AssignPosition(Graveyard);
-        Board.Instance.Receive(new AddOperation(card, Graveyard, Graveyard.Count - 1, true));
-
         if (list.Equals(this.playerThatOwnsThisBattlefield.Hand))
         {
             int index = list.IndexOf(card);
             this.playerThatOwnsThisBattlefield.EmptyHandAt(index);
-            Board.Instance.Receive(new RemoveOperation(card, list, index));
         }
         else if (list.Equals(this.playerThatOwnsThisBattlefield.Deck))
         {
@@ -45,9 +40,13 @@ public class Battlefield
         else
         {
             if (card is ClearCard) RemoveClearEffect(Utils.IndexByZone[this.playerThatOwnsThisBattlefield.ZoneByList[list]]);
+            Board.Instance.Receive(new RemoveOperation(card, list, list.IndexOf(card)));
             list[list.IndexOf(card)] = Utils.BaseCard;
         }
 
+        Graveyard.Add(card);
+        card.AssignPosition(Graveyard);
+        Board.Instance.Receive(new AddOperation(card, Graveyard, Graveyard.Count - 1, true));
         if (card is UnitCard unit) unit.InitializeDamage();
     }
 
@@ -178,7 +177,8 @@ public class Battlefield
         staysInBattlefieldController = (card, list, list.IndexOf(card));
         return true;
     }
-    
+    public void StaysInBattlefieldRemove() => staysInBattlefieldController = (null, null, -1);
+
     public List<Card> CardsInBattlefield
     {
         get
