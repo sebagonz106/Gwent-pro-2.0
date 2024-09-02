@@ -13,7 +13,6 @@ public class LeaderSkillPanel : MonoBehaviour
     {
         if(!player.Leader.Effect(player.context.UpdatePlayerInstance(list, card))) Exception();
         Info.SetActive(true);
-        board.board.ValidTurn = true;
         skillButton.SetActive(false);
     }
 
@@ -30,9 +29,7 @@ public class LeaderSkillPanel : MonoBehaviour
         if (!leader.NeedsCardSelection)
         {
             if(!leader.Effect(player.context)) Exception();
-            Board.Instance.UpdateTotalDamage();
             board.UpdateView(true);
-            board.board.ValidTurn = true;
             skillButton.SetActive(false);
         }
         else

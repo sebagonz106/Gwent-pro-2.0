@@ -71,7 +71,7 @@ public class Board
         }
     }
 
-    public bool EndTurn(Player player)
+    public bool EndTurn(Player player = null)
     {
         if (!ValidTurn) return false;
         ValidTurn = false;
@@ -85,8 +85,9 @@ public class Board
         return true;
     }
 
-    public bool EndRound(Player player)
+    public bool EndRound(Player player = null)
     {
+        if (player is null) player = GetCurrentPlayer();
         if (ValidTurn) return false;
         ValidTurn = true;
         player.EndRound = true;
@@ -219,7 +220,11 @@ public class Board
 
     public void Receive(Operation operation) => currentTurn.Receive(operation);
 
-    public void NewTurn() => turnInfo.Push(new TurnInfo());
+    public void NewTurn()
+    {
+        turnInfo.Push(new TurnInfo());
+        ValidTurn = false;
+    }
     public TurnInfo RemoveLastTurn() => turnInfo.Pop();
 
     public void Undo()

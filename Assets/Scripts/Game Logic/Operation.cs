@@ -28,7 +28,8 @@ public class AddOperation : Operation
         if (deckOrGraveyard) list.RemoveAt(position);
         else list[position] = Utils.BaseCard;
 
-        if (card is ClearCard clear && !deckOrGraveyard && !list.Equals(clear.Owner.Hand)) clear.Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[clear.Owner.ZoneByList[list]]);
+        if (list.Equals(card.Owner.Hand)) card.Owner.UpdateEmptySlots();
+        else if (card is ClearCard clear && !deckOrGraveyard) clear.Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[clear.Owner.ZoneByList[list]]);
     }
 }
 
@@ -48,7 +49,8 @@ public class RemoveOperation : Operation
         else list[position] = card;
 
         card.AssignPosition(list);
-        if(card is ClearCard clear && !deckOrGraveyard && !list.Equals(clear.Owner.Hand)) clear.Owner.Battlefield.ClearsPlayed[Utils.IndexByZone[clear.Owner.ZoneByList[list]]] = true;
+        if (list.Equals(card.Owner.Hand)) card.Owner.UpdateEmptySlots();
+        else if (card is ClearCard clear && !deckOrGraveyard) clear.Owner.Battlefield.ClearsPlayed[Utils.IndexByZone[clear.Owner.ZoneByList[list]]] = true;
     }
 }
 

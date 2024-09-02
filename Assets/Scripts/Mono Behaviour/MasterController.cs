@@ -60,18 +60,23 @@ public class MasterController : MonoBehaviour
 
     public void EndTurn(bool roundEnded = false)
     {
+        if (aIActive)
+        {
+            aI.EndTurn();
+            return;
+        }
         if (!board.EndTurn(board.CurrentPlayer)) return;
         UpdateScoreInText();
-
-        cameras[1].gameObject.SetActive(false);
-        cameras[2].gameObject.SetActive(false);
-        playerPanel.SetActive(false);
-        betweenRoundsPanel.SetActive(true);
-        cameras[0].gameObject.SetActive(true);
+        OpenBetweenRounds();
     }
 
     public void EndRound()
     {
+        if (aIActive)
+        {
+            aI.EndRound();
+            return;
+        }
         if (!board.EndRound(board.CurrentPlayer)) return;
 
         EndTurn(true);
@@ -79,24 +84,21 @@ public class MasterController : MonoBehaviour
 
     public void ReceiveTurn()
     {
-        cameras[0].gameObject.SetActive(false);
-        playerPanel.SetActive(true);
-        betweenRoundsPanel.SetActive(false);
+        if (aIActive) aI.StartRound();
 
-        if (isBatistaPlayingOrAboutToPlay && !Player.Batista.EndRound)
+        else if (isBatistaPlayingOrAboutToPlay && !Player.Batista.EndRound)
         {
-            cameras[2].gameObject.SetActive(true);
+            OpenPlayer(2);
             board.RecieveTurn(board.Batista);
         }
         else if (!Player.Fidel.EndRound)
         {
-            cameras[1].gameObject.SetActive(true);
+            OpenPlayer(1);
             board.RecieveTurn(board.Fidel);
         }
         else
         {
-            cameras[0].gameObject.SetActive(true);
-            betweenRoundsPanel.SetActive(true); 
+            OpenBetweenRounds();
         }
     }
 
@@ -224,4 +226,24 @@ public class MasterController : MonoBehaviour
         }
         return false;
     }
+
+    public void OpenBetweenRounds()
+    {
+        cameras[1].gameObject.SetActive(false);
+        cameras[2].gameObject.SetActive(false);
+        playerPanel.SetActive(false);
+        betweenRoundsPanel.SetActive(true);
+        cameras[0].gameObject.SetActive(true);
+    }
+
+    public void OpenPlayer(int index)
+    {
+        cameras[0].gameObject.SetActive(false);
+        playerPanel.SetActive(true);
+        betweenRoundsPanel.SetActive(false);
+        playerPanel.SetActive(true);
+        cameras[index].gameObject.SetActive(true);
+    }
+
+    public void OpenPlayer(string name) => OpenPlayer(name == "Fidel" ? 1 : 2);
 }

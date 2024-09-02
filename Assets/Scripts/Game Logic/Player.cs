@@ -109,7 +109,7 @@ public class Player
 
         while (cardsToSteal> 0)
         {
-            int index = new System.Random().Next(Deck.Count - 1);
+            int index = Deck.Count - 1;
             AddToHand(Deck[index]);
             Board.Instance.Receive(new RemoveOperation(Deck[index], Deck, index, true));
             Deck.RemoveAt(index);

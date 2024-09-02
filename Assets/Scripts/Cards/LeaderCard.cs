@@ -16,19 +16,24 @@ public class LeaderCard : Card
     public override bool Effect(Context context)
     {
         Board.Instance.Receive(new LeaderEffectOperation(this));
+        Board.Instance.ValidTurn = true;
         if (!context.CurrentPlayer.LeaderEffectUsedThisRound)
         {
             context.CurrentPlayer.LeaderEffectUsedThisRound = true;
+            bool ok = false;
             try
             {
-                if (effect is null) return NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :
+                if (effect is null) ok = NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :
                                                                 StealCard(context.CurrentPlayer);
-                else return effect.Invoke(context);
+                else ok = effect.Invoke(context);
             }
             catch
             {
-                return false;
+                ok = false;
             }
+
+            Board.Instance.UpdateTotalDamage();
+            return ok;
         }
         else return false;
     }

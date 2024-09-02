@@ -198,7 +198,6 @@ public class CardController : MonoBehaviour
                             {
                                 BaitFound = true;
                                 masterController.board.UpdateView(true);
-                                board.ValidTurn = true;
                             }
 
                             break;
