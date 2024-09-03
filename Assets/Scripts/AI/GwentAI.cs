@@ -36,7 +36,7 @@ namespace Gwent_AI
             (Card, Zone, Card) value = MyPlay(context, 2, out bool leaderEffect);
             info = faction + " se pasó y no jugará más.";
 
-            if (leaderEffect) info = faction + " usó el efecto de su líder.";
+            if (leaderEffect) info = faction + " usó el efecto de su líder" + (value.Item3 is null? "." : ("sobre la carta '" + value.Item3.Name + "'."));
             else if (value.Item1 is BaitCard) info = faction + " usó el señuelo '" + value.Item1.Name + "' para recuperar la carta '" + value.Item3.Name + "'.";
             else if (value.Item1 is Card) info = faction + " jugó la carta '" + value.Item1.Name + "' en la zona de " + (value.Item2 is Zone.Melee ? "cuerpo a cuerpo." : (value.Item2 is Zone.Range ? "rango." : "asedio."));
             else return false;
@@ -58,9 +58,16 @@ namespace Gwent_AI
             Card toPlay = null;
             Zone zone = Zone.Melee;
             Card target = null;
-            double difference = board.GetDamage() - board.GetEnemyDamage();
+            double difference = board.GetDifference();
 
-            if(count<0 || (difference>0 && gameBoard.GetCurrentEnemy().EndRound) || !(Utils.GetEnemyOf(player).Score - player.Score >= 2) && 
+            if (count > 0 && difference > 0 && gameBoard.GetCurrentEnemy().EndRound && !player.LeaderEffectUsedThisRound)
+            {
+                board.NewTurn();
+                leaderEffect = LeaderEffect(context, 0, out target) && difference > 0;
+                target = leaderEffect ? target : null;
+                board.Undo();
+            }
+            else if(count<0 || (difference>0 && gameBoard.GetCurrentEnemy().EndRound) || !(Utils.GetEnemyOf(player).Score - player.Score >= 2) && 
                                                                                      (difference <-25||(difference<-12 && new System.Random().Next(0, 10) == 6)))
                 return (toPlay, zone, target);
 
@@ -94,7 +101,7 @@ namespace Gwent_AI
                     }
                 }
 
-                double thisDifference = board.GetDamage() - board.GetEnemyDamage();
+                double thisDifference = board.GetDifference();
                 if (thisDifference > difference || ((tempLeaderEffect || card != null) &&
                                                    thisDifference == difference &&
                                                    (context.Hand.Count > 4 ||
@@ -147,7 +154,7 @@ namespace Gwent_AI
         Card PlayBait(IContext context, int count, BaitCard bait)
         {
             Card bestCard = null;
-            double difference = board.GetDamage() - board.GetEnemyDamage();
+            double difference = board.GetDifference();
 
             for (int i = 0; i < player.Battlefield.CardsInBattlefield.Count; i++)
             {
@@ -161,7 +168,7 @@ namespace Gwent_AI
                 }
                 MyPlay(context, count-1, out bool temp);
 
-                double thisDifference = board.GetDamage() - board.GetEnemyDamage();
+                double thisDifference = board.GetDifference();
                 if (thisDifference>difference || thisDifference == difference &&
                                                  (context.Hand.Count > 4 ||
                                                  (Utils.GetEnemyOf(player).Score - player.Score >= 2)))

@@ -54,14 +54,14 @@ namespace Gwent_AI
         #endregion
 
         #region Damage values
-        public double GetEnemyDamage()
-        {
-            return player.TotalDamage;
-        }
-
-        public double GetDamage()
+        double GetEnemyDamage()
         {
             return Utils.GetEnemyOf(player).TotalDamage;
+        }
+
+        double GetDamage()
+        {
+            return player.TotalDamage;
         }
 
         public double GetDifference() => GetDamage() - GetEnemyDamage();
