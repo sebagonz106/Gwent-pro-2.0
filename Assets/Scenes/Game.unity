@@ -12842,7 +12842,7 @@ GameObject:
   - component: {fileID: 348803511}
   - component: {fileID: 348803514}
   m_Layer: 0
-  m_Name: Batista Hand 2
+  m_Name: Batista Hand (2)
   m_TagString: HandCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -38001,7 +38001,7 @@ GameObject:
   - component: {fileID: 1008516721}
   - component: {fileID: 1008516724}
   m_Layer: 0
-  m_Name: Batista Hand 0
+  m_Name: Batista Hand (0)
   m_TagString: HandCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -72923,7 +72923,7 @@ GameObject:
   - component: {fileID: 2036043104}
   - component: {fileID: 2036043107}
   m_Layer: 0
-  m_Name: Batista Hand 1
+  m_Name: Batista Hand (1)
   m_TagString: HandCard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

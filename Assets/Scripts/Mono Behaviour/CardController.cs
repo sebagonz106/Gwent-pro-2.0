@@ -69,6 +69,8 @@ public class CardController : MonoBehaviour
 
             this.IsOccupied = true;
         }
+
+        else if(this.gameObject.tag == "HandCard") this.gameObject.AddComponent<DoubleClick>();
     }
 
     public void OnMouseDown()

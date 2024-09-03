@@ -81,7 +81,6 @@ namespace Gwent_AI
                 board.NewTurn();
                 if (i == context.Hand.Count)
                 {
-                        Debug.Log(i);
                     if (!player.LeaderEffectUsedThisRound && context.Hand.Count<10)
                         tempLeaderEffect = LeaderEffect(context, count, out tempTarget);
                 }
