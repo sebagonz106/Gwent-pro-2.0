@@ -8,4 +8,5 @@ static class Getter
 {
     public static Board BoardInstance => Board.Instance; //null reference otherwise
     public static Card BaseCard => Utils.BaseCard;
+    public static void Shuffle(List<Card> list) => Utils.ShuffleList(list, true);
 }

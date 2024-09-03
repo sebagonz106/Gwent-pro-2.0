@@ -73,7 +73,9 @@ public class Card : IEffect, ICardsWithOwner
         return other is Card card && this.Name == card.Name 
                                   && this.Type == card .Type 
                                   && this.FactionEnum == card.FactionEnum 
-                                  && (CurrentPosition is null? true : this.CurrentPosition.Equals(card.CurrentPosition));
+                                  && (CurrentPosition is null? true : 
+                                                               card.CurrentPosition is null? true : 
+                                                                                             this.CurrentPosition.Equals(card.CurrentPosition));
     }
 
     public override int GetHashCode()

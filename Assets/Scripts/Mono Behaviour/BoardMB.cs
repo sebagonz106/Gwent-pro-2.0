@@ -37,7 +37,7 @@ public class BoardMB : MonoBehaviour
     #endregion
 
     #region ViewModification
-    public void UpdateView( bool alsoUpdateTexts = false)
+    public void UpdateView(bool alsoUpdateTexts = false, bool playing = true)
     {
         for (int i = 0; i < Utils.ZonesName.Length; i++)
         {
@@ -54,7 +54,7 @@ public class BoardMB : MonoBehaviour
                                                                                 !board.IsBatistaPlayingOrAboutToPlay);
         }
 
-        CardsInBoardViewModificator(ZonesList["Weather"], Board.Instance.Weather, 3);
+        CardsInBoardViewModificator(ZonesList["Weather"], Board.Instance.Weather, 3, playing);
         CardsInBoardViewModificator(Batista.Hand, Player.Batista.Hand, 10, false);
         CardsInBoardViewModificator(Fidel.Hand, Player.Fidel.Hand, 10, false);
 
@@ -76,17 +76,19 @@ public class BoardMB : MonoBehaviour
             else child.GetComponent<CardController>().Occupy(list[i]);
         }
     }
-    public void DeactivatePlayableSlots(PlayerMB player)
+    public void ModifyPlayableSlots(PlayerMB player, bool activate = false)
     {
         foreach (GameObject item in player.AvailableSlots)
         {
+            if (item.name.Contains("Hand")) continue;
+
             for (int i = 0; i < item.transform.childCount; i++)
             {
                 if (item.transform.GetChild(i).gameObject.tag == "LeaderCard") continue;
 
                 if (player.player.ListByName[item.name][i].Equals(Utils.BaseCard))
                 {
-                    item.transform.GetChild(i).gameObject.SetActive(false);
+                    item.transform.GetChild(i).gameObject.SetActive(activate);
                 }
             }
         }
@@ -105,7 +107,7 @@ public class BoardMB : MonoBehaviour
     {
         if(!board.EndTurn(player.player)) return false;
 
-        DeactivatePlayableSlots(player);
+        ModifyPlayableSlots(player);
 
         for (int i = 0; i < Weather.transform.childCount; i++)
         {
@@ -137,7 +139,7 @@ public class BoardMB : MonoBehaviour
             else
             {
                 this.masterController.RoundEndedNotification(winner);
-                DeactivatePlayableSlots(GetMBPlayerByName[winner]);
+                ModifyPlayableSlots(GetMBPlayerByName[winner]);
             }
 
             #region Activating Coins
@@ -163,13 +165,18 @@ public class BoardMB : MonoBehaviour
             Board.Instance.UpdateTotalDamage();
             ModifyVisibility(Batista.Body, true);
             ModifyVisibility(Fidel.Body, true);
-            UpdateView(true);
+            UpdateView(true, false);
         }
     }
 
+    public void UndoTurn()
+    {
+        Board.Instance.Undo();
+        UpdateView(true);
+    }
     #endregion
 
-    void ModifyVisibility(GameObject[] collection, bool visibility)
+    public void ModifyVisibility(GameObject[] collection, bool visibility)
     {
         foreach (GameObject item in collection)
         {

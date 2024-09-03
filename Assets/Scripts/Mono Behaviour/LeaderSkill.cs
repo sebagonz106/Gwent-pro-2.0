@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class LeaderSkillPanel : MonoBehaviour
 {
+    [SerializeField] GameObject effectException;
     [SerializeField] GameObject Info;
     [SerializeField] GameObject skillButton;
     [SerializeField] BoardMB board;
 
     public void LeaderSkillWhenCardSelected(Player player, Card card, List<Card> list)
     {
-        player.Leader.Effect(player.context.UpdatePlayerInstance(list, card));
+        if(!player.Leader.Effect(player.context.UpdatePlayerInstance(list, card))) Exception();
         Info.SetActive(true);
-        board.board.ValidTurn = true;
         skillButton.SetActive(false);
     }
 
@@ -20,14 +20,16 @@ public class LeaderSkillPanel : MonoBehaviour
     {
         Player player = board.board.GetCurrentPlayer();
         LeaderCard leader = player.Leader;
-        if (player.LeaderEffectUsedThisRound) return;
+        if (player.LeaderEffectUsedThisRound)
+        {
+            Exception();
+            return;
+        }
 
         if (!leader.NeedsCardSelection)
         {
-            leader.Effect(player.context);
-            Board.Instance.UpdateTotalDamage();
+            if(!leader.Effect(player.context)) Exception();
             board.UpdateView(true);
-            board.board.ValidTurn = true;
             skillButton.SetActive(false);
         }
         else
@@ -35,5 +37,11 @@ public class LeaderSkillPanel : MonoBehaviour
             player.LeaderCardSelected = true;
             Info.SetActive(false);
         }
+    }
+
+    public void Exception()
+    {
+        effectException.SetActive(true);
+        Info.SetActive(false);
     }
 }

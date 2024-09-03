@@ -87,16 +87,7 @@ public class Player
         if (Deck.Count <= cardsToSteal) //If there are no longer cards left in deck, this conditional shuffles
                                         //graveyard cards and add them to the deck so the game goes on
         {
-            int randomNumber;
-            Card swapCard;
-
-            for (int k = Battlefield.Graveyard.Count - 1; k >= 0; k--)
-            {
-                randomNumber = new System.Random().Next(Battlefield.Graveyard.Count - 1);
-                swapCard = Battlefield.Graveyard[randomNumber];
-                Battlefield.Graveyard[randomNumber] = Battlefield.Graveyard[k];
-                Battlefield.Graveyard[k] = swapCard;
-            }
+            Utils.ShuffleList(Battlefield.Graveyard);
 
             foreach (var card in Battlefield.Graveyard)
             {
@@ -110,18 +101,17 @@ public class Player
                                                       //a random card in deck to graveyard until a proper value for cardsToSteal is achieved
         {
             int index = new System.Random().Next(Deck.Count - 1);
-            Battlefield.Graveyard.Add(Deck[index]);
-            Deck[index].AssignPosition(Battlefield.Graveyard);
-            Deck.RemoveAt(index);
+            Battlefield.ToGraveyard(Deck[index], Deck);
             cardsToSteal--;
         }
 
-        if (cardsToSteal == 0) return false;
+        if (cardsToSteal == 0 || emptySlotsInHand.Count<cardsToSteal) return false;
 
         while (cardsToSteal> 0)
         {
-            int index = new System.Random().Next(Deck.Count - 1);
+            int index = Deck.Count - 1;
             AddToHand(Deck[index]);
+            Board.Instance.Receive(new RemoveOperation(Deck[index], Deck, index, true));
             Deck.RemoveAt(index);
             cardsToSteal--;
         }
@@ -133,48 +123,60 @@ public class Player
     public bool PlayCard(int originPosition, int targetPosition, Zone rangeType, out bool effectFailed)
     {
         effectFailed = false;
+        if (targetPosition < 0 || originPosition < 0) return false;
 
-        /* i'm sorry but i have to say it: i f***ing hate Unity. i don't know why, every time i load a compiled card, the context of the player 
-         * that uses it is deleted and when trying to use the effect of the played card, the game breaks. this might be a hell of a patch
-         * but I assure you i haven't found another way and I need this damn thing up and running. forgive my language, i've been looking
-         * for this piece of sh*t error for a week and i was already freaking out. god bless you with a long live without having to use Unity <3
-         */
-        if (context is null) context = new Context(this, Board.Instance.GetCurrentEnemy());
-
-        if (!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard || Board.Instance.ValidTurn) //in case of unexpected behaviours. bait cards will be played through their effect
+        try
         {
-            return false;
-        }
+            /* i'm sorry but i have to say it: i f***ing hate Unity. i don't know why, every time i load a compiled card, the context of the player 
+             * that uses it is deleted and when trying to use the effect of the played card, the game breaks. this might be a hell of a patch
+             * but I assure you i haven't found another way and I need this damn thing up and running. forgive my language, i've been looking
+             * for this piece of sh*t error for a week and i was already freaking out. god bless you with a long live without having to use Unity <3
+             */
+            if (context is null) context = new Context(this, Board.Instance.GetCurrentEnemy());
 
-        if (card is WeatherCard weather && Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
-        {
-            Board.Instance.Weather[targetPosition] = weather;
-            weather.AssignPosition(Board.Instance.Weather);
-        }
-        else if (!this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
-        {
-            return false;
-        }
-        EmptyHandAt(originPosition);
-        effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
+            if (!(this.Hand[originPosition] is Card card) || card.Equals(Utils.BaseCard) || card is BaitCard || Board.Instance.ValidTurn) //in case of unexpected behaviours. bait cards will be played through their effect
+            {
+                return false;
+            }
 
-        Board.Instance.ValidTurn = true;
-        Board.Instance.UpdateTotalDamage();
-        UpdateEmptySlots();
-        return true;
+            if (card is WeatherCard weather && Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
+            {
+                Board.Instance.Weather[targetPosition] = weather;
+                weather.AssignPosition(Board.Instance.Weather);
+                Board.Instance.Receive(new AddOperation(weather, Board.Instance.Weather, targetPosition));
+            }
+            else if (!this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
+            {
+                return false;
+            }
+            EmptyHandAt(originPosition);
+            effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
+
+            Board.Instance.ValidTurn = true;
+            Board.Instance.UpdateTotalDamage();
+            UpdateEmptySlots();
+            return true;
+        }
+        catch { return false; }
     }
 
     public void AddToHand(Card card)
     {
-        if (emptySlotsInHand.Count == 0) return;
+        if (emptySlotsInHand.Count == 0)
+        {
+            Battlefield.ToGraveyard(card, card.CurrentPosition);
+            return;
+        }
 
         Hand[emptySlotsInHand[0]] = card;
         card.AssignPosition(Hand);
+        Board.Instance.Receive(new AddOperation(card, Hand, emptySlotsInHand[0]));
         emptySlotsInHand.RemoveAt(0);
     }
 
     public void EmptyHandAt(int index)
     {
+        Board.Instance.Receive(new RemoveOperation(Hand[index], Hand, index));
         this.emptySlotsInHand.Add(index);
         this.Hand[index] = Utils.BaseCard;
     }

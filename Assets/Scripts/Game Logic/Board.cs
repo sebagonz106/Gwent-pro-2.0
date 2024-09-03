@@ -18,7 +18,12 @@ public class Board
     public int RoundCount { get => roundCount; private set => roundCount = value; }
     public bool ValidTurn { get; set; }
 
-    private Board() { IsBatistaPlayingOrAboutToPlay = true; }
+    private Board()
+    {
+        IsBatistaPlayingOrAboutToPlay = true;
+        turnInfo = new Stack<TurnInfo>();
+        turnInfo.Push(new TurnInfo());
+    }
 
     public void SetZonesList()
     {
@@ -62,10 +67,11 @@ public class Board
 
             RoundCount++;
             newRound = false;
+            NewTurn();
         }
     }
 
-    public bool EndTurn(Player player)
+    public bool EndTurn(Player player = null)
     {
         if (!ValidTurn) return false;
         ValidTurn = false;
@@ -74,12 +80,14 @@ public class Board
         {
             if (IsBatistaPlayingOrAboutToPlay) IsBatistaPlayingOrAboutToPlay = Player.Fidel.EndRound;
             else IsBatistaPlayingOrAboutToPlay = !Player.Batista.EndRound;
+            NewTurn();
         }
         return true;
     }
 
-    public bool EndRound(Player player)
+    public bool EndRound(Player player = null)
     {
+        if (player is null) player = GetCurrentPlayer();
         if (ValidTurn) return false;
         ValidTurn = true;
         player.EndRound = true;
@@ -151,6 +159,19 @@ public class Board
             UpdateTotalDamage(Player.Batista);
             player = Player.Fidel;
         }
+        else
+        {
+            foreach (Card card in this.Weather) //applies weather effects
+            {
+                if (card is WeatherCard weather)
+                {
+                    //same patch as in PlayCard
+                    if (weather.Owner.context is null) weather.Owner.context = new Context(weather.Owner, Utils.GetEnemyOf(weather.Owner));
+
+                    weather.WeatherEffect(weather.Owner.context.UpdatePlayerInstance(this.Weather, weather));
+                }
+            }
+        }
 
         player.TotalDamage = 0;
 
@@ -158,17 +179,6 @@ public class Board
         for (int i = 0; i < bonus.Length; i++)
         {
             bonus[i] = (player.Battlefield.Bonus[i] is BonusCard) ? ((BonusCard)player.Battlefield.Bonus[i]).Increase : 1;
-        }
-
-        foreach (Card card in this.Weather) //applies weather effects
-        {
-            if (card is WeatherCard weather)
-            {
-                //same patch as in PlayCard
-                if(weather.Owner.context is null) weather.Owner.context = new Context(weather.Owner, Utils.GetEnemyOf(weather.Owner));
-
-                weather.WeatherEffect(weather.Owner.context.UpdatePlayerInstance(this.Weather, weather));
-            }
         }
 
         for (int i = 0; i < player.Battlefield.Zones.Length; i++)
@@ -201,6 +211,27 @@ public class Board
     {
         instance = new Board();
         Player.Reset();
+    }
+    #endregion
+
+    #region Operation controller
+    TurnInfo currentTurn => turnInfo.Peek();
+    Stack<TurnInfo> turnInfo = new Stack<TurnInfo>();
+
+    public void Receive(Operation operation) => currentTurn.Receive(operation);
+
+    public void NewTurn()
+    {
+        turnInfo.Push(new TurnInfo());
+        ValidTurn = false;
+    }
+    public TurnInfo RemoveLastTurn() => turnInfo.Pop();
+
+    public void Undo()
+    {
+        currentTurn.Restore();
+        UpdateTotalDamage();
+        ValidTurn = false;
     }
     #endregion
 }

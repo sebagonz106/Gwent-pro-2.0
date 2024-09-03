@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class MasterController : MonoBehaviour
 {
     public Camera[] cameras = new Camera[3]; //Camera[0] between rounds, Camera[1] fidel, Camera[2] batista
+    Camera GetCameraOf(string player) => player == "Fidel" ? cameras[1] : player == "Batista" ? cameras[2] : cameras[0];
 
     #region Panels
     [SerializeField] CompiledCardVisual infoContainer;
@@ -20,6 +21,7 @@ public class MasterController : MonoBehaviour
     [SerializeField] GameObject fidelVictory;
     [SerializeField] GameObject effectException;
     [SerializeField] GameObject generalException;
+    [SerializeField] GameObject undoButton;
     [SerializeField] TMP_Text roundEndedNotification;
     [SerializeField] TMP_Text BatistaScoreInPlayersPanel;
     [SerializeField] TMP_Text FidelScoreInPlayersPanel;
@@ -30,10 +32,17 @@ public class MasterController : MonoBehaviour
     #endregion
 
     public BoardMB board;
+    bool aIActive;
+    [SerializeField] AIController aI;
 
     public GameObject PanelOnWhenInformationDisplayed { get => panelOnWhenInformationDisplayed; private set => panelOnWhenInformationDisplayed = value; }
     bool isBatistaPlayingOrAboutToPlay => Board.Instance.IsBatistaPlayingOrAboutToPlay;
     bool validTurn => Board.Instance.ValidTurn;
+
+    private void Awake()
+    {
+        aIActive = PlayerPrefs.GetString("AI").Length > 0;
+    }
 
     private void Start()
     {
@@ -44,45 +53,52 @@ public class MasterController : MonoBehaviour
         };
     }
 
-    public void EndTurn()
+    private void Update()
     {
-        if (!board.EndTurn(board.CurrentPlayer)) return;
+        undoButton.SetActive(Board.Instance.ValidTurn && !betweenRoundsPanel.activeInHierarchy);
+    }
 
-        cameras[1].gameObject.SetActive(false);
-        cameras[2].gameObject.SetActive(false);
+    public void EndTurn(bool roundEnded = false)
+    {
+        if (aIActive)
+        {
+            aI.EndTurn();
+            return;
+        }
+        if (!board.EndTurn(board.CurrentPlayer)) return;
         UpdateScoreInText();
-        playerPanel.SetActive(false);
-        betweenRoundsPanel.SetActive(true);
-        cameras[0].gameObject.SetActive(true);
+        OpenBetweenRounds();
     }
 
     public void EndRound()
     {
+        if (aIActive)
+        {
+            aI.EndRound();
+            return;
+        }
         if (!board.EndRound(board.CurrentPlayer)) return;
 
-        EndTurn();
+        EndTurn(true);
     }
 
     public void ReceiveTurn()
     {
-        cameras[0].gameObject.SetActive(false);
-        playerPanel.SetActive(true);
-        betweenRoundsPanel.SetActive(false);
+        if (aIActive) aI.StartRound();
 
-        if (isBatistaPlayingOrAboutToPlay && !Player.Batista.EndRound)
+        else if (isBatistaPlayingOrAboutToPlay && !Player.Batista.EndRound)
         {
-            cameras[2].gameObject.SetActive(true);
+            OpenPlayer(2);
             board.RecieveTurn(board.Batista);
         }
         else if (!Player.Fidel.EndRound)
         {
-            cameras[1].gameObject.SetActive(true);
+            OpenPlayer(1);
             board.RecieveTurn(board.Fidel);
         }
         else
         {
-            cameras[0].gameObject.SetActive(true);
-            betweenRoundsPanel.SetActive(true); 
+            OpenBetweenRounds();
         }
     }
 
@@ -93,15 +109,14 @@ public class MasterController : MonoBehaviour
             if (this.gameObject.transform.GetChild(i).gameObject.activeInHierarchy)
             {
                 this.PanelOnWhenInformationDisplayed = this.gameObject.transform.GetChild(i).gameObject;
-                this.gameObject.transform.GetChild(i).gameObject.SetActive(leaveActive);
+                PanelOnWhenInformationDisplayed.SetActive(leaveActive);
                 break;
             }
         }
     }
     public void EffectException()
     {
-        SavePanelOnWhenInformationDisplayed();
-        PanelOnWhenInformationDisplayed.SetActive(false);
+        SavePanelOnWhenInformationDisplayed(false);
         effectException.SetActive(true);
     }
     public void GeneralException()
@@ -211,4 +226,24 @@ public class MasterController : MonoBehaviour
         }
         return false;
     }
+
+    public void OpenBetweenRounds()
+    {
+        cameras[1].gameObject.SetActive(false);
+        cameras[2].gameObject.SetActive(false);
+        playerPanel.SetActive(false);
+        betweenRoundsPanel.SetActive(true);
+        cameras[0].gameObject.SetActive(true);
+    }
+
+    public void OpenPlayer(int index)
+    {
+        cameras[0].gameObject.SetActive(false);
+        playerPanel.SetActive(true);
+        betweenRoundsPanel.SetActive(false);
+        playerPanel.SetActive(true);
+        cameras[index].gameObject.SetActive(true);
+    }
+
+    public void OpenPlayer(string name) => OpenPlayer(name == "Fidel" ? 1 : 2);
 }

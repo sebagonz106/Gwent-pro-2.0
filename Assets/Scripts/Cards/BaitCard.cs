@@ -11,14 +11,18 @@ public class BaitCard : Card
 
     public override bool Effect(Context context)
     {
+        bool ok = false;
         try
         {
-            return Effect(context.CurrentPosition, context.CurrentPosition.IndexOf(context.CurrentCard)) & effect.Invoke(context);
+            ok = Effect(context.CurrentPosition, context.CurrentPosition.IndexOf(context.CurrentCard)) & effect.Invoke(context);
         }
         catch (System.NullReferenceException)
         {
-            return false;
+            ok = false;
         }
+        Board.Instance.UpdateTotalDamage();
+        Board.Instance.ValidTurn = true;
+        return ok;
     }
 
     public bool Effect(List<Card> list, int index)
@@ -28,9 +32,10 @@ public class BaitCard : Card
         Owner.Hand[Owner.Hand.IndexOf(this)] = card;
         list[index] = this;
         card.AssignPosition(Owner.Hand);
+        this.AssignPosition(list);
         if (card is UnitCard unit) unit.InitializeDamage(); //in case any permanent effects were applied on this card
         else if (card is ClearCard) Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[Owner.ZoneByList[list]]);
-        Board.Instance.UpdateTotalDamage();
+        Board.Instance.Receive(new BaitOperation(this, card, list, index));
         return true;
     }
 }

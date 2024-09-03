@@ -12,13 +12,13 @@ public static class CardsWarehouse
 
         new BaitCard("Resistencia organizada", Faction.Fidel, Type.Bait, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
 
-        new ClearCard("Capas y linternas", Faction.Fidel, Type.Clear, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
-        new ClearCard("Mantas", Faction.Fidel, Type.Clear, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
-        new ClearCard("Santeria", Faction.Fidel, Type.Clear, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
+        new ClearCard("Capas y linternas", Faction.Fidel, Type.Clear, new List<Zone>{Zone.Range, Zone.Siege}),
+        new ClearCard("Mantas", Faction.Fidel, Type.Clear, new List<Zone>{Zone.Melee,  Zone.Siege}),
+        new ClearCard("Santeria", Faction.Fidel, Type.Clear, new List<Zone>{Zone.Melee, Zone.Range}),
 
-        new WeatherCard("Lluvia", Faction.Fidel, Type.Weather, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
-        new WeatherCard("Frente Frio", Faction.Fidel, Type.Weather, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
-        new WeatherCard("Niebla", Faction.Fidel, Type.Weather, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
+        new WeatherCard("Lluvia", Faction.Fidel, Type.Weather, new List<Zone>{Zone.Range, Zone.Siege}),
+        new WeatherCard("Frente Frio", Faction.Fidel, Type.Weather, new List<Zone>{Zone.Melee, Zone.Siege}),
+        new WeatherCard("Niebla", Faction.Fidel, Type.Weather, new List<Zone>{Zone.Melee, Zone.Range}),
 
         new BonusCard("Huelga revolucionaria", Faction.Fidel, Type.Bonus, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}, 1.8),
         new BonusCard("Expedicion revolucionaria", Faction.Fidel, Type.Bonus, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}, 1.5),
@@ -44,13 +44,13 @@ public static class CardsWarehouse
 
         new BaitCard("Retirada estrategica", Faction.Batista, Type.Bait, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
 
-        new ClearCard("Capas y linternas", Faction.Batista, Type.Clear, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
-        new ClearCard("Mantas", Faction.Batista, Type.Clear, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
-        new ClearCard("Santeria", Faction.Batista, Type.Clear, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
+        new ClearCard("Capas y linternas", Faction.Batista, Type.Clear, new List<Zone>{Zone.Range, Zone.Siege}),
+        new ClearCard("Mantas", Faction.Batista, Type.Clear, new List<Zone>{Zone.Melee, Zone.Siege}),
+        new ClearCard("Santeria", Faction.Batista, Type.Clear, new List<Zone>{Zone.Melee, Zone.Siege}),
 
-        new WeatherCard("Lluvia", Faction.Batista, Type.Weather, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
-        new WeatherCard("Frente Frio", Faction.Batista, Type.Weather, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
-        new WeatherCard("Niebla", Faction.Batista, Type.Weather, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}),
+        new WeatherCard("Lluvia", Faction.Batista, Type.Weather, new List<Zone>{Zone.Range, Zone.Siege}),
+        new WeatherCard("Frente Frio", Faction.Batista, Type.Weather, new List<Zone>{Zone.Melee, Zone.Siege}),
+        new WeatherCard("Niebla", Faction.Batista, Type.Weather, new List<Zone>{Zone.Melee, Zone.Range}),
 
         new BonusCard("Asesoria estadounidense", Faction.Batista, Type.Bonus, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}, 1.8),
         new BonusCard("Casinos y hoteles", Faction.Batista, Type.Bonus, new List<Zone>{Zone.Melee, Zone.Range, Zone.Siege}, 1.5),

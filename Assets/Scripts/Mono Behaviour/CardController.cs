@@ -69,6 +69,8 @@ public class CardController : MonoBehaviour
 
             this.IsOccupied = true;
         }
+
+        else if(this.gameObject.tag == "HandCard") this.gameObject.AddComponent<DoubleClick>();
     }
 
     public void OnMouseDown()
@@ -198,7 +200,6 @@ public class CardController : MonoBehaviour
                             {
                                 BaitFound = true;
                                 masterController.board.UpdateView(true);
-                                board.ValidTurn = true;
                             }
 
                             break;
@@ -217,6 +218,7 @@ public class CardController : MonoBehaviour
         else GameManager.GetComponent<MasterController>().GeneralException();
     }
 
+    #region Misc
     private void Disable(CardController cardController)
     {
         cardController.isSelected = false;
@@ -271,4 +273,5 @@ public class CardController : MonoBehaviour
     List<Card> GetList () => this.gameObject.tag == "WeatherCard" ? board.Weather :
                              this.gameObject.tag == "BonusCard" ? this.player.Battlefield.Bonus : 
                              this.player.ListByZone[rangeTypes[0]];
+    #endregion
 }

@@ -10,35 +10,45 @@ public class LeaderCard : Card
                  base(name, faction, cardType, new List<Zone>(), initialDamage, effect)
     {
         NeedsCardSelection = needsCardSelection;
+        this.effect = effect;
     }
 
     public override bool Effect(Context context)
     {
-        try
+        Board.Instance.Receive(new LeaderEffectOperation(this));
+        Board.Instance.ValidTurn = true;
+        if (!context.CurrentPlayer.LeaderEffectUsedThisRound)
         {
-            if (effect is null) return NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :
-                                                            StealCard(context.CurrentPlayer);
-            else return effect.Invoke(context);
+            context.CurrentPlayer.LeaderEffectUsedThisRound = true;
+            bool ok = false;
+            try
+            {
+                if (effect is null) ok = NeedsCardSelection ? KeepInBattlefield(context.CurrentPlayer, context.CurrentCard, context.CurrentPosition) :
+                                                                StealCard(context.CurrentPlayer);
+                else ok = effect.Invoke(context);
+            }
+            catch
+            {
+                ok = false;
+            }
+
+            Board.Instance.UpdateTotalDamage();
+            return ok;
         }
-        catch 
-        {
-            return false;
-        }
+        else return false;
     }
 
     private bool KeepInBattlefield(Player player, Card card, List<Card> list)
     {
-        if (player.LeaderEffectUsedThisRound || !this.NeedsCardSelection || !player.Battlefield.StaysInBattlefieldModifier(card, list)) return false;
+        if (!this.NeedsCardSelection || !player.Battlefield.StaysInBattlefieldModifier(card, list)) return false;
 
-        player.LeaderEffectUsedThisRound = true;
-        return true;
+        else return true;
     }
 
     private bool StealCard(Player player)
     {
-        if (player.LeaderEffectUsedThisRound || this.NeedsCardSelection || !player.GetCard()) return false;
+        if (this.NeedsCardSelection || !player.GetCard()) return false;
 
-        player.LeaderEffectUsedThisRound = true;
-        return true;
+        else return true;
     }
 }
