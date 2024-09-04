@@ -68,7 +68,9 @@ namespace Gwent_AI
                 board.Undo();
             }
             else if(count<0 || (difference>0 && gameBoard.GetCurrentEnemy().EndRound) || !(Utils.GetEnemyOf(player).Score - player.Score >= 2) && 
-                                                                                     (difference <-25||(difference<-12 && new System.Random().Next(0, 10) == 6)))
+                                                                                          (difference <-25||
+                                                                                          (difference<-12 && new System.Random().Next(0, 10) == 6) ||
+                                                                                          (difference < -5 && context.Hand.Count<=4)))
                 return (toPlay, zone, target);
 
             else for (int i = 0; i <= context.Hand.Count; i++)

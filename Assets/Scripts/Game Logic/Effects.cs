@@ -28,8 +28,7 @@ public static class Effects
 
     #region Rebel effects
 
-    public static bool StealCard(Context context) => context.CurrentPlayer.GetCard(); //for it to work, the card with this effect must not 
-                                                                                      //be the first card played of a full hand
+    public static bool StealCard(Context context) => context.CurrentPlayer.GetCard();
     public static bool NoOneSurrendersHereGodDamn(Context context)
     {
         context.Board.AlmeidaIsPlayed = true;

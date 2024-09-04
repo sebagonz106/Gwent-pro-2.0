@@ -166,11 +166,7 @@ public class CardController : MonoBehaviour
                                 (this.gameObject.tag == "BattlefieldCard" && !(new List<Type> { Type.Bait, Type.Bonus, Type.Weather }).Contains(player.Hand[i].Type)) ||
                                 (this.gameObject.tag == "BonusCard" && player.Hand[i] is BonusCard))
                             {
-                                if (playerMB.PlayCard(i, indexOfThisInParent, this.rangeTypes[0]))
-                                {
-                                    child.SetActive(false); //just in case jeje
-                                    this.IsOccupied = true;
-                                }
+                                if (playerMB.PlayCard(i, indexOfThisInParent, this.rangeTypes[0]))  this.IsOccupied = true;
                                 else masterController.GeneralException();
                             }
                             else masterController.GeneralException();

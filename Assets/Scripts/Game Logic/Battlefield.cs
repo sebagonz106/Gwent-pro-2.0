@@ -79,7 +79,7 @@ public class Battlefield
             Card card = Board.Instance.Weather[i];
 
             //sending to graveyard only the cards on this list played by this player
-            if ((card is BaitCard bait && bait.Owner.Equals(playerThatOwnsThisBattlefield)) || (card is WeatherCard weather && weather.Owner.Equals(playerThatOwnsThisBattlefield)))
+            if (card.Owner.Equals(playerThatOwnsThisBattlefield))
             {
                 this.ToGraveyard(card, Board.Instance.Weather);
             }
@@ -95,7 +95,7 @@ public class Battlefield
 
         if (staysInBattlefieldController.Item1 is Card stayingCard)
         {
-            if (stayingCard is WeatherCard || stayingCard is BaitCard || stayingCard is BonusCard)
+            if (stayingCard is WeatherCard || stayingCard is BaitCard)
                 staysInBattlefieldController.Item2[staysInBattlefieldController.Item3] = stayingCard;
 
             else if (!TryAdd(stayingCard, staysInBattlefieldController.Item2, staysInBattlefieldController.Item3))
@@ -118,12 +118,16 @@ public class Battlefield
     {
         int bonusAndClearIndex = Utils.IndexByZone[this.playerThatOwnsThisBattlefield.ZoneByList[list]];
 
-        if (card.Type == Type.Bonus && Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
+        if (card.Type == Type.Bonus)
         {
-            Bonus[bonusAndClearIndex] = card;
-            card.AssignPosition(Bonus);
-            Board.Instance.Receive(new AddOperation(card, Bonus, bonusAndClearIndex));
-            return true;
+            if (Bonus[bonusAndClearIndex].Equals(Utils.BaseCard))
+            {
+                Bonus[bonusAndClearIndex] = card;
+                card.AssignPosition(Bonus);
+                Board.Instance.Receive(new AddOperation(card, Bonus, bonusAndClearIndex));
+                return true;
+            }
+            else return false;
         }
         else if (list[index].Equals(Utils.BaseCard))
         {

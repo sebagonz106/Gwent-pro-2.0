@@ -39,6 +39,7 @@ public class CardInitializer : MonoBehaviour
             player.GetCard(2);
             cardsStolen = true;
             board.UpdateView();
+            board.board.NewTurn();
         }
         else board.masterController.GeneralException();
     }

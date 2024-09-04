@@ -71,7 +71,7 @@ namespace Gwent_AI
         public bool AddNormalCard(Card card, out Zone bestZone)
         {
             bestZone = Zone.Melee;
-            if (card.Type is Type.Bait || card.Type is Type.Bait) throw new System.ArgumentException();
+            if (card.Type is Type.Bait) throw new System.ArgumentException();
 
             double biggestDifference = int.MinValue;
             foreach (Zone zone in card.AvailableRange)

@@ -105,7 +105,7 @@ public class Player
             cardsToSteal--;
         }
 
-        if (cardsToSteal == 0 || emptySlotsInHand.Count<cardsToSteal) return false;
+        if (cardsToSteal == 0) return false;
 
         while (cardsToSteal> 0)
         {
@@ -139,16 +139,21 @@ public class Player
                 return false;
             }
 
-            if (card is WeatherCard weather && Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard)) //play weather card
+            if (card is WeatherCard weather) //play weather card
             {
-                Board.Instance.Weather[targetPosition] = weather;
-                weather.AssignPosition(Board.Instance.Weather);
-                Board.Instance.Receive(new AddOperation(weather, Board.Instance.Weather, targetPosition));
+                if (Board.Instance.Weather[targetPosition].Equals(Utils.BaseCard))
+                {
+                    Board.Instance.Weather[targetPosition] = weather;
+                    weather.AssignPosition(Board.Instance.Weather);
+                    Board.Instance.Receive(new AddOperation(weather, Board.Instance.Weather, targetPosition));
+                }
+                else return false;
             }
             else if (!this.Battlefield.AddCard(card, rangeType, targetPosition)) //play unit, clear and bonus card
             {
                 return false;
             }
+
             EmptyHandAt(originPosition);
             effectFailed = !card.Effect(context.UpdatePlayerInstance(this.ListByZone[rangeType], card));
 
@@ -165,13 +170,14 @@ public class Player
         if (emptySlotsInHand.Count == 0)
         {
             Battlefield.ToGraveyard(card, card.CurrentPosition);
-            return;
         }
-
-        Hand[emptySlotsInHand[0]] = card;
-        card.AssignPosition(Hand);
-        Board.Instance.Receive(new AddOperation(card, Hand, emptySlotsInHand[0]));
-        emptySlotsInHand.RemoveAt(0);
+        else
+        {
+            Hand[emptySlotsInHand[0]] = card;
+            card.AssignPosition(Hand);
+            Board.Instance.Receive(new AddOperation(card, Hand, emptySlotsInHand[0]));
+            emptySlotsInHand.RemoveAt(0);
+        }
     }
 
     public void EmptyHandAt(int index)
