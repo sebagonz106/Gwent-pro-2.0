@@ -51,9 +51,20 @@ public class VisualInfo
 public interface IEffect
 {
     bool Effect(Context context);
+    void Effect(Gwent_AI.IContext context);
 }
 
 public interface ICardsWithOwner
 {
     Player Owner { get; }
+    string OwnerName { get; }
+}
+
+public interface ICard : IEffect, ICardsWithOwner
+{
+    string CardType { get;}
+    string Name { get;}
+    string Faction { get; }
+    double Power { get; }
+    List<string> Zones { get; }
 }

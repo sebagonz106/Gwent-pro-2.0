@@ -144,24 +144,24 @@ public class Battlefield
     #endregion
 
     #region utils
-    public (UnitCard, List<Card>) SilverCardWithHighestOrLowestDamage(bool highestOrLowestDamage) //analizes which is the most or least powerful unit card in the field and returns it alongside the list where it is played
+    public (UnitCard, List<Card>) SilverCardWithHighestOrLowestDamage(bool highestDamage) //analizes which is the most or least powerful unit card in the field and returns it alongside the list where it is played
     {
         UnitCard unit = null;
         List<Card> list = null;
 
         for (int i = 0; i < Zones.Length; i++) //not looking in Bonus
         {
-            CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, Zones[i], highestOrLowestDamage);
+            CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref unit, ref list, Zones[i], highestDamage);
         }
 
         return (unit, list);
     }
 
-    private void CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref UnitCard unit, ref List<Card> listToSave, List<Card> listToCheck, bool HighestOrLowestDamage)
+    private void CompareListsOfCardsToGetTheSilverCardWithHighestOrLowestDamage(ref UnitCard unit, ref List<Card> listToSave, List<Card> listToCheck, bool highestDamage)
     {
         foreach (Card item in listToCheck)
         {
-            if (item is UnitCard unitItem && unitItem.Level == Level.Silver && (unit == null || Compare(unit.InitialDamage, HighestOrLowestDamage, unitItem.InitialDamage)))
+            if (item is UnitCard unitItem && unitItem.Level == Level.Silver && (unit == null || Compare(unitItem.InitialDamage, highestDamage, unit.InitialDamage)))
             {
                 unit = unitItem;
                 listToSave = listToCheck;
@@ -190,20 +190,19 @@ public class Battlefield
             List<Card> list = new List<Card>();
             foreach (var zone in Zones)
             {
-                foreach (var item in zone)
-                {
-                    if (!item.Equals(Utils.BaseCard)) list.Add(item);
-                }
+                AddFrom(zone, list);
             }
-            foreach (var item in Bonus)
-            {
-                if (!item.Equals(Utils.BaseCard)) list.Add(item);
-            }
-            foreach (var card in Board.Instance.Weather)
-            {
-                if (!card.Equals(Utils.BaseCard) && card is ICardsWithOwner common && common.Owner.Equals(playerThatOwnsThisBattlefield)) list.Add(card);
-            }
+            AddFrom(Bonus, list);
+            AddFrom(Board.Instance.Weather, list);
             return list;
+        }
+    }
+
+    void AddFrom(List<Card> origin, List<Card> list)
+    {
+        foreach (var card in origin)
+        {
+            if (!card.Equals(Utils.BaseCard) && card.Owner.Equals(playerThatOwnsThisBattlefield)) list.Add(card);
         }
     }
 

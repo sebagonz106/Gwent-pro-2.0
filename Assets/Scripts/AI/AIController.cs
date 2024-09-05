@@ -105,7 +105,7 @@ public class AIController : MonoBehaviour
     {
         string info = "";
         if (this.Player.player.EndRound) return;
-        else if (!aI.DirectPlay(context, out info)) EndRound(true);
+        else if (!aI.DirectPlay(context, out info, 0)) EndRound(true);
         else Board.Instance.ValidTurn = true;
 
         playedNotificationText.text = info;

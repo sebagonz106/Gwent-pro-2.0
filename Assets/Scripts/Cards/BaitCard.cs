@@ -16,7 +16,7 @@ public class BaitCard : Card
         {
             ok = Effect(context.CurrentPosition, context.CurrentPosition.IndexOf(context.CurrentCard)) & effect.Invoke(context);
         }
-        catch (System.NullReferenceException)
+        catch
         {
             ok = false;
         }
@@ -33,6 +33,12 @@ public class BaitCard : Card
         list[index] = this;
         card.AssignPosition(Owner.Hand);
         this.AssignPosition(list);
+        Debug.Log(list[index]);
+        Debug.Log(Owner.Name);
+        foreach (var item in list)
+        {
+            Debug.Log(item);
+        }
         if (card is UnitCard unit) unit.InitializeDamage(); //in case any permanent effects were applied on this card
         else if (card is ClearCard) Owner.Battlefield.RemoveClearEffect(Utils.IndexByZone[Owner.ZoneByList[list]]);
         Board.Instance.Receive(new BaitOperation(this, card, list, index));

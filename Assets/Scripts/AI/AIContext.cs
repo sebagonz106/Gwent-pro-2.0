@@ -6,25 +6,33 @@ using System.Threading.Tasks;
 
 namespace Gwent_AI
 {
-    interface IContext
+    public interface IContext
     {
-        List<Card> Hand { get; set; }
-        List<Card> Board { get; set; }
-        List<Card> Graveyard { get; set; }
+        List<ICard> Hand { get; set; }
+        List<ICard> Board { get; set; }
+        List<ICard> Graveyard { get; set; }
     }
-    class AIContext : IContext
+    class AIContext
     {
         Player player;
+        List<Card> hand;
 
         public AIContext(Player player)
         {
             this.player = player;
         }
 
+        public AIContext(Player player, List<Card> hand)
+        {
+            this.player = player;
+            this.hand = hand;
+        }
+
         public List<Card> Hand
         {
             get
             {
+                if (!(hand is null)) return hand;
                 List<Card> list = new List<Card>();
                 foreach (var item in player.Hand)
                 {

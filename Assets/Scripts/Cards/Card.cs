@@ -2,8 +2,9 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Gwent_AI;
 
-public class Card : IEffect, ICardsWithOwner
+public class Card : ICard
 {
     #region Fields
     public string Name { get; }
@@ -53,6 +54,10 @@ public class Card : IEffect, ICardsWithOwner
     }
 
     public Player Owner => Utils.GetPlayerByFaction(FactionEnum);
+    public string OwnerName => Utils.GetPlayerByFaction(FactionEnum).Name;
+
+    public void Effect(IContext context) => throw new NotImplementedException();
+    public List<string> Zones => throw new NotImplementedException();
 
     public double InitialDamage { get => initialDamage;}
     #endregion
