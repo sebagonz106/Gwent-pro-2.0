@@ -95,16 +95,15 @@ namespace Gwent_AI
                         }
                     }
 
-                    if(Utils.GetEnemyOf(player).Battlefield.CardsInBattlefield.Count == 0 && card is UnitCard unit && unit.Level is Level.Golden)
+                    if(Utils.GetEnemyOf(player).Battlefield.CardsInBattlefield.Count <= 2 && card is UnitCard unit && unit.Level is Level.Golden)
                     {
                         board.Undo();
                         continue;
                     }
                     double thisDifference = board.GetDifference();
-                    if (((Losing  || difference>-6) && thisDifference > difference) || ((tempLeaderEffect || card != null) &&
-                                                                                        thisDifference == difference &&
-                                                                                        (context.Hand.Count > 4 ||
-                                                                                        Losing)))
+                    if (((Losing  || Winning || thisDifference > -6) && thisDifference > difference) || ((tempLeaderEffect || card != null) &&
+                                                                                                        thisDifference == difference &&
+                                                                                                        Losing))
                     {
                         difference = thisDifference;
                         toPlay = card;
@@ -126,7 +125,11 @@ namespace Gwent_AI
             }
 
             if (leaderEffect) player.Leader.Effect(player.Leader.NeedsCardSelection ? player.context.UpdatePlayerInstance(target.CurrentPosition, target) : player.context);
-            else if (toPlay is BaitCard bait) board.AddBait(bait, target);
+            else if (toPlay is BaitCard bait)
+            {
+                if (target is null) toPlay = null;
+                else board.AddBait(bait, target);
+            }
             else if (toPlay != null) board.AddNormalCard(toPlay, zone);
 
             return (toPlay, zone, target);
@@ -308,9 +311,10 @@ namespace Gwent_AI
                                                                    || (difference > 0 && gameBoard.GetCurrentEnemy().EndRound)
                                                                    || (!Losing && (difference < -25 ||
                                                                                   (difference < -12 && new System.Random().Next(0, 10) == 6) ||
-                                                                                  (difference < -5 && context.Hand.Count <= 4)))
+                                                                                  (!Winning && difference < -5 && context.Hand.Count <= 4)))
                                                                    || (difference > 12 && CountListWithEmptyCards(Utils.GetEnemyOf(player).Hand)<5));
-        bool Losing => (Utils.GetEnemyOf(player).Score - player.Score >= 2);
+        bool Losing => (Utils.GetEnemyOf(player).Score >= 2);
+        bool Winning => player.Score > 2;
 
         int CountListWithEmptyCards(List<Card> list)
         {

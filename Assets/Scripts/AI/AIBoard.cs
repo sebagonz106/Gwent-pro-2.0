@@ -61,7 +61,8 @@ namespace Gwent_AI
 
         double GetDamage()
         {
-            return player.TotalDamage;
+            if (player.Equals(Player.Fidel) && Board.Instance.AlmeidaIsPlayed) return 3 + player.TotalDamage;
+            else return player.TotalDamage;
         }
 
         public double GetDifference() => GetDamage() - GetEnemyDamage();
