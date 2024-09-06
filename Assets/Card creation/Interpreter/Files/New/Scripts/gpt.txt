@@ -1,0 +1,254 @@
+﻿effect {
+    Name: "Heal",
+    Params: {
+        amount: Number
+    },
+    Action: (targets, context) =>
+    { a=2; }
+}
+
+card {
+    Type: "Oro",
+    Name: "Geralt",
+    Faction: "Batista",
+    Power: 15,
+    Range: ["Melee"],
+    OnActivation: [
+        {
+            Effect: {Name: "Heal",
+            amount: 10},
+            Selector: {
+                Source: "board",
+                Single: true,
+                Predicate: (unit) => unit.Faction == "Fidel"
+            }
+        }
+    ]
+}
+
+effect {
+    Name: "Heal1",
+    Params: {
+        amount: Number
+    },
+    Action: (targets, context) => for target in targets target.Power += amount;
+}
+
+card {
+    Type: "Oro",
+    Name: "Geralt1",
+    Faction: "Fidel",
+    Power: 15,
+    Range: ["Melee"],
+    OnActivation: [
+        {
+            Effect: {Name: "Damage",
+            amount: 10},
+            Selector: {
+                Source: "board",
+                Single: true,
+                Predicate: (unit) => unit.Faction == "Monster"
+            }
+        }
+    ]
+}
+
+effect {
+    Name: "Boost",
+    Params: {
+        amount: Number,
+        duration: Number
+    },
+    Action: (targets, context) =>
+        for target in targets {
+            target.Power += amount;
+            context.Board.Shuffle();
+        }
+}
+
+card {
+    Type: "Oro",
+    Name: "Triss",
+    Faction: "Fidel",
+    Power: 12,
+    Range: ["Ranged"],
+    OnActivation: [
+        {
+            Effect: "Heal",
+            Selector: {
+                Source: "deck",
+                Single: true,
+                Predicate: (unit) => true
+            },
+            PostAction: {
+                Type: "Heal",
+                amount: 5,
+                Selector: {
+                    Source: "board",
+                    Single: false,
+                    Predicate: (unit) => unit.Power < 5
+                }
+            }
+        }
+    ]
+}
+
+effect {
+    Name: "Boost1",
+    Params: {
+        amount: Number,
+        duration: Number
+    },
+    Action: (targets, context) =>
+        for target in targets {
+            target.Power += amount;
+            context.Board.Shuffle();
+        }
+}
+
+
+card {
+    Type: "Oro",
+    Name: "Trissti",
+    Faction: "Batista",
+    Power: 12,
+    Range: ["Ranged"],
+    OnActivation: [
+        {
+            Effect: "Draw",
+            Selector: {
+                Source: "dekk",
+                Single: true,
+                Predicate: (unit) => true
+            },
+            PostAction: {
+                Type: "Damage",
+                amount: 5,
+                Selector: {
+                    Source: "board",
+                    Single: false,
+                    Predicate: (unit) => unit.Power < 5
+                }
+            }
+        }
+    ]
+}
+
+
+effect {
+    Name: "DrawAndBoost",
+    Action: (targets, context) => {
+        topCard = context.Deck.Pop();
+        context.Hand.Add(topCard);
+        for target in targets
+            target.Power += 2;
+    }
+}
+
+
+effect {
+    Name: "Shield",
+    Params: {
+        amount: Number
+    },
+    Action: (targets, context) =>
+        for target in targets
+            target.Armor += amount;
+}
+
+card {
+    Type: "Plata",
+    Name: "Shieldmaiden",
+    Faction: "Batista",
+    Power: 5,
+    Range: ["Melee"],
+    OnActivation: [
+        {
+            Effect: {Name: "Shield",
+	amount: 3,
+			}
+            Selector: {
+                Source: "board",
+                Single: false,
+                Predicate: (unit) => unit.Faction == "Skellige"
+            }
+        }
+    ]
+}
+
+
+effect {
+    Name: "Boost12",
+    Action: (targets, context) =>
+        for target in targets
+            target.Power += boostAmount;  // Error: boostAmount no está declarado
+}
+
+card {
+    Type: "Oro",
+    Name: "Ciri",
+    Faction: "Fidel",
+    Power: 10,
+    Range: ["Melee", "Ranged"],
+    OnActivation: [
+        {
+            Effect: {Name: "Boost",  // Error: Teleport no está declarado
+            amount: 2,
+			}
+            Selector: {
+                Source: "board",
+                Single: true,
+                Predicate: (unit) => unit.Faction == "Nilfgaard"
+            }
+        }
+    ]
+}
+
+effect {
+
+Name: "Damage",
+
+Params: {
+
+amount: Number
+
+}
+
+Action: (targets, context) => {
+
+for target in targets {
+
+i = 0;
+
+while (i++ < amount) target.Power -= 1;
+
+};
+
+}
+}
+
+effect {
+
+Name: "Draw",
+
+Action: (targets, context) => { topCard = context.Deck.Pop(); context.Hand.Add(topCard); context.Hand.Shuffle();
+
+}
+
+}
+
+effect {
+
+Name: "Return ToDeck",
+
+Action: (targets, context) => {
+
+for target in targets {
+owner = target.Owner;
+deck = context.DeckOfPlayer (owner);
+deck. Push(target); deck.Shuffle(); context.Board. Remove (target);
+};
+
+}
+
+}

@@ -102,7 +102,7 @@ namespace Gwent_Interpreter
                         } //scape sequences
                         else currentToken += currentLine[column];
                     }
-                    else if (currentLine[column] == ' ') { }
+                    else if (currentLine[column] == ' ' || currentLine[column] == '\t') { }
                     else
                     {
                         if (stringPattern.IsMatch(currentLine[column].ToString()))

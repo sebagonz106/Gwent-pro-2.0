@@ -116,7 +116,7 @@ namespace Gwent_Interpreter
                             if (!MatchAndMove(TokenType.Lambda)) throw new ParsingError("Invalid Action declaration" + positionForErrorBuilder + " (=>)' expected after targets and context idenfiers)");
 
                             if (MatchAndMove(TokenType.OpenBrace)) body = ActionBody();
-                            else body = SingleStatement();
+                            else body = Statement();
 
                             if (body is null) throw new ParsingError("Invalid Action declaration" + positionForErrorBuilder + " (body expected)");
                         }
@@ -384,23 +384,7 @@ namespace Gwent_Interpreter
             if (environments.Count > 1) environments.Push(new Environment(environments.Peek()));
             do
             {
-                try
-                {
-                    if (MatchAndStay(TokenType.End))  throw new ParsingError($"Unfinished statement ('}}' missing) {positionForErrorBuilder}");
-
-                    else if (MatchAndMove(TokenType.If)) statements.Add(If());
-
-                    else if (MatchAndMove(TokenType.While)) statements.Add(While());
-
-                    else if (MatchAndMove(TokenType.For)) statements.Add(For());
-
-                    else statements.Add(SingleStatement());
-                }
-                catch (ParsingError error)
-                {
-                    if (PanicMode(error.Message, TokenType.Semicolon)) break;
-                }
-
+                statements.Add(Statement());
             } while (!MatchAndMove(TokenType.CloseBrace));
 
             MatchAndMove(TokenType.Semicolon);
@@ -408,6 +392,28 @@ namespace Gwent_Interpreter
             if (environments.Count > 1) environments.Pop();
 
             return new StatementBlock(statements);
+        }
+
+        IStatement Statement()
+        {
+            try
+            {
+                if (MatchAndStay(TokenType.End)) throw new ParsingError($"Unfinished statement ('}}' missing) {positionForErrorBuilder}");
+
+                else if (MatchAndMove(TokenType.If)) return If();
+
+                else if (MatchAndMove(TokenType.While)) return While();
+
+                else if (MatchAndMove(TokenType.For)) return For();
+
+                else return SingleStatement();
+            }
+            catch (ParsingError error)
+            {
+                if (PanicMode(error.Message, TokenType.Semicolon)) return null;
+            }
+
+            throw new ParsingError($"Invalid statement {positionForErrorBuilder}");
         }
 
         IStatement If()
@@ -420,12 +426,12 @@ namespace Gwent_Interpreter
             if (!MatchAndMove(TokenType.CloseParen)) throw new ParsingError($"Invalid if statement declaration (')' missing) {positionForErrorBuilder}");
 
             if (MatchAndMove(TokenType.OpenBrace)) stmt = ActionBody();
-            else stmt = SingleStatement();
+            else stmt = Statement();
 
             if (MatchAndMove(TokenType.Else))
             {
                 if (MatchAndMove(TokenType.OpenBrace)) stmt = new If(condition, stmt, coordinates, ActionBody());
-                else stmt = new If(condition, stmt, coordinates, SingleStatement());
+                else stmt = new If(condition, stmt, coordinates, Statement());
             }
             else stmt = new If(condition, stmt, coordinates);
 
@@ -443,7 +449,7 @@ namespace Gwent_Interpreter
             IStatement body = null;
 
             if (MatchAndMove(TokenType.OpenBrace)) body = ActionBody();
-            else body = SingleStatement();
+            else body = Statement();
 
             return new While(condition, body, coordinates);
 
@@ -461,7 +467,7 @@ namespace Gwent_Interpreter
 
             IStatement body = null;
             if (MatchAndMove(TokenType.OpenBrace)) body = ActionBody();
-            else body = SingleStatement();
+            else body = Statement();
 
             return new For(item, collection, environments.Peek(), body);
         }

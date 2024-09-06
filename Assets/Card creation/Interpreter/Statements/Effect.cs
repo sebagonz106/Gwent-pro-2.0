@@ -63,7 +63,7 @@ namespace Gwent_Interpreter.Statements
                     case "Object":
                         break;
                     default:
-                        throw new ParsingError($"Invalid return type expression received in param at {pair.Item1.Coordinates} (return types include: \"String\", \"Num\", \"Bool\", \"Object\")");
+                        throw new ParsingError($"Invalid return type expression received in param at {pair.Item1.Coordinates} (return types include: \"String\", \"Number\", \"Bool\", \"Card\", \"List\" and \"Object\")");
                 }
 
                 _params.Add(pair.Item1.Value, temp);

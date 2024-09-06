@@ -155,7 +155,14 @@ namespace Gwent_Interpreter.Statements
                 }
             });
 
-            CardDeclaration.Add(name, Code);
+            try
+            {
+                CardDeclaration.Add(name, Code);
+            }
+            catch(ArgumentException exc)
+            {
+                throw new EvaluationError($"A card with the same name as the one at {Coordinates} has already been declared");
+            }
         }
 
         string position => $"in card declaration at {coordinates.Item1}:{coordinates.Item2}";
