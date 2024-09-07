@@ -159,7 +159,7 @@ namespace Gwent_Interpreter.Statements
             {
                 CardDeclaration.Add(name, Code);
             }
-            catch(ArgumentException exc)
+            catch(ArgumentException)
             {
                 throw new EvaluationError($"A card with the same name as the one at {Coordinates} has already been declared");
             }

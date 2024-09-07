@@ -50,8 +50,7 @@ public class DoubleClick : MonoBehaviour
         {
             if (clickCount>=2)
             {
-                masterController.SavePanelOnWhenInformationDisplayed(false);
-                masterController.OpenInfo(cardController.Info);
+                cardController.OpenInfoPanel();
                 break;
             }
             yield return new WaitForEndOfFrame();

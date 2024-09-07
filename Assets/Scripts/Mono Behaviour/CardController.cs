@@ -225,13 +225,14 @@ public class CardController : MonoBehaviour
         cardController.transform.position = Vector3.MoveTowards(cardController.transform.position, cardController.upPosition, step);
     }
 
-    private void OpenInfoPanel(Card card, bool leader = false)
+    public void OpenInfoPanel(Card card = null, bool leader = false)
     {
         if (!isOccupied)
         {
             masterController.GeneralException();
             return;
         }
+        else if (card is null) card = GetList()[indexOfThisInParent];
 
         masterController.SavePanelOnWhenInformationDisplayed(false);
         if (card.Info.Main is null) masterController.OpenInfo(this.Info, leader);
@@ -267,6 +268,7 @@ public class CardController : MonoBehaviour
     }
 
     List<Card> GetList () => this.gameObject.tag == "WeatherCard" ? board.Weather :
+                             this.gameObject.tag == "HandCard" ? this.player.Hand :
                              this.gameObject.tag == "BonusCard" ? this.player.Battlefield.Bonus : 
                              this.player.ListByZone[rangeTypes[0]];
     #endregion
