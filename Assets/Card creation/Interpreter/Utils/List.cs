@@ -11,17 +11,27 @@ namespace Gwent_Interpreter.Utils
         Board board;
         Player player;
 
-        public int Count => list.Count;
+        public int Count
+        {
+            get
+            {
+                int count = list.Count;
+                foreach (var item in list)
+                    if (item.Equals(Getter.BaseCard)) count--;
+
+                return count;
+            }
+        }
 
         public bool IsReadOnly => false;
 
-        Card IList<Card>.this[int index] { get => list[index]; set => list[index] = value; }
+        Card IList<Card>.this[int index] { get => this[index]; set => this[index] = value; }
 
         public GwentList(List<Card> list, Player player = null)
         {
             this.list = list;
-            if (player is null) board = Board.Instance;
-            else this.player = player;
+            board = Board.Instance;
+            this.player = player;
         }
         public GwentList()
         {
@@ -31,36 +41,42 @@ namespace Gwent_Interpreter.Utils
 
         public Card this[Num index]
         {
-            get => list[Convert.ToInt32(index.Value)];
-            set => list[Convert.ToInt32(index.Value)] = value;
+            get => this[Convert.ToInt32(index.Value)];
+            set => this[Convert.ToInt32(index.Value)] = value;
         }
         public Card this[int index]
         {
             get => list[index];
-            set => list[index] = value;
+            set
+            {
+                bool deckOrGraveyard = (player is null ? false : list.Equals(player.Deck) || list.Equals(player.Battlefield.Graveyard));
+                board.Receive(new AddOperation(value, list, index, deckOrGraveyard));
+                board.Receive(new RemoveOperation(list[index], list, index, deckOrGraveyard));
+
+                list[index] = value;
+            }
         }
 
-        public void Remove(Card card)
-        {
-            Player player = this.player;
-            if (player is null) player = card.FactionEnum == Faction.Fidel ? Player.Fidel : Player.Batista;
-
-            player.Battlefield.ToGraveyard(card);
-        }
+        public void Remove(Card card) => card.Owner.Battlefield.ToGraveyard(card);
         public GwentList Find(Predicate<Card> predicate) => new GwentList(list.FindAll(predicate), player);
         public void Push(Card card)
         {
-            if (list.Equals(player.Deck)) list.Add(card);
+            if (!(player is null) && (list.Equals(player.Deck) || list.Equals(player.Battlefield.Graveyard)))
+            {
+                list.Add(card);
+                board.Receive(new AddOperation(card, list, list.Count-1, true));
+            }
             else Insert(list.Count - 1, card);
         }
         public Card Pop()
         {
             Card card = null;
 
-            if (!(player is null) && list.Equals(player.Deck))
+            if ( !(player is null) && (list.Equals(player.Deck) || list.Equals(player.Battlefield.Graveyard)) )
             {
-                card = player.Deck[player.Deck.Count - 1];
-                player.Deck.RemoveAt(player.Deck.Count - 1);
+                card = list[list.Count - 1];
+                board.Receive(new RemoveOperation(card, list, list.Count - 1, true));
+                list.RemoveAt(list.Count - 1);
             }
             else for (int i = list.Count-1; i >= 0; i--)
             {
@@ -69,6 +85,7 @@ namespace Gwent_Interpreter.Utils
                 else
                 {
                     list[i] = Getter.BaseCard;
+                    board.Receive(new RemoveOperation(card, list, i, false));
                     break;
                 }
             }
@@ -84,23 +101,24 @@ namespace Gwent_Interpreter.Utils
         {
             if (item.Equals(Getter.BaseCard)) return;
 
-            if(!(this.player is null) && list.Equals(this.player.Deck))
+            if (!(player is null) && (list.Equals(player.Deck) || list.Equals(player.Battlefield.Graveyard)))
             {
                 list.Insert(index, item);
+                board.Receive(new AddOperation(item, list, index, true));
             }
             else
             {
-                if (list[index].Name == "Empty") list[index] = item;
+                if (list[index].Equals(Getter.BaseCard)) list[index] = item;
                 else
                 {
                     Card temp = list[index];
                     list[index] = item;
+                    board.Receive(new RemoveOperation(temp, list, index));
                     MyAdd(temp, index + 1);
                 }
 
-                Player player = this.player;
-                if (player is null) player = list[index].FactionEnum == Faction.Fidel ? Player.Fidel : Player.Batista;
-                if (list.Equals(player.Hand)) player.UpdateEmptySlots();
+                board.Receive(new AddOperation(item, list, index));
+                if (list.Equals(item.Owner.Hand)) item.Owner.UpdateEmptySlots();
             }
         }
 
@@ -116,7 +134,11 @@ namespace Gwent_Interpreter.Utils
             else if (!(player is null))
             {
                 if (player.Hand.Equals(list)) player.AddToHand(item);
-                else if (player.Deck.Equals(list)) player.Deck.Add(item);
+                else if (player.Deck.Equals(list) || player.Battlefield.Graveyard.Equals(list))
+                {
+                    board.Receive(new AddOperation(item, list, list.Count, true));
+                    list.Add(item);
+                }
             }
             else MyAdd(item);
         }
@@ -125,7 +147,12 @@ namespace Gwent_Interpreter.Utils
         {
             for (int i = startIndex; i - startIndex < list.Count; i++)
             {
-                if (list[i % list.Count].Name == "Empty") { list[i % list.Count] = item; break; }
+                if (list[i % list.Count].Equals(Getter.BaseCard))
+                {
+                    list[i % list.Count] = item;
+                    board.Receive(new AddOperation(item, list, i % list.Count));
+                    break;
+                }
             }
         }
 
