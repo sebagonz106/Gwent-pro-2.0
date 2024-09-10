@@ -117,7 +117,7 @@ card {
         {
             Effect: "Draw",
             Selector: {
-                Source: "dekk",
+                Source: "deck",
                 Single: true,
                 Predicate: (unit) => true
             },
