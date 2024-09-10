@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Gwent_Interpreter.Utils
 {
@@ -174,15 +175,7 @@ namespace Gwent_Interpreter.Utils
             else return false;
         }
 
-        public IEnumerator<Card> GetEnumerator()
-        {
-            List<Card> newList = new List<Card>();
-            foreach (var card in list)
-            {
-                if (!card.Equals(Getter.BaseCard)) newList.Add(card);
-            }
-            return newList.GetEnumerator();
-        }
+        public IEnumerator<Card> GetEnumerator() => list.Where((Card card) => !card.Equals(Getter.BaseCard)).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
     }

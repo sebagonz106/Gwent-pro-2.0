@@ -75,11 +75,11 @@ amount: 5, // ... y tener estos parámetros.
 
 Selector: {
 
-Source: "board", // o "hand", "otherHand", "deck", "otherDeck", "field", "otherField", "parent".
+Source: "otherField", // o "hand", "otherHand", "deck", "otherDeck", "field", "otherField", "parent".
 
 Single: false, // aunque por defecto es false.
 
-Predicate: (unit) => unit. Faction == "Fi" @ "del"
+Predicate: (unit) => unit. Faction == "Batista"
 
 }
 
@@ -93,7 +93,7 @@ Source: "parent",
 
 Single: false,
 
-Predicate: (unit) => unit.Power <= 2
+Predicate: (unit) => unit.Power >= 2
 }
 
 }
