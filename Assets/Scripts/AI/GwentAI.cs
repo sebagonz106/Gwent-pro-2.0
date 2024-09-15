@@ -95,7 +95,7 @@ namespace Gwent_AI
                         }
                     }
 
-                    if(Utils.GetEnemyOf(player).Battlefield.CardsInBattlefield.Count <= 2 && card is UnitCard unit && unit.Level is Level.Golden)
+                    if(Utils.GetEnemyOf(player).Battlefield.CardsInBattlefield.Count <= 2 && card is UnitCard unit && unit.Level is Level.Golden && player.Hand.Count>3)
                     {
                         board.Undo();
                         continue;

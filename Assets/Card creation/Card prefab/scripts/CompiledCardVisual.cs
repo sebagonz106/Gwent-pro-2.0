@@ -53,6 +53,8 @@ public class CompiledCardVisual : MonoBehaviour
         }
 
         range.text = "";
+        hasRange = hasRange && card.AvailableRange.Count > 0;
+
         if (hasRange)
         {
             foreach (var item in card.AvailableRange)

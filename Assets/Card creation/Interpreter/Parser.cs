@@ -625,7 +625,7 @@ namespace Gwent_Interpreter
             if (MatchAndMove(TokenType.OpenParen))
             {
                 expr = Boolean();
-                if (tokens.Current.Type != TokenType.CloseParen && !(expr is Predicate))
+                if (!(expr is Predicate) && !MatchAndMove(TokenType.CloseParen))
                     throw new ParsingError($"Unclosed parenthesis {positionForErrorBuilder}");
             }
             else
